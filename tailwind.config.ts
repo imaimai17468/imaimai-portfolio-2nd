@@ -65,6 +65,7 @@ const config = {
       },
       fontFamily: {
         raleway: ["Raleway", "sans-serif"],
+        nakamori: ["Nakamori", "sans-serif"],
       },
       keyframes: {
         "accordion-down": {
