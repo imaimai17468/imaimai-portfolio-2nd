@@ -18,7 +18,7 @@ type Props = {
 export const MovieModal: React.FC<Props> = ({ title, description, src }) => {
   return (
     <Dialog>
-      <DialogTrigger>
+      <DialogTrigger asChild>
         <Button variant="ghost" size="icon">
           <InfoIcon />
         </Button>
