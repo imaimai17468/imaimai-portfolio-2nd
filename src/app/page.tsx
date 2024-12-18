@@ -1,9 +1,5 @@
-import { Button } from "@/components/ui/button";
+import { Top } from "@/components/feature/top";
 
 export default function Home() {
-  return (
-    <main>
-      <Button>Get Started!</Button>
-    </main>
-  );
+  return <Top />;
 }
