@@ -6,15 +6,22 @@ export const Top: React.FC = () => {
       <div className="flex flex-col items-center justify-center h-screen">
         <div className="w-fit">
           <h1 className="text-6xl font-raleway font-black">CREATOR's HIGH</h1>
-          <p className="text-end">－ 開発でキマろう</p>
+          <p className="text-end">－ 開発でキマれ</p>
         </div>
       </div>
-      <div className="flex flex-col gap-4 items-center justify-center h-screen">
-        <p className="text-9xl font-nakamori">
-          筆先の黒は
+      <div className="flex flex-col gap-28 items-center justify-center h-screen">
+        <h1 className="text-9xl font-nakamori">
+          <span className="transform scale-150 translate-y-2 translate-x-4 inline-block">筆</span>
+          <span className="transform scale-140 translate-y-8 translate-x-8 inline-block">先</span>
+          <span className="transform scale-100 translate-y-8 translate-x-4 inline-block">の</span>
+          <span className="transform scale-150 translate-y-6 translate-x-4 inline-block">黒</span>
+          <span className="transform scale-170 translate-y-8 translate-x-4 inline-block">は</span>
           <br />
-          乾かすな
-        </p>
+          <span className="transform scale-150 translate-y-16 translate-x-16 inline-block">乾</span>
+          <span className="transform scale-140 translate-y-20 translate-x-20 inline-block">か</span>
+          <span className="transform scale-160 translate-y-20 translate-x-16 inline-block">す</span>
+          <span className="transform scale-125 translate-y-16 translate-x-16 inline-block">な</span>
+        </h1>
         <MovieModal description="Respect" src="https://www.youtube.com/embed/62_EvhRoj2g?si=1bOmyya8zY_fb9q6" />
       </div>
     </div>
