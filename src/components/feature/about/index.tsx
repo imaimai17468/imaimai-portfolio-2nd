@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MonitorIcon, Tickets, UserIcon } from "lucide-react";
 import Image from "next/image";
@@ -29,10 +28,7 @@ export const About: React.FC = () => {
           </div>
 
           <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-2">
-              <Badge className="bg-green-400 text-zinc-900 mt-[3px]">2024 ~</Badge>
-              <h3 className="text-lg mt-1">株式会社ゆめみ</h3>
-            </div>
+            <h3 className="text-lg mt-1">株式会社ゆめみ</h3>
             <ul className="flex flex-col gap-2 pl-4 border-l-2 border-zinc-500 text-sm">
               <li className="flex gap-2 items-center">
                 <MonitorIcon className="w-4 h-4" />
