@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { FlipWords } from "@/components/ui/flip-words";
 import { MonitorIcon, Tickets, UserIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -8,25 +9,23 @@ export const About: React.FC = () => {
     <div className="max-w-3xl mx-auto font-light h-screen flex justify-center flex-col gap-16" aria-label="私について">
       <div className="w-full flex justify-between items-center">
         <div className="flex flex-col gap-8">
-          <div className="flex flex-col gap-2">
-            <div className="flex items-end gap-4">
-              <h1 className="text-6xl font-black">いまいまい</h1>
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" asChild>
-                  <Link href="https://github.com/imaimai17468">
-                    <Image src="/images/github-mark-white.svg" alt="いまいまいのGitHub" width={20} height={20} />
-                  </Link>
-                </Button>
-                <Button variant="ghost" size="icon" asChild>
-                  <Link href="https://x.com/imaimai17468">
-                    <Image src="/images/x-logo-white.png" alt="いまいまいのX（旧Twitter）" width={20} height={20} />
-                  </Link>
-                </Button>
-              </div>
+          <div className="flex flex-col gap-4">
+            <div className="text-6xl font-black">
+              <FlipWords words={["いまいまい", "imaimai17468", "Toshiki Imai"]} className="px-0" />
             </div>
-            <p className="text-lg text-zinc-500">imaimai17468 - Toshiki Imai</p>
           </div>
-
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" asChild>
+              <Link href="https://github.com/imaimai17468">
+                <Image src="/images/github-mark-white.svg" alt="いまいまいのGitHub" width={20} height={20} />
+              </Link>
+            </Button>
+            <Button variant="ghost" size="icon" asChild>
+              <Link href="https://x.com/imaimai17468">
+                <Image src="/images/x-logo-white.png" alt="いまいまいのX（旧Twitter）" width={20} height={20} />
+              </Link>
+            </Button>
+          </div>
           <div className="flex flex-col gap-4">
             <h3 className="text-lg mt-1">株式会社ゆめみ</h3>
             <ul className="flex flex-col gap-2 pl-4 border-l-2 border-zinc-500 text-sm">
