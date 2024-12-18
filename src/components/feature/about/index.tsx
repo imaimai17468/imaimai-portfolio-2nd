@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export const About: React.FC = () => {
   return (
-    <div className="max-w-3xl mx-auto font-light h-screen flex justify-center flex-col gap-16">
+    <div className="max-w-3xl mx-auto font-light h-screen flex justify-center flex-col gap-16" aria-label="私について">
       <div className="w-full flex justify-between items-center">
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-2">
