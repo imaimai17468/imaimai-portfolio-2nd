@@ -1,5 +1,5 @@
+import { Menu } from "@/components/parts/menu";
 import { TopLayout } from "./layout";
-import { Menu } from "./menu";
 
 export const Top: React.FC = () => {
   return (
