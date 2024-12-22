@@ -23,5 +23,5 @@ export const ScrollCounts: React.FC = () => {
     };
   }, [handleScroll]);
 
-  return <div className="fixed bottom-4 right-4 text-2xl text-zinc-500">{scrollPercentage} / 100</div>;
+  return <div className="fixed top-4 right-4 text-2xl text-zinc-500">{scrollPercentage} / 100</div>;
 };
