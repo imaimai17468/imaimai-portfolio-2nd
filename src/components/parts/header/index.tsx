@@ -3,7 +3,7 @@ import type React from "react";
 
 export const Header: React.FC = () => {
   return (
-    <header className="w-fit p-2 rotate-90 fixed top-28 -left-24 flex gap-4 text-zinc-500">
+    <header className="w-fit p-2 fixed bottom-4 right-4 flex gap-4">
       <p>imaimai portfolio</p>
       <p>-</p>
       <Link
