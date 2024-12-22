@@ -121,8 +121,12 @@ const data = [
         </div>
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-2">
-            <Badge className="bg-green-500 text-white w-fit">Prize</Badge>
+            <Badge className="bg-green-500 text-white w-fit">Result</Badge>
             <ul className="flex flex-col gap-2 text-sm">
+              <li className="flex items-center">
+                <Dot className="shrink-0" />
+                <p>第一回技育博にNUTMEGの代表として参加</p>
+              </li>
               <li className="flex items-center">
                 <Dot className="shrink-0" />
                 <p>技育展 2023 企業賞</p>
@@ -168,15 +172,15 @@ const data = [
             <ul className="flex flex-col gap-2 pl-4 border-l-2 border-zinc-500 text-sm">
               <li className="flex gap-2 items-center">
                 <UserIcon className="w-4 h-4" />
-                <p>電気電子情報工学課程</p>
+                <p>電子制御工学科</p>
               </li>
               <li className="flex gap-2 items-center">
                 <Search className="w-4 h-4" />
-                <p>睡眠時脳波の構造解析</p>
+                <p>光学式心拍センサの精度評価</p>
               </li>
               <li className="flex gap-2 items-center">
                 <Tickets className="w-4 h-4" />
-                <p>学園祭実行委員会 情報局 (NUTMEG)</p>
+                <p>プログラミング研究同好会</p>
               </li>
             </ul>
           </div>
@@ -185,51 +189,40 @@ const data = [
             <ul className="flex flex-col gap-2 text-sm">
               <li className="flex items-center">
                 <Dot />
-                <p>学園祭で使われる資金の管理アプリ</p>
+                <p>文化祭での自作ゲーム展示</p>
               </li>
               <li className="flex items-center">
                 <Dot />
-                <p>サークルメンバーの育成管理アプリ</p>
+                <p>研究室の鍵のカードキーシステム化</p>
               </li>
               <li className="flex items-center">
                 <Dot />
-                <p>駐車場空き情報のリアルタイム監視アプリ</p>
+                <p>学校の単位数計算サイト</p>
               </li>
             </ul>
           </div>
         </div>
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-2">
-            <Badge className="bg-green-500 text-white w-fit">Prize</Badge>
+            <Badge className="bg-green-500 text-white w-fit">Result</Badge>
             <ul className="flex flex-col gap-2 text-sm">
               <li className="flex items-center">
                 <Dot className="shrink-0" />
-                <p>技育展 2023 企業賞</p>
+                <p>Paiza S</p>
+              </li>
+              <li className="flex items-center">
+                <Dot className="shrink-0" />
+                <p>AtCoder緑</p>
               </li>
             </ul>
           </div>
           <div className="flex flex-col gap-2">
             <Badge className="bg-green-500 text-white w-fit">Works</Badge>
-            <p className="text-sm border-b border-zinc-300 pb-1 border-dashed">スタートアップA社</p>
+            <p className="text-sm border-b border-zinc-300 pb-1 border-dashed">paiza Inc.</p>
             <ul className="flex flex-col gap-2 text-sm">
               <li className="flex items-center">
                 <Dot className="shrink-0" />
-                <p>修理の受注/発注ができるLINEアプリの開発</p>
-              </li>
-            </ul>
-            <p className="text-sm border-b border-zinc-300 pb-1 border-dashed">スタートアップB社</p>
-            <ul className="flex flex-col gap-2 text-sm">
-              <li className="flex items-center">
-                <Dot className="shrink-0" />
-                <p>建築関係のマッチングプラットフォームの開発</p>
-              </li>
-              <li className="flex items-center">
-                <Dot className="shrink-0" />
-                <p>学会の抄録冊子の自動作成サービス</p>
-              </li>
-              <li className="flex items-center">
-                <Dot className="shrink-0" />
-                <p>履歴書の自動PDF化・管理サービス</p>
+                <p>競技プログラミング問題集の作問</p>
               </li>
             </ul>
           </div>
