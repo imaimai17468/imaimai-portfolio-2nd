@@ -1,7 +1,23 @@
 "use client";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
+
+const generateRandomBeams = (count: number) => {
+  const heightClasses = ["h-8", "h-10", "h-12", "h-14", "h-16"];
+
+  return Array.from({ length: count }, () => {
+    const initialX = Math.floor(Math.random() * 1600);
+    return {
+      initialX,
+      translateX: initialX,
+      duration: Math.random() * 10 + 3,
+      repeatDelay: Math.random() * 5 + 1,
+      delay: Math.random() * 3,
+      className: heightClasses[Math.floor(Math.random() * heightClasses.length)],
+    };
+  });
+};
 
 export const BackgroundBeamsWithCollision = ({
   children,
@@ -13,58 +29,7 @@ export const BackgroundBeamsWithCollision = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const parentRef = useRef<HTMLDivElement>(null);
 
-  const beams = [
-    {
-      initialX: 10,
-      translateX: 10,
-      duration: 7,
-      repeatDelay: 3,
-      delay: 2,
-    },
-    {
-      initialX: 600,
-      translateX: 600,
-      duration: 3,
-      repeatDelay: 3,
-      delay: 4,
-    },
-    {
-      initialX: 100,
-      translateX: 100,
-      duration: 7,
-      repeatDelay: 7,
-      className: "h-6",
-    },
-    {
-      initialX: 400,
-      translateX: 400,
-      duration: 5,
-      repeatDelay: 14,
-      delay: 4,
-    },
-    {
-      initialX: 800,
-      translateX: 800,
-      duration: 11,
-      repeatDelay: 2,
-      className: "h-20",
-    },
-    {
-      initialX: 1000,
-      translateX: 1000,
-      duration: 4,
-      repeatDelay: 2,
-      className: "h-12",
-    },
-    {
-      initialX: 1200,
-      translateX: 1200,
-      duration: 6,
-      repeatDelay: 4,
-      delay: 2,
-      className: "h-6",
-    },
-  ];
+  const beams = useMemo(() => generateRandomBeams(20), []);
 
   return (
     <div
@@ -75,9 +40,9 @@ export const BackgroundBeamsWithCollision = ({
         className,
       )}
     >
-      {beams.map((beam) => (
+      {beams.map((beam, index) => (
         <CollisionMechanism
-          key={`${beam.initialX}beam-idx`}
+          key={`${beam.initialX}-${index}`}
           beamOptions={beam}
           containerRef={containerRef}
           parentRef={parentRef}
