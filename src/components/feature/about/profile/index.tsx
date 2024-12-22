@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { FlipWords } from "@/components/ui/flip-words";
-import { MonitorIcon, Tickets, UserIcon } from "lucide-react";
+import { Cake, PenTool } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -25,21 +25,31 @@ export const Profile: React.FC = () => {
                 <Image src="/images/x-logo-white.png" alt="いまいまいのX（旧Twitter）" width={20} height={20} />
               </Link>
             </Button>
+            <Button variant="ghost" size="icon" asChild>
+              <Link href="https://note.com/imaimai17468">
+                <Image src="/images/note.svg" alt="いまいまいのnote" width={20} height={20} />
+              </Link>
+            </Button>
+            <Button variant="ghost" size="icon" asChild>
+              <Link href="https://zenn.dev/imaimai17468">
+                <Image src="/images/zenn.svg" alt="いまいまいのZenn" width={20} height={20} />
+              </Link>
+            </Button>
+            <Button variant="ghost" size="icon" asChild>
+              <Link href="https://speakerdeck.com/imaimai17468">
+                <Image src="/images/speaker-deck.png" alt="いまいまいのSpeaker Deck" width={20} height={20} />
+              </Link>
+            </Button>
           </div>
           <div className="flex flex-col gap-4">
-            <h3 className="text-lg mt-1">株式会社ゆめみ</h3>
             <ul className="flex flex-col gap-2 pl-4 border-l-2 border-zinc-500 text-sm">
               <li className="flex gap-2 items-center">
-                <MonitorIcon className="w-4 h-4" />
-                <p>フロントエンドエンジニア</p>
+                <Cake className="w-4 h-4" />
+                <p>2001-08-01</p>
               </li>
               <li className="flex gap-2 items-center">
-                <UserIcon className="w-4 h-4" />
-                <p>リクルーター</p>
-              </li>
-              <li className="flex gap-2 items-center">
-                <Tickets className="w-4 h-4" />
-                <p>技育プロジェクト担当</p>
+                <PenTool className="w-4 h-4" />
+                <p>開発・料理</p>
               </li>
             </ul>
           </div>
