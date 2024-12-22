@@ -1,11 +1,11 @@
 import { BackgroundAnimation } from "@/components/feature/top/background-animation";
 import { Header } from "@/components/parts/header";
 
-type MainLayoutProps = {
+type TopLayoutProps = {
   children: React.ReactNode;
 };
 
-export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+export const TopLayout: React.FC<TopLayoutProps> = ({ children }) => {
   return (
     <div>
       <Header />
