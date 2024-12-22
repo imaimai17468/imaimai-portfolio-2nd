@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { FlipWords } from "@/components/ui/flip-words";
-import { Cake, PenTool } from "lucide-react";
+import { Cake, Heart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -48,7 +48,7 @@ export const Profile: React.FC = () => {
                 <p>2001-08-01</p>
               </li>
               <li className="flex gap-2 items-center">
-                <PenTool className="w-4 h-4" />
+                <Heart className="w-4 h-4" />
                 <p>開発・料理</p>
               </li>
             </ul>
