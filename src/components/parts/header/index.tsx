@@ -8,7 +8,7 @@ export const Header: React.FC = () => {
       <p>-</p>
       <Link
         href="https://github.com/imaimai17468/imaimai-portfolio-2nd"
-        className="hover:text-zinc-300 transition-colors duration-300"
+        className="hover:text-zinc-500 transition-colors duration-300"
       >
         <p>GitHub</p>
       </Link>
