@@ -1,5 +1,6 @@
 "use client";
 
+import { Mouse } from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -23,5 +24,10 @@ export const ScrollCounts: React.FC = () => {
     };
   }, [handleScroll]);
 
-  return <div className="fixed top-4 right-4 text-2xl text-zinc-500">{scrollPercentage} / 100</div>;
+  return (
+    <div className="flex items-center gap-2 fixed top-4 right-4">
+      <Mouse className="w-4 h-4 text-zinc-500 animate-bounce" />
+      <p className="text-zinc-500">{scrollPercentage} / 100</p>
+    </div>
+  );
 };
