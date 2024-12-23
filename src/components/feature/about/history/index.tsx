@@ -45,6 +45,15 @@ const data = [
         </div>
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-2">
+            <Badge className="bg-green-500 text-white w-fit">Owner</Badge>
+            <ul className="flex flex-col gap-2 text-sm">
+              <li className="flex items-center">
+                <Dot className="shrink-0" />
+                <p>mixi2 フロントエンド部</p>
+              </li>
+            </ul>
+          </div>
+          <div className="flex flex-col gap-2">
             <Badge className="bg-green-500 text-white w-fit">Speaker</Badge>
             <ul className="flex flex-col gap-2 text-sm">
               <li className="flex items-center">
@@ -74,15 +83,6 @@ const data = [
               <li className="flex items-center">
                 <Dot className="shrink-0" />
                 <p>ゆめみ x LayerX x サイボウズ3社合同フロントエンドカンファレンス北海道2024後夜祭＠東京</p>
-              </li>
-            </ul>
-          </div>
-          <div className="flex flex-col gap-2">
-            <Badge className="bg-green-500 text-white w-fit">Owner</Badge>
-            <ul className="flex flex-col gap-2 text-sm">
-              <li className="flex items-center">
-                <Dot className="shrink-0" />
-                <p>mixi2 フロントエンド部</p>
               </li>
             </ul>
           </div>
