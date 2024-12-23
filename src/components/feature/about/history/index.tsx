@@ -43,38 +43,49 @@ const data = [
             </ul>
           </div>
         </div>
-        <div className="flex flex-col gap-2">
-          <Badge className="bg-green-500 text-white w-fit">Speaker</Badge>
-          <ul className="flex flex-col gap-2 text-sm">
-            <li className="flex items-center">
-              <Dot className="shrink-0" />
-              <p>BEELT : BEENOS LT会</p>
-            </li>
-            <li className="flex items-center">
-              <Dot className="shrink-0" />
-              <p>ゆめみ x はてな LT会</p>
-            </li>
-            <li className="flex items-center">
-              <Dot className="shrink-0" />
-              <p>ゆめみ x タイミー アクセシビリティLT会</p>
-            </li>
-            <li className="flex items-center">
-              <Dot className="shrink-0" />
-              <p>フロントエンドカンファレンス北海道</p>
-            </li>
-            <li className="flex items-center">
-              <Dot className="shrink-0" />
-              <p>ゆめみ x bitkey LT会</p>
-            </li>
-            <li className="flex items-center">
-              <Dot className="shrink-0" />
-              <p>フロントエンドカンファレンス北海道2024アフタートーク Online</p>
-            </li>
-            <li className="flex items-center">
-              <Dot className="shrink-0" />
-              <p>ゆめみ x LayerX x サイボウズ3社合同フロントエンドカンファレンス北海道2024後夜祭＠東京</p>
-            </li>
-          </ul>
+        <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-2">
+            <Badge className="bg-green-500 text-white w-fit">Speaker</Badge>
+            <ul className="flex flex-col gap-2 text-sm">
+              <li className="flex items-center">
+                <Dot className="shrink-0" />
+                <p>BEELT : BEENOS LT会</p>
+              </li>
+              <li className="flex items-center">
+                <Dot className="shrink-0" />
+                <p>ゆめみ x はてな LT会</p>
+              </li>
+              <li className="flex items-center">
+                <Dot className="shrink-0" />
+                <p>ゆめみ x タイミー アクセシビリティLT会</p>
+              </li>
+              <li className="flex items-center">
+                <Dot className="shrink-0" />
+                <p>フロントエンドカンファレンス北海道</p>
+              </li>
+              <li className="flex items-center">
+                <Dot className="shrink-0" />
+                <p>ゆめみ x bitkey LT会</p>
+              </li>
+              <li className="flex items-center">
+                <Dot className="shrink-0" />
+                <p>フロントエンドカンファレンス北海道2024アフタートーク Online</p>
+              </li>
+              <li className="flex items-center">
+                <Dot className="shrink-0" />
+                <p>ゆめみ x LayerX x サイボウズ3社合同フロントエンドカンファレンス北海道2024後夜祭＠東京</p>
+              </li>
+            </ul>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Badge className="bg-green-500 text-white w-fit">Owner</Badge>
+            <ul className="flex flex-col gap-2 text-sm">
+              <li className="flex items-center">
+                <Dot className="shrink-0" />
+                <p>mixi2 フロントエンド部</p>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     ),
@@ -212,7 +223,7 @@ const data = [
               </li>
               <li className="flex items-center">
                 <Dot className="shrink-0" />
-                <p>AtCoder緑</p>
+                <p>AtCoder 緑</p>
               </li>
             </ul>
           </div>
