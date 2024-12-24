@@ -22,12 +22,12 @@ export const Profile: React.FC = () => {
             </Button>
             <Button variant="ghost" size="icon" asChild>
               <Link href="https://x.com/imaimai17468">
-                <Image src="/images/x-logo-white.png" alt="いまいまいのX（旧Twitter）" width={20} height={20} />
+                <Image src="/images/x-logo-white.png" alt="いまいまいのX（旧Twitter）" width={16} height={16} />
               </Link>
             </Button>
             <Button variant="ghost" size="icon" asChild>
               <Link href="https://note.com/imaimai17468">
-                <Image src="/images/note.svg" alt="いまいまいのnote" width={20} height={20} />
+                <Image src="/images/note.svg" alt="いまいまいのnote" width={24} height={24} />
               </Link>
             </Button>
             <Button variant="ghost" size="icon" asChild>
