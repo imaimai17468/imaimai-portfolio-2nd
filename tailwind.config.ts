@@ -69,6 +69,7 @@ const config = {
       fontFamily: {
         raleway: ["Raleway", "sans-serif"],
         nakamori: ["Nakamori", "sans-serif"],
+        cinecaption: ["cinecaption", "sans-serif"],
       },
       keyframes: {
         "accordion-down": {
