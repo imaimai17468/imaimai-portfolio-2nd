@@ -42,6 +42,27 @@ const data = [
               </li>
             </ul>
           </div>
+          <div className="flex flex-col gap-2">
+            <Badge className="bg-green-500 text-white w-fit">Event Sponsor</Badge>
+            <ul className="flex flex-col gap-2 text-sm">
+              <li className="flex">
+                <Dot />
+                <p>技育CAMPハッカソン</p>
+              </li>
+              <li className="flex">
+                <Dot />
+                <p>技育CAMPキャラバン</p>
+              </li>
+              <li className="flex">
+                <Dot />
+                <p>技育展 2024</p>
+              </li>
+              <li className="flex">
+                <Dot />
+                <p>アクセシビリティカンファレンス 福岡</p>
+              </li>
+            </ul>
+          </div>
         </div>
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-2">
