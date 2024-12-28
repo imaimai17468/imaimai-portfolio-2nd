@@ -20,36 +20,38 @@ export const BackgroundAnimation: React.FC = () => {
   const poi = useRef<THREE.Mesh>(new THREE.Mesh());
   const float = true;
   return (
-    <Canvas camera={{ position: [10, 15, -10], fov: 45 }}>
-      <ambientLight />
-      <pointLight position={[10, 10, 10]} />
-      <MotionPathControls focus={poi} damping={0.2} focusDamping={0.15}>
-        <Circle />
-        <Loop />
-      </MotionPathControls>
-      <Float floatIntensity={20} rotationIntensity={25} speed={float ? 4 : 0}>
-        <Sticker position={[1, 0, 1]} scale={2} ref={poi} />
-      </Float>
-      <Environment preset="city" background blur={0.5} />
-      <Clouds>
-        <Cloud
-          concentrate="outside"
-          seed={1}
-          segments={100}
-          bounds={20}
-          volume={20}
-          growth={10}
-          opacity={0.15}
-          position={[0, 0, -10]}
-          speed={1}
-        />
-      </Clouds>
-      <EffectComposer multisampling={4}>
-        <HueSaturation saturation={-1} />
-        <TiltShift2 blur={0.5} />
-        <DotScreen scale={2} />
-      </EffectComposer>
-    </Canvas>
+    <div className="fixed top-0 left-0 w-full h-screen z-[-1]">
+      <Canvas camera={{ position: [10, 15, -10], fov: 45 }}>
+        <ambientLight />
+        <pointLight position={[10, 10, 10]} />
+        <MotionPathControls focus={poi} damping={0.2} focusDamping={0.15}>
+          <Circle />
+          <Loop />
+        </MotionPathControls>
+        <Float floatIntensity={20} rotationIntensity={25} speed={float ? 4 : 0}>
+          <Sticker position={[1, 0, 1]} scale={2} ref={poi} />
+        </Float>
+        <Environment preset="city" background blur={0.5} />
+        <Clouds>
+          <Cloud
+            concentrate="outside"
+            seed={1}
+            segments={100}
+            bounds={20}
+            volume={20}
+            growth={10}
+            opacity={0.15}
+            position={[0, 0, -10]}
+            speed={1}
+          />
+        </Clouds>
+        <EffectComposer multisampling={4}>
+          <HueSaturation saturation={-1} />
+          <TiltShift2 blur={0.5} />
+          <DotScreen scale={2} />
+        </EffectComposer>
+      </Canvas>
+    </div>
   );
 };
 

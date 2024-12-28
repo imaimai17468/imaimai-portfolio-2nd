@@ -9,9 +9,7 @@ export const TopLayout: React.FC<TopLayoutProps> = ({ children }) => {
   return (
     <div>
       <Header />
-      <div className="fixed top-0 left-0 w-full h-screen z-[-1]">
-        <BackgroundAnimation />
-      </div>
+      <BackgroundAnimation />
       <main>{children}</main>
     </div>
   );
