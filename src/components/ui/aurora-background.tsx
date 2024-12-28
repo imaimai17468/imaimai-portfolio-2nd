@@ -8,14 +8,9 @@ interface AuroraBackgroundProps extends React.HTMLProps<HTMLDivElement> {
   showRadialGradient?: boolean;
 }
 
-export const AuroraBackground = ({
-  className,
-  children,
-  showRadialGradient = true,
-  ...props
-}: AuroraBackgroundProps) => {
+export const AuroraBackground = ({ className, showRadialGradient = true, ...props }: AuroraBackgroundProps) => {
   return (
-    <main>
+    <main className="fixed inset-0 w-full h-screen -z-10">
       <div
         className={cn("relative flex flex-col  h-[100vh] items-center justify-center transition-bg", className)}
         {...props}
@@ -41,7 +36,6 @@ export const AuroraBackground = ({
             )}
           />
         </div>
-        {children}
       </div>
     </main>
   );
