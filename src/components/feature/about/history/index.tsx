@@ -146,14 +146,14 @@ const data = [
           </div>
           <div className="flex flex-col gap-2">
             <Badge className="bg-green-500 text-white w-fit">Works</Badge>
-            <p className="text-sm border-b border-zinc-300 pb-1 border-dashed">スタートアップA社</p>
-            <ul className="flex flex-col gap-2 text-sm">
+            <p className="text-sm">スタートアップA社</p>
+            <ul className="flex flex-col gap-2 text-sm border-b border-zinc-300 pb-1 border-dashed">
               <li className="flex items-center">
                 <Dot className="shrink-0" />
                 <p>修理の受注/発注ができるLINEアプリの開発</p>
               </li>
             </ul>
-            <p className="text-sm border-b border-zinc-300 pb-1 border-dashed">スタートアップB社</p>
+            <p className="text-sm">スタートアップB社</p>
             <ul className="flex flex-col gap-2 text-sm">
               <li className="flex items-center">
                 <Dot className="shrink-0" />
@@ -229,7 +229,7 @@ const data = [
           </div>
           <div className="flex flex-col gap-2">
             <Badge className="bg-green-500 text-white w-fit">Works</Badge>
-            <p className="text-sm border-b border-zinc-300 pb-1 border-dashed">paiza Inc.</p>
+            <p className="text-sm">paiza Inc.</p>
             <ul className="flex flex-col gap-2 text-sm">
               <li className="flex items-center">
                 <Dot className="shrink-0" />
