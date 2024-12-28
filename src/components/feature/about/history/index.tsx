@@ -28,15 +28,15 @@ const data = [
           <div className="flex flex-col gap-2">
             <Badge className="bg-green-500 text-white w-fit">Project</Badge>
             <ul className="flex flex-col gap-2 text-sm">
-              <li className="flex items-center">
+              <li className="flex">
                 <Dot />
                 <p>大型漫画掲載サイトのリニューアル</p>
               </li>
-              <li className="flex items-center">
+              <li className="flex">
                 <Dot />
                 <p>HR系サービスのホームページのリニューアル</p>
               </li>
-              <li className="flex items-center">
+              <li className="flex">
                 <Dot />
                 <p>求人掲載サービスの管理画面の新規機能開発</p>
               </li>
@@ -47,8 +47,8 @@ const data = [
           <div className="flex flex-col gap-2">
             <Badge className="bg-green-500 text-white w-fit">Owner</Badge>
             <ul className="flex flex-col gap-2 text-sm">
-              <li className="flex items-center">
-                <Dot className="shrink-0" />
+              <li className="flex">
+                <Dot className="shrink-0 -mt-0.5" />
                 <p>mixi2 フロントエンド部</p>
               </li>
             </ul>
@@ -56,32 +56,32 @@ const data = [
           <div className="flex flex-col gap-2">
             <Badge className="bg-green-500 text-white w-fit">Speaker</Badge>
             <ul className="flex flex-col gap-2 text-sm">
-              <li className="flex items-center">
-                <Dot className="shrink-0" />
+              <li className="flex">
+                <Dot className="shrink-0 -mt-0.5" />
                 <p>BEELT : BEENOS LT会</p>
               </li>
-              <li className="flex items-center">
-                <Dot className="shrink-0" />
+              <li className="flex">
+                <Dot className="shrink-0 -mt-0.5" />
                 <p>ゆめみ x はてな LT会</p>
               </li>
-              <li className="flex items-center">
-                <Dot className="shrink-0" />
+              <li className="flex">
+                <Dot className="shrink-0 -mt-0.5" />
                 <p>ゆめみ x タイミー アクセシビリティLT会</p>
               </li>
-              <li className="flex items-center">
-                <Dot className="shrink-0" />
+              <li className="flex">
+                <Dot className="shrink-0 -mt-0.5" />
                 <p>フロントエンドカンファレンス北海道</p>
               </li>
-              <li className="flex items-center">
-                <Dot className="shrink-0" />
+              <li className="flex">
+                <Dot className="shrink-0 -mt-0.5" />
                 <p>ゆめみ x bitkey LT会</p>
               </li>
-              <li className="flex items-center">
-                <Dot className="shrink-0" />
+              <li className="flex">
+                <Dot className="shrink-0 -mt-0.5" />
                 <p>フロントエンドカンファレンス北海道2024アフタートーク Online</p>
               </li>
-              <li className="flex items-center">
-                <Dot className="shrink-0" />
+              <li className="flex">
+                <Dot className="shrink-0 -mt-0.5" />
                 <p>ゆめみ x LayerX x サイボウズ3社合同フロントエンドカンファレンス北海道2024後夜祭＠東京</p>
               </li>
             </ul>
@@ -115,15 +115,15 @@ const data = [
           <div className="flex flex-col gap-2">
             <Badge className="bg-green-500 text-white w-fit">Project</Badge>
             <ul className="flex flex-col gap-2 text-sm">
-              <li className="flex items-center">
+              <li className="flex">
                 <Dot />
                 <p>学園祭で使われる資金の管理アプリ</p>
               </li>
-              <li className="flex items-center">
+              <li className="flex">
                 <Dot />
                 <p>サークルメンバーの育成管理アプリ</p>
               </li>
-              <li className="flex items-center">
+              <li className="flex">
                 <Dot />
                 <p>駐車場空き情報のリアルタイム監視アプリ</p>
               </li>
@@ -134,12 +134,12 @@ const data = [
           <div className="flex flex-col gap-2">
             <Badge className="bg-green-500 text-white w-fit">Result</Badge>
             <ul className="flex flex-col gap-2 text-sm">
-              <li className="flex items-center">
-                <Dot className="shrink-0" />
+              <li className="flex">
+                <Dot className="shrink-0 -mt-0.5" />
                 <p>第一回技育博にNUTMEGの代表として参加</p>
               </li>
-              <li className="flex items-center">
-                <Dot className="shrink-0" />
+              <li className="flex">
+                <Dot className="shrink-0 -mt-0.5" />
                 <p>技育展 2023 企業賞</p>
               </li>
             </ul>
@@ -148,23 +148,23 @@ const data = [
             <Badge className="bg-green-500 text-white w-fit">Works</Badge>
             <p className="text-sm">スタートアップA社</p>
             <ul className="flex flex-col gap-2 text-sm border-b border-zinc-300 pb-1 border-dashed">
-              <li className="flex items-center">
-                <Dot className="shrink-0" />
+              <li className="flex">
+                <Dot className="shrink-0 -mt-0.5" />
                 <p>修理の受注/発注ができるLINEアプリの開発</p>
               </li>
             </ul>
             <p className="text-sm">スタートアップB社</p>
             <ul className="flex flex-col gap-2 text-sm">
-              <li className="flex items-center">
-                <Dot className="shrink-0" />
+              <li className="flex">
+                <Dot className="shrink-0 -mt-0.5" />
                 <p>建築関係のマッチングプラットフォームの開発</p>
               </li>
-              <li className="flex items-center">
-                <Dot className="shrink-0" />
+              <li className="flex">
+                <Dot className="shrink-0 -mt-0.5" />
                 <p>学会の抄録冊子の自動作成サービス</p>
               </li>
-              <li className="flex items-center">
-                <Dot className="shrink-0" />
+              <li className="flex">
+                <Dot className="shrink-0 -mt-0.5" />
                 <p>履歴書の自動PDF化・管理サービス</p>
               </li>
             </ul>
@@ -198,15 +198,15 @@ const data = [
           <div className="flex flex-col gap-2">
             <Badge className="bg-green-500 text-white w-fit">Project</Badge>
             <ul className="flex flex-col gap-2 text-sm">
-              <li className="flex items-center">
+              <li className="flex">
                 <Dot />
                 <p>文化祭での自作ゲーム展示</p>
               </li>
-              <li className="flex items-center">
+              <li className="flex">
                 <Dot />
                 <p>研究室の鍵のカードキーシステム化</p>
               </li>
-              <li className="flex items-center">
+              <li className="flex">
                 <Dot />
                 <p>学校の単位数計算サイト</p>
               </li>
@@ -217,12 +217,12 @@ const data = [
           <div className="flex flex-col gap-2">
             <Badge className="bg-green-500 text-white w-fit">Result</Badge>
             <ul className="flex flex-col gap-2 text-sm">
-              <li className="flex items-center">
-                <Dot className="shrink-0" />
+              <li className="flex">
+                <Dot className="shrink-0 -mt-0.5" />
                 <p>Paiza S</p>
               </li>
-              <li className="flex items-center">
-                <Dot className="shrink-0" />
+              <li className="flex">
+                <Dot className="shrink-0 -mt-0.5" />
                 <p>AtCoder 緑</p>
               </li>
             </ul>
@@ -231,8 +231,8 @@ const data = [
             <Badge className="bg-green-500 text-white w-fit">Works</Badge>
             <p className="text-sm">paiza Inc.</p>
             <ul className="flex flex-col gap-2 text-sm">
-              <li className="flex items-center">
-                <Dot className="shrink-0" />
+              <li className="flex">
+                <Dot className="shrink-0 -mt-0.5" />
                 <p>競技プログラミング問題集の作問</p>
               </li>
             </ul>
