@@ -68,9 +68,9 @@ const config = {
       },
       fontFamily: {
         roboto: ["var(--font-roboto)"],
-        raleway: ["Raleway", "sans-serif"],
-        nakamori: ["Nakamori", "sans-serif"],
-        cinecaption: ["cinecaption", "sans-serif"],
+        raleway: ["var(--font-raleway)"],
+        nakamori: ["var(--font-nakamori)"],
+        cinecaption: ["var(--font-cinecaption)"],
       },
       keyframes: {
         "accordion-down": {

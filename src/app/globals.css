@@ -67,24 +67,3 @@
     @apply bg-background text-foreground;
   }
 }
-
-@font-face {
-  font-family: 'Raleway';
-  src: url('/fonts/Raleway-Black.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Nakamori';
-  src: url('/fonts/Nakamori.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'cinecaption';
-  src: url('/fonts/cinecaption.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
