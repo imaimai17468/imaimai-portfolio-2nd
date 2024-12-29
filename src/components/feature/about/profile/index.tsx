@@ -1,8 +1,7 @@
-import { Button } from "@/components/ui/button";
+import { SnsLinkButton } from "@/components/parts/sns-link-button";
 import { FlipWords } from "@/components/ui/flip-words";
 import { Cake, Heart } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 
 export const Profile: React.FC = () => {
   return (
@@ -15,31 +14,15 @@ export const Profile: React.FC = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" asChild>
-              <Link href="https://github.com/imaimai17468">
-                <Image src="/images/github-mark-white.svg" alt="いまいまいのGitHub" width={20} height={20} />
-              </Link>
-            </Button>
-            <Button variant="ghost" size="icon" asChild>
-              <Link href="https://x.com/imaimai17468">
-                <Image src="/images/x-logo-white.png" alt="いまいまいのX（旧Twitter）" width={16} height={16} />
-              </Link>
-            </Button>
-            <Button variant="ghost" size="icon" asChild>
-              <Link href="https://note.com/imaimai17468">
-                <Image src="/images/note.svg" alt="いまいまいのnote" width={24} height={24} />
-              </Link>
-            </Button>
-            <Button variant="ghost" size="icon" asChild>
-              <Link href="https://zenn.dev/imaimai17468">
-                <Image src="/images/zenn.svg" alt="いまいまいのZenn" width={20} height={20} />
-              </Link>
-            </Button>
-            <Button variant="ghost" size="icon" asChild>
-              <Link href="https://speakerdeck.com/imaimai17468">
-                <Image src="/images/speaker-deck.png" alt="いまいまいのSpeaker Deck" width={20} height={20} />
-              </Link>
-            </Button>
+            <SnsLinkButton type="github" href="https://github.com/imaimai17468" alt="いまいまいのGitHub" />
+            <SnsLinkButton type="x" href="https://x.com/imaimai17468" alt="いまいまいのX（旧Twitter）" />
+            <SnsLinkButton type="note" href="https://note.com/imaimai17468" alt="いまいまいのnote" />
+            <SnsLinkButton type="zenn" href="https://zenn.dev/imaimai17468" alt="いまいまいのZenn" />
+            <SnsLinkButton
+              type="speakerdeck"
+              href="https://speakerdeck.com/imaimai17468"
+              alt="いまいまいのSpeaker Deck"
+            />
           </div>
           <div className="flex flex-col gap-4">
             <ul className="flex flex-col gap-2 pl-4 border-l-2 border-zinc-500 text-sm">

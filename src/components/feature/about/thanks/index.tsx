@@ -1,8 +1,5 @@
-import { Button } from "@/components/ui/button";
+import { SnsLinkButton } from "@/components/parts/sns-link-button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LinkIcon } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
 
 export const Thanks: React.FC = () => {
   return (
@@ -18,16 +15,8 @@ export const Thanks: React.FC = () => {
             <CardDescription>学園祭実行委員会 情報局</CardDescription>
           </CardHeader>
           <CardContent className="flex gap-2">
-            <Button variant="outline" size="icon">
-              <Link href="https://blog.nutmeg.cloud/">
-                <LinkIcon />
-              </Link>
-            </Button>
-            <Button variant="outline" size="icon" asChild>
-              <Link href="https://twitter.com/nutfes_nutmeg">
-                <Image src="/images/x-logo-white.png" alt="NUTMEGのX（旧Twitter）" width={16} height={16} />
-              </Link>
-            </Button>
+            <SnsLinkButton type="link" href="https://blog.nutmeg.cloud/" alt="NUTMEGのブログ" />
+            <SnsLinkButton type="x" href="https://twitter.com/nutfes_nutmeg" alt="NUTMEGのX（旧Twitter）" />
           </CardContent>
         </Card>
         <Card>
@@ -36,11 +25,7 @@ export const Thanks: React.FC = () => {
             <CardDescription>木更津高専 プログラミング研究同好会</CardDescription>
           </CardHeader>
           <CardContent className="flex gap-2">
-            <Button variant="outline" size="icon" asChild>
-              <Link href="https://x.com/NITKiC_pro">
-                <Image src="/images/x-logo-white.png" alt="プロ研のX（旧Twitter）" width={16} height={16} />
-              </Link>
-            </Button>
+            <SnsLinkButton type="x" href="https://x.com/NITKiC_pro" alt="プロ研のX（旧Twitter）" />
           </CardContent>
         </Card>
         <Card>
@@ -49,16 +34,8 @@ export const Thanks: React.FC = () => {
             <CardDescription>23-24卒エンジニアグループ</CardDescription>
           </CardHeader>
           <CardContent className="flex gap-2">
-            <Button variant="outline" size="icon">
-              <Link href="https://post-get.joshi-engineer.com/">
-                <LinkIcon />
-              </Link>
-            </Button>
-            <Button variant="outline" size="icon" asChild>
-              <Link href="https://twitter.com/postGetAnpan">
-                <Image src="/images/x-logo-white.png" alt="POSTGETのX（旧Twitter）" width={16} height={16} />
-              </Link>
-            </Button>
+            <SnsLinkButton type="link" href="https://post-get.joshi-engineer.com/" alt="POSTGETのウェブサイト" />
+            <SnsLinkButton type="x" href="https://twitter.com/postGetAnpan" alt="POSTGETのX（旧Twitter）" />
           </CardContent>
         </Card>
         <Card>
@@ -67,16 +44,8 @@ export const Thanks: React.FC = () => {
             <CardDescription>関西学院大学発のIT系学生団体</CardDescription>
           </CardHeader>
           <CardContent className="flex gap-2">
-            <Button variant="outline" size="icon">
-              <Link href="https://techuni.org/">
-                <LinkIcon />
-              </Link>
-            </Button>
-            <Button variant="outline" size="icon" asChild>
-              <Link href="https://twitter.com/TechUni1026">
-                <Image src="/images/x-logo-white.png" alt="TechUniのX（旧Twitter）" width={16} height={16} />
-              </Link>
-            </Button>
+            <SnsLinkButton type="link" href="https://techuni.org/" alt="TechUniのウェブサイト" />
+            <SnsLinkButton type="x" href="https://twitter.com/TechUni1026" alt="TechUniのX（旧Twitter）" />
           </CardContent>
         </Card>
         <Card>
@@ -85,11 +54,7 @@ export const Thanks: React.FC = () => {
             <CardDescription>Androidコミュニティ</CardDescription>
           </CardHeader>
           <CardContent className="flex gap-2">
-            <Button variant="outline" size="icon">
-              <Link href="https://www.nidkt.org/">
-                <LinkIcon />
-              </Link>
-            </Button>
+            <SnsLinkButton type="link" href="https://www.nidkt.org/" alt="NID.ktのウェブサイト" />
           </CardContent>
         </Card>
         <Card>
@@ -98,11 +63,7 @@ export const Thanks: React.FC = () => {
             <CardDescription>技育系イベントを開催</CardDescription>
           </CardHeader>
           <CardContent className="flex gap-2">
-            <Button variant="outline" size="icon">
-              <Link href="https://talent.supporterz.jp/">
-                <LinkIcon />
-              </Link>
-            </Button>
+            <SnsLinkButton type="link" href="https://talent.supporterz.jp/" alt="サポーターズのウェブサイト" />
           </CardContent>
         </Card>
       </div>
