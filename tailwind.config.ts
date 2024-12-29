@@ -67,6 +67,7 @@ const config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
+        roboto: ["var(--font-roboto)"],
         raleway: ["Raleway", "sans-serif"],
         nakamori: ["Nakamori", "sans-serif"],
         cinecaption: ["cinecaption", "sans-serif"],

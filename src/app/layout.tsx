@@ -1,5 +1,32 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import localFont from "next/font/local";
+
+const roboto = localFont({
+  src: [
+    {
+      path: "../fonts/roboto/Roboto-Thin.ttf",
+      weight: "100",
+      style: "normal",
+    },
+    {
+      path: "../fonts/roboto/Roboto-Light.ttf",
+      weight: "300",
+      style: "normal",
+    },
+    {
+      path: "../fonts/roboto/Roboto-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../fonts/roboto/Roboto-Bold.ttf",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  variable: "--font-roboto",
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -12,7 +39,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${roboto.variable} font-roboto`}>
       <body className="dark">{children}</body>
     </html>
   );
