@@ -2,6 +2,7 @@ import { SnsLinkButton } from "@/components/parts/sns-link-button";
 import { FlipWords } from "@/components/ui/flip-words";
 import { Cake, Heart } from "lucide-react";
 import Image from "next/image";
+import frogImage from "./frog.jpeg";
 
 export const Profile: React.FC = () => {
   return (
@@ -39,7 +40,7 @@ export const Profile: React.FC = () => {
         </div>
         <Image
           className="rounded-full w-64 h-64"
-          src="/images/frog.jpeg"
+          src={frogImage}
           alt="いまいまいのプロフィール画像。カエルの上にカタツムリが乗っている。"
           width={300}
           height={300}
