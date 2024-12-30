@@ -2,16 +2,17 @@
 
 import { Reflector, Text, useGLTF, useTexture } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
+import { useSearchParams } from "next/navigation";
 import type React from "react";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import * as THREE from "three";
+import { WORKS } from "../const";
 
-type Props = {
-  text: string;
-  backgroundImageSrc: string;
-};
+export const BackgroundAnimation: React.FC = () => {
+  const searchParams = useSearchParams();
+  const work = searchParams.get("work");
+  const selectedWork = useMemo(() => WORKS.find((w) => w.title === work), [work]) ?? WORKS[0];
 
-export const BackgroundAnimation: React.FC<Props> = ({ text, backgroundImageSrc }) => {
   return (
     <div className="h-screen w-full -z-10 fixed top-0 left-0">
       <Canvas gl={{ alpha: false }} dpr={[1, 1.5]} camera={{ position: [0, 3, 100], fov: 15 }}>
@@ -20,7 +21,11 @@ export const BackgroundAnimation: React.FC<Props> = ({ text, backgroundImageSrc 
         <Suspense fallback={null}>
           <group position={[0, -1, 0]}>
             <Carla rotation={[0, Math.PI - 0.4, 0]} position={[-1.2, 0, 0.6]} scale={[0.26, 0.26, 0.26]} />
-            <VideoText position={[0, 1.3, -2]} text={text} backgroundImageSrc={backgroundImageSrc} />
+            <VideoText
+              position={[0, 1.3, -2]}
+              text={selectedWork?.videoText ?? "Select a work"}
+              background={selectedWork?.background ?? ""}
+            />
             <Ground />
           </group>
           <ambientLight intensity={0.5} />
@@ -41,14 +46,36 @@ function Carla(props: JSX.IntrinsicElements["group"]) {
 function VideoText({
   position,
   text,
-  backgroundImageSrc,
-}: { position: [number, number, number]; text: string; backgroundImageSrc: string }) {
-  const texture = useTexture(backgroundImageSrc);
+  background: backgroundSrc,
+}: { position: [number, number, number]; text: string; background: string }) {
+  const isPng = backgroundSrc.endsWith(".png");
+  const texture = isPng ? useTexture(backgroundSrc) : null;
+  const video = useMemo(() => {
+    if (isPng) return null;
+    return Object.assign(document.createElement("video"), {
+      src: backgroundSrc,
+      crossOrigin: "Anonymous",
+      loop: true,
+      muted: true,
+    });
+  }, [backgroundSrc, isPng]);
+
+  useEffect(() => {
+    if (video) {
+      void video.play();
+    }
+  }, [video]);
 
   return (
-    <Text font="/Inter-Bold.woff" fontSize={3} letterSpacing={-0.06} position={position}>
+    <Text font="/Inter-Bold.woff" fontSize={1} position={position} lineHeight={0.8}>
       {text}
-      <meshBasicMaterial toneMapped={false} map={texture} />
+      <meshBasicMaterial toneMapped={false}>
+        {isPng && texture ? (
+          <primitive attach="map" object={texture} />
+        ) : (
+          video && <videoTexture attach="map" args={[video]} />
+        )}
+      </meshBasicMaterial>
     </Text>
   );
 }
