@@ -6,7 +6,12 @@ import type React from "react";
 import { Suspense, useState } from "react";
 import * as THREE from "three";
 
-export const BackgroundAnimation: React.FC = () => {
+type Props = {
+  text: string;
+  backgroundImageSrc: string;
+};
+
+export const BackgroundAnimation: React.FC<Props> = ({ text, backgroundImageSrc }) => {
   return (
     <div className="h-screen w-full -z-10 fixed top-0 left-0">
       <Canvas gl={{ alpha: false }} dpr={[1, 1.5]} camera={{ position: [0, 3, 100], fov: 15 }}>
@@ -15,7 +20,7 @@ export const BackgroundAnimation: React.FC = () => {
         <Suspense fallback={null}>
           <group position={[0, -1, 0]}>
             <Carla rotation={[0, Math.PI - 0.4, 0]} position={[-1.2, 0, 0.6]} scale={[0.26, 0.26, 0.26]} />
-            <VideoText position={[0, 1.3, -2]} />
+            <VideoText position={[0, 1.3, -2]} text={text} backgroundImageSrc={backgroundImageSrc} />
             <Ground />
           </group>
           <ambientLight intensity={0.5} />
@@ -33,12 +38,16 @@ function Carla(props: JSX.IntrinsicElements["group"]) {
   return <primitive object={scene} {...props} />;
 }
 
-function VideoText({ position }: { position: [number, number, number] }) {
-  const texture = useTexture("/SurfaceImperfections003_1K_Normal.jpg");
+function VideoText({
+  position,
+  text,
+  backgroundImageSrc,
+}: { position: [number, number, number]; text: string; backgroundImageSrc: string }) {
+  const texture = useTexture(backgroundImageSrc);
 
   return (
     <Text font="/Inter-Bold.woff" fontSize={3} letterSpacing={-0.06} position={position}>
-      drei
+      {text}
       <meshBasicMaterial toneMapped={false} map={texture} />
     </Text>
   );
