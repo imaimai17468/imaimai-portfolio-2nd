@@ -73,7 +73,7 @@ type StickerProps = {
 };
 
 const Sticker = forwardRef<THREE.Mesh, StickerProps>(({ position, scale, ...props }, ref) => {
-  const [smiley, invert] = useTexture(["/images/frog_circle.png", "/images/frog_circle.png"]);
+  const [smiley, invert] = useTexture(["/frog_circle.png", "/frog_circle.png"]);
   return (
     <mesh ref={ref} position={position} scale={scale} {...props}>
       <planeGeometry args={[1, 1, 32, 32]} />
