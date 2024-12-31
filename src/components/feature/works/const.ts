@@ -125,9 +125,9 @@ export const WORKS: Work[] = [
   {
     title: "Akeome",
     videoText: "Akeome",
-    background: "/works/akeome.png",
+    background: "/works/akeome.mov",
     path: "/",
-    type: "image",
+    type: "video",
     people: 1,
     date: "2023/12",
     role: "All",
