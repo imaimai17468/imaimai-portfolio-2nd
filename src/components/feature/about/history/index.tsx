@@ -26,7 +26,7 @@ const data = [
             </ul>
           </div>
           <div className="flex flex-col gap-2">
-            <Badge className="bg-green-500 text-white w-fit">Project</Badge>
+            <Badge className="w-fit">Project</Badge>
             <ul className="flex flex-col gap-2 text-sm">
               <li className="flex">
                 <Dot />
@@ -43,7 +43,7 @@ const data = [
             </ul>
           </div>
           <div className="flex flex-col gap-2">
-            <Badge className="bg-green-500 text-white w-fit">Event Sponsor</Badge>
+            <Badge className="w-fit">Event Sponsor</Badge>
             <ul className="flex flex-col gap-2 text-sm">
               <li className="flex">
                 <Dot />
@@ -66,7 +66,7 @@ const data = [
         </div>
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-2">
-            <Badge className="bg-green-500 text-white w-fit">Owner</Badge>
+            <Badge className="w-fit">Owner</Badge>
             <ul className="flex flex-col gap-2 text-sm">
               <li className="flex">
                 <Dot className="shrink-0 -mt-0.5" />
@@ -75,7 +75,7 @@ const data = [
             </ul>
           </div>
           <div className="flex flex-col gap-2">
-            <Badge className="bg-green-500 text-white w-fit">Speaker</Badge>
+            <Badge className="w-fit">Speaker</Badge>
             <ul className="flex flex-col gap-2 text-sm">
               <li className="flex">
                 <Dot className="shrink-0 -mt-0.5" />
@@ -134,7 +134,7 @@ const data = [
             </ul>
           </div>
           <div className="flex flex-col gap-2">
-            <Badge className="bg-green-500 text-white w-fit">Project</Badge>
+            <Badge className="w-fit">Project</Badge>
             <ul className="flex flex-col gap-2 text-sm">
               <li className="flex">
                 <Dot />
@@ -153,7 +153,7 @@ const data = [
         </div>
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-2">
-            <Badge className="bg-green-500 text-white w-fit">Result</Badge>
+            <Badge className="w-fit">Result</Badge>
             <ul className="flex flex-col gap-2 text-sm">
               <li className="flex">
                 <Dot className="shrink-0 -mt-0.5" />
@@ -166,7 +166,7 @@ const data = [
             </ul>
           </div>
           <div className="flex flex-col gap-2">
-            <Badge className="bg-green-500 text-white w-fit">Works</Badge>
+            <Badge className="w-fit">Works</Badge>
             <p className="text-sm">スタートアップA社</p>
             <ul className="flex flex-col gap-2 text-sm border-b border-zinc-300 pb-1 border-dashed">
               <li className="flex">
@@ -217,7 +217,7 @@ const data = [
             </ul>
           </div>
           <div className="flex flex-col gap-2">
-            <Badge className="bg-green-500 text-white w-fit">Project</Badge>
+            <Badge className="w-fit">Project</Badge>
             <ul className="flex flex-col gap-2 text-sm">
               <li className="flex">
                 <Dot />
@@ -236,7 +236,7 @@ const data = [
         </div>
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-2">
-            <Badge className="bg-green-500 text-white w-fit">Result</Badge>
+            <Badge className="w-fit">Result</Badge>
             <ul className="flex flex-col gap-2 text-sm">
               <li className="flex">
                 <Dot className="shrink-0 -mt-0.5" />
@@ -249,7 +249,7 @@ const data = [
             </ul>
           </div>
           <div className="flex flex-col gap-2">
-            <Badge className="bg-green-500 text-white w-fit">Works</Badge>
+            <Badge className="w-fit">Works</Badge>
             <p className="text-sm">paiza Inc.</p>
             <ul className="flex flex-col gap-2 text-sm">
               <li className="flex">
