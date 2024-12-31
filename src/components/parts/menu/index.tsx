@@ -44,7 +44,10 @@ export const SpMenu: React.FC = () => {
   return (
     <div className="block sm:hidden">
       <Sheet>
-        <SheetTrigger className="z-50 fixed top-4 right-4 bg-zinc-900 p-2 rounded-lg border border-zinc-800">
+        <SheetTrigger
+          className="z-50 fixed top-4 right-4 bg-zinc-900 p-2 rounded-lg border border-zinc-800"
+          aria-label="Menu"
+        >
           <MenuIcon className="h-6 w-6 text-zinc-100" />
         </SheetTrigger>
         <SheetContent side="right" className="w-[240px] bg-zinc-900 text-zinc-00 pt-12 flex flex-col gap-4">

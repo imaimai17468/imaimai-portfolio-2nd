@@ -14,7 +14,7 @@ export const Menu: React.FC = () => {
     <div>
       <div className="fixed top-4 left-4 w-[200px]">
         <Select value={work ?? ""} onValueChange={(value) => setWork(value)}>
-          <SelectTrigger className="text-sm font-thin">
+          <SelectTrigger className="text-sm font-thin" aria-label="Select a work">
             <SelectValue placeholder="Select a work" />
           </SelectTrigger>
           <SelectContent>
