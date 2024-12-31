@@ -4,6 +4,14 @@ export type Work = {
   background: string;
   path: string;
   type: "video" | "image";
+  people: number;
+  date: string;
+  role: string;
+  description: string;
+  github?: string;
+  url?: string;
+  slide?: string;
+  status: "completed" | "in-progress" | "stopped" | "graduated";
 };
 
 export const WORKS: Work[] = [
@@ -13,6 +21,12 @@ export const WORKS: Work[] = [
     background: "/works/imaimai_portfolio_2nd.mov",
     path: "/",
     type: "video",
+    people: 1,
+    date: "2024/12 -",
+    role: "All",
+    description: "imaimai portfolioのデザインを作り直し",
+    status: "in-progress",
+    github: "https://github.com/imaimai17468/imaimai-portfolio-2nd/",
   },
   {
     title: "imaimai portfolio",
@@ -20,6 +34,13 @@ export const WORKS: Work[] = [
     background: "/works/imaimai_portfolio.mov",
     path: "/",
     type: "video",
+    people: 1,
+    date: "2023/02 - 2024/12",
+    role: "All",
+    description: "技術の遊び場として, ポートフォリオが欲しかったので制作",
+    status: "completed",
+    github: "https://github.com/imaimai17468/imaimai-portfolio/",
+    url: "https://imaimai-portfolio.vercel.app/",
   },
   {
     title: "NUTMEG Seeds",
@@ -27,6 +48,12 @@ export const WORKS: Work[] = [
     background: "/works/nutmeg_seeds.png",
     path: "/",
     type: "image",
+    people: 6,
+    date: "2022/06 - 2024/03",
+    role: "Frontend",
+    description: "NUTMEGのメンバー情報や学習記録を管理するために制作",
+    status: "graduated",
+    slide: "https://docs.google.com/presentation/d/1E1sfNE5K3RQa_ad4wLrgDHhA9pxx8gkL/edit#slide=id.p1",
   },
   {
     title: "FinanSu",
@@ -34,6 +61,12 @@ export const WORKS: Work[] = [
     background: "/works/finansu.png",
     path: "/",
     type: "image",
+    people: 8,
+    date: "2022/09 - 2024/03",
+    role: "PM / Frontend",
+    description: "学園祭に使われる資金管理をサポートするために制作",
+    status: "graduated",
+    slide: "https://docs.google.com/presentation/d/13MDFLSlJoL7IjJAYpROsIqTJSDR6whIZ/edit#slide=id.p1",
   },
   {
     title: "Group Manager 2",
@@ -41,6 +74,12 @@ export const WORKS: Work[] = [
     background: "/works/group_manager_2.png",
     path: "/",
     type: "image",
+    people: 10,
+    date: "2022/10 - 2024/03",
+    role: "Frontend",
+    description: "学園祭に参加する学生団体を管理するために制作",
+    status: "graduated",
+    slide: "https://docs.google.com/presentation/d/1GJ9rAku8HDjErt069q_jSoJU0gl8k-S8-nX4HNddFO0/edit#slide=id.p1",
   },
   {
     title: "Tracking Parking",
@@ -48,6 +87,13 @@ export const WORKS: Work[] = [
     background: "/works/tracking_parking.png",
     path: "/",
     type: "image",
+    people: 3,
+    date: "2023/03 - 2024/03",
+    role: "Frontend",
+    description: "学園祭に訪れる車の数を把握するために制作",
+    status: "graduated",
+    slide:
+      "https://docs.google.com/presentation/d/1Juucm7S0rWtzMJnSPszK2CzO9Ry6oWrYJ9KyZFyTsi4/edit#slide=id.g1724dedfe5c_0_54",
   },
   {
     title: "TS Audio Visualizer",
@@ -55,6 +101,13 @@ export const WORKS: Work[] = [
     background: "/works/ts_audio_visualizer.png",
     path: "/",
     type: "image",
+    people: 1,
+    date: "2023/07",
+    role: "All",
+    description: "web上でのマイク音声をリアルタイムで可視化するために制作",
+    status: "completed",
+    github: "https://github.com/imaimai17468/ts-audio-visualizer",
+    url: "https://www.npmjs.com/package/ts-audio-visualizer?activeTab=readme",
   },
   {
     title: "AtCoder Team Battle",
@@ -62,6 +115,12 @@ export const WORKS: Work[] = [
     background: "/works/atcoder_team_battle.png",
     path: "/",
     type: "image",
+    people: 1,
+    date: "2023/10 -",
+    role: "All",
+    description: "AtCoderのチーム戦を行えるようにしたくて制作",
+    status: "stopped",
+    github: "https://github.com/imaimai17468/atcoder-teambattle",
   },
   {
     title: "Akeome",
@@ -69,6 +128,13 @@ export const WORKS: Work[] = [
     background: "/works/akeome.png",
     path: "/",
     type: "image",
+    people: 1,
+    date: "2023/12",
+    role: "All",
+    description: "2024年のあけおめ用サイト。akeo.meはもう他の人が使ってた :cry:",
+    status: "completed",
+    github: "https://github.com/imaimai17468/akeome",
+    url: "https://akeome-imaimai17468.vercel.app/",
   },
   {
     title: "Contrast Color palette",
@@ -76,6 +142,13 @@ export const WORKS: Work[] = [
     background: "/works/contrast_color_palette.png",
     path: "/",
     type: "image",
+    people: 1,
+    date: "2024/09 -",
+    role: "All",
+    description: "ダークテーマを含め、コントラスト比が高いカラーパレットを作れるようにするためのツール",
+    status: "in-progress",
+    url: "https://contrast-color-pallet.vercel.app/",
+    github: "https://github.com/imaimai17468/contrast-color-pallet/",
   },
   {
     title: "Silk Weave",
@@ -83,6 +156,12 @@ export const WORKS: Work[] = [
     background: "/works/silk_weave.png",
     path: "/",
     type: "image",
+    people: 1,
+    date: "2024/10 - 2024/11",
+    role: "All",
+    description: "Slack上のスレッドをNotionにまとめてくれるSlackBot",
+    status: "completed",
+    github: "https://github.com/imaimai17468/silk-weave-slack-bot",
   },
   {
     title: "Tech Tips",
@@ -90,5 +169,11 @@ export const WORKS: Work[] = [
     background: "/works/tech_tips.png",
     path: "/",
     type: "image",
+    people: 1,
+    date: "2024/04 -",
+    role: "All",
+    description: "人の評価を気にせず技術記事を投稿できるようにするために制作",
+    status: "in-progress",
+    github: "https://github.com/imaimai17468/tech-tips",
   },
 ];
