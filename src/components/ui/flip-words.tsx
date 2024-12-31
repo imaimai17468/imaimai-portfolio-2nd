@@ -62,7 +62,7 @@ export const FlipWords = ({
       >
         {currentWord.split(" ").map((word, wordIndex) => (
           <motion.span
-            key={word}
+            key={`${word}`}
             initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             transition={{
@@ -73,7 +73,7 @@ export const FlipWords = ({
           >
             {word.split("").map((letter, letterIndex) => (
               <motion.span
-                key={letter}
+                key={`${word}-${letter}-${Math.random()}`}
                 initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 transition={{

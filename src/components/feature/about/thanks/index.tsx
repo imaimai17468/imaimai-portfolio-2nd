@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 export const Thanks: React.FC = () => {
   return (
-    <div className="max-w-5xl min-h-screen font-light flex flex-col justify-center mx-auto gap-8">
+    <div className="max-w-5xl min-h-screen font-light flex flex-col justify-center mx-auto gap-8 p-4">
       <div className="flex flex-col">
         <h1 className="text-4xl font-black">Thanks</h1>
         <h2>お世話になった人々 - 団体</h2>

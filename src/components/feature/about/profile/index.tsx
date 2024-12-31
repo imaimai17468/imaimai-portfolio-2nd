@@ -7,10 +7,10 @@ import frogImage from "./frog.jpeg";
 export const Profile: React.FC = () => {
   return (
     <div className="max-w-3xl mx-auto font-light h-screen flex justify-center flex-col gap-16" aria-label="私について">
-      <div className="w-full flex justify-between items-center">
+      <div className="w-full flex justify-between items-center flex-col-reverse sm:flex-row gap-8 sm:gap-0 px-8">
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-4">
-            <div className="text-6xl font-black">
+            <div className="text-4xl sm:text-6xl font-black">
               <FlipWords words={["いまいまい", "imaimai17468", "Toshiki Imai"]} className="px-0" />
             </div>
           </div>
@@ -39,7 +39,7 @@ export const Profile: React.FC = () => {
           </div>
         </div>
         <Image
-          className="rounded-full w-64 h-64"
+          className="rounded-full w-48 h-48 sm:w-64 sm:h-64"
           src={frogImage}
           alt="いまいまいのプロフィール画像。カエルの上にカタツムリが乗っている。"
           width={300}
