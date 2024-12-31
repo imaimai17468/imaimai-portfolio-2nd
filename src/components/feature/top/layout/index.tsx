@@ -1,5 +1,5 @@
 import { BackgroundAnimation } from "@/components/feature/top/background-animation";
-import { Header } from "@/components/parts/header";
+import { PortfolioGitHubLink } from "@/components/parts/github-portfolio-link";
 
 type TopLayoutProps = {
   children: React.ReactNode;
@@ -8,7 +8,7 @@ type TopLayoutProps = {
 export const TopLayout: React.FC<TopLayoutProps> = ({ children }) => {
   return (
     <div>
-      <Header />
+      <PortfolioGitHubLink />
       <BackgroundAnimation />
       <main>{children}</main>
     </div>
