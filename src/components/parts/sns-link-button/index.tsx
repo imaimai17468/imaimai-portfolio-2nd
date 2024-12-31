@@ -79,7 +79,7 @@ export const SnsLinkButton: React.FC<Props> = ({ type, href, alt }) => {
   if (type === "link") {
     return (
       <Button variant="outline" size="icon" asChild>
-        <Link href={href}>
+        <Link href={href} aria-label={alt}>
           <LinkIcon />
         </Link>
       </Button>
@@ -89,7 +89,7 @@ export const SnsLinkButton: React.FC<Props> = ({ type, href, alt }) => {
   if (type === "slide") {
     return (
       <Button variant="outline" size="icon" asChild>
-        <Link href={href}>
+        <Link href={href} aria-label={alt}>
           <Presentation />
         </Link>
       </Button>
