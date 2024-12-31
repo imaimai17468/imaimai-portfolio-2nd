@@ -4,9 +4,9 @@ import { Reflector, Text, useGLTF, useTexture } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useSearchParams } from "next/navigation";
 import type React from "react";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import * as THREE from "three";
-import { WORKS } from "../const";
+import { WORKS, type Work } from "../const";
 
 export const BackgroundAnimation: React.FC = () => {
   const searchParams = useSearchParams();
@@ -21,10 +21,11 @@ export const BackgroundAnimation: React.FC = () => {
         <Suspense fallback={null}>
           <group position={[0, -1, 0]}>
             <Carla rotation={[0, Math.PI - 0.4, 0]} position={[-1.2, 0, 0.6]} scale={[0.26, 0.26, 0.26]} />
-            <VideoText
+            <BackgroundText
               position={[0, 1.3, -2]}
               text={selectedWork?.videoText ?? "Select a work"}
               background={selectedWork?.background ?? ""}
+              type={selectedWork?.type ?? "image"}
             />
             <Ground />
           </group>
@@ -48,36 +49,55 @@ function VideoText({
   text,
   background: backgroundSrc,
 }: { position: [number, number, number]; text: string; background: string }) {
-  const isPng = backgroundSrc.endsWith(".png");
-  const texture = isPng ? useTexture(backgroundSrc) : null;
   const video = useMemo(() => {
-    if (isPng) return null;
-    return Object.assign(document.createElement("video"), {
+    const video = Object.assign(document.createElement("video"), {
       src: backgroundSrc,
       crossOrigin: "Anonymous",
       loop: true,
       muted: true,
     });
-  }, [backgroundSrc, isPng]);
-
-  useEffect(() => {
-    if (video) {
-      void video.play();
-    }
-  }, [video]);
-
+    void video.play();
+    return video;
+  }, [backgroundSrc]);
   return (
     <Text font="/Inter-Bold.woff" fontSize={1} position={position} lineHeight={0.8}>
       {text}
       <meshBasicMaterial toneMapped={false}>
-        {isPng && texture ? (
-          <primitive attach="map" object={texture} />
-        ) : (
-          video && <videoTexture attach="map" args={[video]} />
-        )}
+        <videoTexture attach="map" args={[video]} />
       </meshBasicMaterial>
     </Text>
   );
+}
+
+function ImageText({
+  position,
+  text,
+  background: backgroundSrc,
+}: { position: [number, number, number]; text: string; background: string }) {
+  const texture = useTexture(backgroundSrc);
+  return (
+    <Text font="/Inter-Bold.woff" fontSize={1} position={position} lineHeight={0.8}>
+      {text}
+      <meshBasicMaterial toneMapped={false} map={texture} />
+    </Text>
+  );
+}
+
+function BackgroundText({
+  position,
+  text,
+  background,
+  type,
+}: {
+  position: [number, number, number];
+  text: string;
+  background: string;
+  type: Work["type"];
+}) {
+  if (type === "video") {
+    return <VideoText position={position} text={text} background={background} />;
+  }
+  return <ImageText position={position} text={text} background={background} />;
 }
 
 function Ground() {
