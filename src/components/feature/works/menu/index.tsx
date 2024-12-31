@@ -26,7 +26,7 @@ export const Menu: React.FC = () => {
           </SelectContent>
         </Select>
       </div>
-      <div className="fixed top-4 right-4 font-light text-sm w-[200px] flex flex-col gap-4">
+      <div className="p-2 sm:p-0 fixed bottom-4 sm:top-4 right-0 sm:right-4 font-light text-sm w-full sm:w-[300px] flex flex-col-reverse sm:flex-col gap-4">
         <div className="flex flex-col gap-2 bg-zinc-100/10 rounded-lg p-4 border border-zinc-100/10">
           <div className="flex items-center">
             <User className="w-4 h-4 mr-2" />
