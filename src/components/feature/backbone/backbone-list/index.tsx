@@ -4,8 +4,8 @@ import { BackboneListItem } from "./backbone-list-item";
 
 export const BackboneList = () => {
   return (
-    <div className="min-h-screen max-w-6xl mx-auto py-16">
-      <div className="grid grid-cols-3 gap-8">
+    <div className="min-h-screen max-w-6xl mx-auto px-4 my-16">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         <BackboneListItem
           title="CHICO CARLITO vs MOL53 : KING OF KINGS 2023 GRAND CHAMPIONSHIP FINAL"
           youtubeUrl="https://www.youtube.com/embed/xemRYJYzs_c?si=jYoKsJVaNRIW4r42"
