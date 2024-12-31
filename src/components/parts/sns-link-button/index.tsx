@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { LinkIcon } from "lucide-react";
+import { LinkIcon, Presentation } from "lucide-react";
 import Image from "next/image";
 import type { StaticImageData } from "next/image";
 import Link from "next/link";
@@ -9,8 +9,8 @@ import speakerdeckLogo from "./logos/speaker-deck.png";
 import xLogo from "./logos/x-logo-white.png";
 import zennLogo from "./logos/zenn.svg";
 
-type SnsType = "github" | "x" | "note" | "zenn" | "speakerdeck" | "link";
-type SnsImageType = Exclude<SnsType, "link">;
+type SnsType = "github" | "x" | "note" | "zenn" | "speakerdeck" | "link" | "slide";
+type SnsImageType = Exclude<SnsType, "link" | "slide">;
 
 type Props = {
   type: SnsType;
@@ -29,6 +29,9 @@ type SnsConfig = {
   [K in SnsImageType]: SnsImageConfig;
 } & {
   link: {
+    alt: string;
+  };
+  slide: {
     alt: string;
   };
 };
@@ -67,6 +70,9 @@ const SNS_CONFIG: SnsConfig = {
   link: {
     alt: "リンク",
   },
+  slide: {
+    alt: "スライド",
+  },
 } as const;
 
 export const SnsLinkButton: React.FC<Props> = ({ type, href, alt }) => {
@@ -75,6 +81,16 @@ export const SnsLinkButton: React.FC<Props> = ({ type, href, alt }) => {
       <Button variant="outline" size="icon" asChild>
         <Link href={href}>
           <LinkIcon />
+        </Link>
+      </Button>
+    );
+  }
+
+  if (type === "slide") {
+    return (
+      <Button variant="outline" size="icon" asChild>
+        <Link href={href}>
+          <Presentation />
         </Link>
       </Button>
     );
