@@ -25,7 +25,7 @@ export const ScrollCounts: React.FC = () => {
   }, [handleScroll]);
 
   return (
-    <div className="flex items-center gap-2 fixed top-4 right-4">
+    <div className="flex items-center gap-2 fixed top-4 left-4">
       <Mouse className="w-4 h-4 text-zinc-500 animate-bounce" />
       <p className="text-zinc-500">{scrollPercentage} / 100</p>
     </div>
