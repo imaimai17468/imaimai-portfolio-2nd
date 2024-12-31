@@ -1,14 +1,18 @@
 "use client";
+
 import { SnsLinkButton } from "@/components/parts/sns-link-button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Briefcase, Calendar, User } from "lucide-react";
-import { useQueryState } from "nuqs";
 import { useMemo } from "react";
 import { WORKS } from "../const";
 
-export const Menu: React.FC = () => {
-  const [work, setWork] = useQueryState("work", { defaultValue: WORKS[0].title });
-  const selectedWork = useMemo(() => WORKS.find((workItem) => workItem.title === work), [work]);
+type MenuProps = {
+  work: string;
+  setWork: (work: string) => void;
+};
+
+export const Menu: React.FC<MenuProps> = ({ work, setWork }) => {
+  const selectedWork = useMemo(() => WORKS.find((w) => w.title === work), [work]);
 
   return (
     <div>

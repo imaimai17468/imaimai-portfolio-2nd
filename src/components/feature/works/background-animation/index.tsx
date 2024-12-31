@@ -2,16 +2,17 @@
 
 import { Reflector, Text, useGLTF, useTexture } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useSearchParams } from "next/navigation";
 import type React from "react";
 import { Suspense, useMemo, useState } from "react";
 import * as THREE from "three";
 import { WORKS, type Work } from "../const";
 
-export const BackgroundAnimation: React.FC = () => {
-  const searchParams = useSearchParams();
-  const work = searchParams.get("work");
-  const selectedWork = useMemo(() => WORKS.find((w) => w.title === work), [work]) ?? WORKS[0];
+type BackgroundAnimationProps = {
+  currentWork: string;
+};
+
+export const BackgroundAnimation: React.FC<BackgroundAnimationProps> = ({ currentWork }) => {
+  const selectedWork = useMemo(() => WORKS.find((w) => w.title === currentWork), [currentWork]) ?? WORKS[0];
 
   return (
     <div className="h-screen w-full -z-10 fixed top-0 left-0">
