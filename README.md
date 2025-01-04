@@ -1,35 +1,81 @@
-# Imaimai Front Template
+<div align="center">
+  <h1>🎨 Imaimai Portfolio</h1>
+  <p>クリエイティブなポートフォリオサイト</p>
+</div>
 
-### Overview
-"Imaimai Front Template" is a Next.js project designed for high-performance and fast development using cutting-edge technology. With Bun as the package manager, it achieves faster build times and execution. Lefthook automates pre-commit and pre-push checks to ensure stable code quality.
+<div align="center">
 
-### Features
-- **High Performance**: Leveraging Bun for faster builds and execution compared to traditional environments.
-- **Theme Switching**: Integrated with `next-themes` for seamless dark/light theme toggling.
-- **Intuitive UI**: Built with shadcn/ui, offering stylish, highly customizable UI components.
-- **Code Quality Assurance**: Biome handles code checks and formatting automatically before commits. TypeScript type checks are also run to catch potential errors early.
-- **Sidebar Included**: An implemented sidebar enhances usability and navigation.
+  ![Next.js](https://img.shields.io/badge/Next.js-black?style=for-the-badge&logo=next.js&logoColor=white)
+  ![TypeScript](https://img.shields.io/badge/TypeScript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
+  ![TailwindCSS](https://img.shields.io/badge/Tailwind-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
+  ![Bun](https://img.shields.io/badge/Bun-%23000000.svg?style=for-the-badge&logo=bun&logoColor=white)
 
-### Technologies Used
-- **Next.js**: A powerful framework for server-side rendering and static site generation.
-- **Bun**: A fast JavaScript runtime for building, executing, and managing packages.
-- **shadcn/ui**: A stylish and modern UI component library.
-- **Tailwind CSS**: A customizable utility-first CSS framework.
-- **TypeScript**: Ensures type safety and reliability.
+</div>
 
-### Scripts
-- `dev`: Starts the development server.
-- `build`: Builds the app for production.
-- `start`: Runs the production build.
-- `check`: Runs Biome for code checks with auto-fixes.
-- `format`: Formats code using Biome.
-- `init:lefthook`: Sets up Lefthook.
+## 🌟 概要
 
-### Lefthook Hooks
-#### pre-commit
-1. **fix**: Formats staged files using Biome and updates the index.
-2. **check**: Runs Biome checks on staged files.
-3. **type**: Runs TypeScript type checks to prevent potential errors.
+このポートフォリオサイトは、最新のWeb技術を活用して作られた、インタラクティブで魅力的な作品集です。
+モダンなデザインと快適なユーザー体験を提供することを目指しています。
 
-#### pre-push
-1. **check**: Runs Biome checks on staged files.
+## ✨ 特徴
+
+- 🎭 **ダイナミックなアニメーション**
+  スムーズな遷移とインタラクティブな要素による没入感のある体験
+
+- 🌓 **ダーク/ライトモード**
+  ユーザーの好みに合わせた快適な閲覧環境
+
+- 📱 **レスポンシブデザイン**
+  あらゆるデバイスで最適な表示を実現
+
+- ⚡ **高速なパフォーマンス**
+  Next.jsとBunによる最適化された読み込み速度
+
+## 🛠️ 技術スタック
+
+- **フレームワーク**: Next.js
+- **言語**: TypeScript
+- **スタイリング**: Tailwind CSS, shadcn/ui
+- **パッケージマネージャー**: Bun
+- **品質管理**: Biome, Lefthook
+
+## 🚀 開発環境のセットアップ
+
+```bash
+# リポジトリのクローン
+git clone https://github.com/yourusername/imaimai-portfolio.git
+
+# 依存関係のインストール
+bun install
+
+# 開発サーバーの起動
+bun dev
+```
+
+## 📂 プロジェクト構成
+
+```
+src/
+├── app/          # ページルーティング
+├── components/   # UIコンポーネント
+│   ├── feature/  # 機能別コンポーネント
+│   ├── parts/    # 再利用可能なパーツ
+│   └── ui/       # 基本UIコンポーネント
+└── styles/       # グローバルスタイル
+```
+
+## 🔄 品質管理
+
+- **コード品質**: Biomeによる自動フォーマットとリント
+- **型チェック**: TypeScriptによる静的型チェック
+- **Git Hooks**: コミット前の自動チェック
+
+## 📝 ライセンス
+
+MIT © Imaimai Portfolio
+
+---
+
+<div align="center">
+  <p>Made with 🐸 by Imaimai</p>
+</div>
