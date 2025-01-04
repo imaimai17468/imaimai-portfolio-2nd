@@ -45,12 +45,14 @@ const cinecaption = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Imaimai Portfolio",
-  description: "クリエイティブなポートフォリオサイト | インタラクティブなUIとアニメーションで彩られた作品集",
+  title: "imaimai17468's Portfolio",
+  description:
+    "imaimai17468のポートフォリオサイト | クリエイティブなWeb開発者として、技術とデザインで新しい体験を創造します",
   keywords: [
+    "imaimai17468",
     "portfolio",
     "web development",
-    "creative",
+    "creative coding",
     "interactive",
     "UI/UX",
     "animation",
@@ -58,23 +60,23 @@ export const metadata: Metadata = {
     "React",
     "TypeScript",
   ],
-  authors: [{ name: "Imaimai" }],
-  creator: "Imaimai",
-  publisher: "Imaimai",
+  authors: [{ name: "imaimai17468" }],
+  creator: "imaimai17468",
+  publisher: "imaimai17468",
   robots: "index, follow",
   openGraph: {
-    title: "Imaimai Portfolio",
-    description: "クリエイティブなポートフォリオサイト | インタラクティブなUIとアニメーションで彩られた作品集",
+    title: "imaimai17468's Portfolio 2nd",
+    description: "imaimai17468のポートフォリオサイト | フロントエンドエンジニアとして、常に自分を示し続けます",
     url: "https://imaimai.tech",
-    siteName: "Imaimai Portfolio",
+    siteName: "imaimai17468's Portfolio",
     locale: "ja_JP",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Imaimai Portfolio",
-    description: "クリエイティブなポートフォリオサイト | インタラクティブなUIとアニメーションで彩られた作品集",
-    creator: "@imaimai_dev",
+    title: "imaimai17468's Portfolio 2nd",
+    description: "imaimai17468のポートフォリオサイト | フロントエンドエンジニアとして、常に自分を示し続けます",
+    creator: "@imaimai17468",
   },
   viewport: {
     width: "device-width",
