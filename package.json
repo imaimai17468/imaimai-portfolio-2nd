@@ -23,6 +23,7 @@
     "@react-three/postprocessing": "^2.16.3",
     "@tabler/icons-react": "^3.26.0",
     "@types/three": "^0.171.0",
+    "@vercel/analytics": "^1.4.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "framer-motion": "^11.15.0",

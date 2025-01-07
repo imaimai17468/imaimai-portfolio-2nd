@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/react";
 import localFont from "next/font/local";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
@@ -101,6 +102,7 @@ export default function RootLayout({
     >
       <body className="dark">
         <NuqsAdapter>{children}</NuqsAdapter>
+        <Analytics />
       </body>
     </html>
   );
