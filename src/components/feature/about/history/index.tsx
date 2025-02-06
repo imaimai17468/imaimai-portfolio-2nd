@@ -6,7 +6,7 @@ const data = [
   {
     title: "2024 -",
     content: (
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-16">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-16 bg-zinc-900 bg-opacity-80 p-4 rounded-lg">
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-4">
             <h3 className="text-lg mt-1">株式会社ゆめみ</h3>
@@ -114,7 +114,7 @@ const data = [
   {
     title: "2022-2024",
     content: (
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-16">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-16 bg-zinc-900 bg-opacity-80 p-4 rounded-lg">
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-4">
             <h3 className="text-lg mt-1">長岡技術科学大学</h3>
@@ -197,7 +197,7 @@ const data = [
   {
     title: "2017-2022",
     content: (
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-16">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-16 bg-zinc-900 bg-opacity-80 p-4 rounded-lg">
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-4">
             <h3 className="text-lg mt-1">木更津工業高等専門学校</h3>
