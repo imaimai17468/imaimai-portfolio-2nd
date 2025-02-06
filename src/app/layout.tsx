@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { MainLayout } from "@/components/layout/main-layout";
 import { Analytics } from "@vercel/analytics/react";
 import localFont from "next/font/local";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
@@ -101,7 +102,9 @@ export default function RootLayout({
       className={`${roboto.variable} ${raleway.variable} ${nakamori.variable} ${cinecaption.variable} font-roboto`}
     >
       <body className="dark">
-        <NuqsAdapter>{children}</NuqsAdapter>
+        <NuqsAdapter>
+          <MainLayout>{children}</MainLayout>
+        </NuqsAdapter>
         <Analytics />
       </body>
     </html>
