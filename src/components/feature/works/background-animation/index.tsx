@@ -5,7 +5,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import type React from "react";
 import { Suspense, useMemo, useState } from "react";
 import * as THREE from "three";
-import { WORKS, type Work } from "../const";
+import { WORKS } from "../const";
 
 type BackgroundAnimationProps = {
   currentWork: string;
@@ -22,11 +22,10 @@ export const BackgroundAnimation: React.FC<BackgroundAnimationProps> = ({ curren
         <Suspense fallback={null}>
           <group position={[0, -1, 0]}>
             <Carla rotation={[0, Math.PI - 0.4, 0]} position={[-1.2, 0, 0.6]} scale={[0.26, 0.26, 0.26]} />
-            <BackgroundText
+            <ImageText
               position={[0, 1.3, -2]}
               text={selectedWork?.videoText ?? "Select a work"}
               background={selectedWork?.background ?? ""}
-              type={selectedWork?.type ?? "image"}
             />
             <Ground />
           </group>
@@ -45,31 +44,6 @@ function Carla(props: JSX.IntrinsicElements["group"]) {
   return <primitive object={scene} {...props} />;
 }
 
-function VideoText({
-  position,
-  text,
-  background: backgroundSrc,
-}: { position: [number, number, number]; text: string; background: string }) {
-  const video = useMemo(() => {
-    const video = Object.assign(document.createElement("video"), {
-      src: backgroundSrc,
-      crossOrigin: "Anonymous",
-      loop: true,
-      muted: true,
-    });
-    void video.play();
-    return video;
-  }, [backgroundSrc]);
-  return (
-    <Text font="/Inter-Bold.woff" fontSize={1} position={position} lineHeight={0.8}>
-      {text}
-      <meshBasicMaterial toneMapped={false}>
-        <videoTexture attach="map" args={[video]} />
-      </meshBasicMaterial>
-    </Text>
-  );
-}
-
 function ImageText({
   position,
   text,
@@ -82,23 +56,6 @@ function ImageText({
       <meshBasicMaterial toneMapped={false} map={texture} />
     </Text>
   );
-}
-
-function BackgroundText({
-  position,
-  text,
-  background,
-  type,
-}: {
-  position: [number, number, number];
-  text: string;
-  background: string;
-  type: Work["type"];
-}) {
-  if (type === "video") {
-    return <VideoText position={position} text={text} background={background} />;
-  }
-  return <ImageText position={position} text={text} background={background} />;
 }
 
 function Ground() {

@@ -3,7 +3,6 @@ export type Work = {
   videoText: string;
   background: string;
   path: string;
-  type: "video" | "image";
   people: number;
   date: string;
   role: string;
@@ -18,9 +17,8 @@ export const WORKS: Work[] = [
   {
     title: "imaimai portfolio 2nd",
     videoText: "imaimai\nportfolio\n2nd",
-    background: "/works/imaimai_portfolio_2nd.mov",
+    background: "/works/imaimai_portfolio_2nd.png",
     path: "/",
-    type: "video",
     people: 1,
     date: "2024/12 -",
     role: "All",
@@ -31,9 +29,8 @@ export const WORKS: Work[] = [
   {
     title: "imaimai portfolio",
     videoText: "imaimai\nportfolio",
-    background: "/works/imaimai_portfolio.mov",
+    background: "/works/imaimai_portfolio.png",
     path: "/",
-    type: "video",
     people: 1,
     date: "2023/02 - 2024/12",
     role: "All",
@@ -47,7 +44,6 @@ export const WORKS: Work[] = [
     videoText: "NUTMEG\nSeeds",
     background: "/works/nutmeg_seeds.png",
     path: "/",
-    type: "image",
     people: 6,
     date: "2022/06 - 2024/03",
     role: "Frontend",
@@ -60,7 +56,6 @@ export const WORKS: Work[] = [
     videoText: "FinanSu",
     background: "/works/finansu.png",
     path: "/",
-    type: "image",
     people: 8,
     date: "2022/09 - 2024/03",
     role: "PM / Frontend",
@@ -73,7 +68,6 @@ export const WORKS: Work[] = [
     videoText: "Group\nManager\n2",
     background: "/works/group_manager_2.png",
     path: "/",
-    type: "image",
     people: 10,
     date: "2022/10 - 2024/03",
     role: "Frontend",
@@ -86,7 +80,6 @@ export const WORKS: Work[] = [
     videoText: "Tracking\nParking",
     background: "/works/tracking_parking.png",
     path: "/",
-    type: "image",
     people: 3,
     date: "2023/03 - 2024/03",
     role: "Frontend",
@@ -100,7 +93,6 @@ export const WORKS: Work[] = [
     videoText: "TS Audio\nVisualizer",
     background: "/works/ts_audio_visualizer.png",
     path: "/",
-    type: "image",
     people: 1,
     date: "2023/07",
     role: "All",
@@ -114,7 +106,6 @@ export const WORKS: Work[] = [
     videoText: "AtCoder\nTeam\nBattle",
     background: "/works/atcoder_team_battle.png",
     path: "/",
-    type: "image",
     people: 1,
     date: "2023/10 -",
     role: "All",
@@ -125,9 +116,8 @@ export const WORKS: Work[] = [
   {
     title: "Akeome",
     videoText: "Akeome",
-    background: "/works/akeome.mov",
+    background: "/works/akeome.png",
     path: "/",
-    type: "video",
     people: 1,
     date: "2023/12",
     role: "All",
@@ -141,7 +131,6 @@ export const WORKS: Work[] = [
     videoText: "Contrast\nColor\npalette",
     background: "/works/contrast_color_palette.png",
     path: "/",
-    type: "image",
     people: 1,
     date: "2024/09 -",
     role: "All",
@@ -155,7 +144,6 @@ export const WORKS: Work[] = [
     videoText: "Silk\nWeave",
     background: "/works/silk_weave.png",
     path: "/",
-    type: "image",
     people: 1,
     date: "2024/10 - 2024/11",
     role: "All",
@@ -168,7 +156,6 @@ export const WORKS: Work[] = [
     videoText: "Tech\nTips",
     background: "/works/tech_tips.png",
     path: "/",
-    type: "image",
     people: 1,
     date: "2024/04 -",
     role: "All",
