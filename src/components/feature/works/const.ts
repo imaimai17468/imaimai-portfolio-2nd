@@ -2,7 +2,6 @@ export type Work = {
   title: string;
   videoText: string;
   background: string;
-  path: string;
   people: number;
   date: string;
   role: string;
@@ -13,12 +12,11 @@ export type Work = {
   status: "completed" | "in-progress" | "stopped" | "graduated";
 };
 
-export const WORKS: Work[] = [
+export const WORKS = [
   {
     title: "imaimai portfolio 2nd",
     videoText: "imaimai\nportfolio\n2nd",
     background: "/works/imaimai_portfolio_2nd.png",
-    path: "/",
     people: 1,
     date: "2024/12 -",
     role: "All",
@@ -30,7 +28,6 @@ export const WORKS: Work[] = [
     title: "imaimai portfolio",
     videoText: "imaimai\nportfolio",
     background: "/works/imaimai_portfolio.png",
-    path: "/",
     people: 1,
     date: "2023/02 - 2024/12",
     role: "All",
@@ -43,7 +40,6 @@ export const WORKS: Work[] = [
     title: "NUTMEG Seeds",
     videoText: "NUTMEG\nSeeds",
     background: "/works/nutmeg_seeds.png",
-    path: "/",
     people: 6,
     date: "2022/06 - 2024/03",
     role: "Frontend",
@@ -55,7 +51,6 @@ export const WORKS: Work[] = [
     title: "FinanSu",
     videoText: "FinanSu",
     background: "/works/finansu.png",
-    path: "/",
     people: 8,
     date: "2022/09 - 2024/03",
     role: "PM / Frontend",
@@ -67,7 +62,6 @@ export const WORKS: Work[] = [
     title: "Group Manager 2",
     videoText: "Group\nManager\n2",
     background: "/works/group_manager_2.png",
-    path: "/",
     people: 10,
     date: "2022/10 - 2024/03",
     role: "Frontend",
@@ -79,7 +73,6 @@ export const WORKS: Work[] = [
     title: "Tracking Parking",
     videoText: "Tracking\nParking",
     background: "/works/tracking_parking.png",
-    path: "/",
     people: 3,
     date: "2023/03 - 2024/03",
     role: "Frontend",
@@ -92,7 +85,6 @@ export const WORKS: Work[] = [
     title: "TS Audio Visualizer",
     videoText: "TS Audio\nVisualizer",
     background: "/works/ts_audio_visualizer.png",
-    path: "/",
     people: 1,
     date: "2023/07",
     role: "All",
@@ -105,7 +97,6 @@ export const WORKS: Work[] = [
     title: "AtCoder Team Battle",
     videoText: "AtCoder\nTeam\nBattle",
     background: "/works/atcoder_team_battle.png",
-    path: "/",
     people: 1,
     date: "2023/10 -",
     role: "All",
@@ -117,7 +108,6 @@ export const WORKS: Work[] = [
     title: "Akeome",
     videoText: "Akeome",
     background: "/works/akeome.png",
-    path: "/",
     people: 1,
     date: "2023/12",
     role: "All",
@@ -130,7 +120,6 @@ export const WORKS: Work[] = [
     title: "Contrast Color palette",
     videoText: "Contrast\nColor\npalette",
     background: "/works/contrast_color_palette.png",
-    path: "/",
     people: 1,
     date: "2024/09 -",
     role: "All",
@@ -143,7 +132,6 @@ export const WORKS: Work[] = [
     title: "Silk Weave",
     videoText: "Silk\nWeave",
     background: "/works/silk_weave.png",
-    path: "/",
     people: 1,
     date: "2024/10 - 2024/11",
     role: "All",
@@ -155,7 +143,6 @@ export const WORKS: Work[] = [
     title: "TsuukinPlace",
     videoText: "Tsuukin\nPlace",
     background: "/works/tsuukin-place.png",
-    path: "/",
     people: 1,
     date: "2025/04 -",
     role: "All",
@@ -163,4 +150,4 @@ export const WORKS: Work[] = [
     status: "completed",
     url: "https://tsuukin-place.com/",
   },
-];
+] satisfies Work[];
