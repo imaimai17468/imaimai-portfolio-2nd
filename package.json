@@ -8,7 +8,8 @@
     "start": "next start",
     "check": "biome check --apply src",
     "format": "biome format --write src",
-    "init:lefthook": "lefthook install"
+    "init:lefthook": "lefthook install",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@biomejs/biome": "^1.8.3",
