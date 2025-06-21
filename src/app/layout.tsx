@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { MainLayout } from "@/components/layout/main-layout";
 import { Analytics } from "@vercel/analytics/react";
@@ -80,11 +80,12 @@ export const metadata: Metadata = {
     description: "imaimai17468のポートフォリオサイト | フロントエンドエンジニアとして、常に自分を示し続けます",
     creator: "@imaimai17468",
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
     { media: "(prefers-color-scheme: dark)", color: "#000000" },
