@@ -47,6 +47,7 @@ const cinecaption = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://imaimai.tech"),
   title: "imaimai17468's Portfolio",
   description:
     "imaimai17468のポートフォリオサイト | クリエイティブなWeb開発者として、技術とデザインで新しい体験を創造します",
