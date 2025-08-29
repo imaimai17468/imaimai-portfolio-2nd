@@ -1,153 +1,33 @@
 export type Work = {
   title: string;
-  videoText: string;
-  background: string;
-  people: number;
-  date: string;
-  role: string;
+  image: string;
   description: string;
-  github?: string;
   url?: string;
-  slide?: string;
-  status: "completed" | "in-progress" | "stopped" | "graduated";
 };
 
 export const WORKS = [
   {
-    title: "imaimai portfolio 2nd",
-    videoText: "imaimai\nportfolio\n2nd",
-    background: "/works/imaimai_portfolio_2nd.png",
-    people: 1,
-    date: "2024/12 -",
-    role: "All",
-    description: "imaimai portfolioのデザインを作り直し",
-    status: "in-progress",
-    github: "https://github.com/imaimai17468/imaimai-portfolio-2nd/",
-  },
-  {
-    title: "imaimai portfolio",
-    videoText: "imaimai\nportfolio",
-    background: "/works/imaimai_portfolio.png",
-    people: 1,
-    date: "2023/02 - 2024/12",
-    role: "All",
-    description: "技術の遊び場として, ポートフォリオが欲しかったので制作",
-    status: "completed",
-    github: "https://github.com/imaimai17468/imaimai-portfolio/",
-    url: "https://imaimai-portfolio.vercel.app/",
-  },
-  {
-    title: "NUTMEG Seeds",
-    videoText: "NUTMEG\nSeeds",
-    background: "/works/nutmeg_seeds.png",
-    people: 6,
-    date: "2022/06 - 2024/03",
-    role: "Frontend",
-    description: "NUTMEGのメンバー情報や学習記録を管理するために制作",
-    status: "graduated",
-    slide: "https://docs.google.com/presentation/d/1E1sfNE5K3RQa_ad4wLrgDHhA9pxx8gkL/edit#slide=id.p1",
-  },
-  {
-    title: "FinanSu",
-    videoText: "FinanSu",
-    background: "/works/finansu.png",
-    people: 8,
-    date: "2022/09 - 2024/03",
-    role: "PM / Frontend",
-    description: "学園祭に使われる資金管理をサポートするために制作",
-    status: "graduated",
-    slide: "https://docs.google.com/presentation/d/13MDFLSlJoL7IjJAYpROsIqTJSDR6whIZ/edit#slide=id.p1",
-  },
-  {
-    title: "Group Manager 2",
-    videoText: "Group\nManager\n2",
-    background: "/works/group_manager_2.png",
-    people: 10,
-    date: "2022/10 - 2024/03",
-    role: "Frontend",
-    description: "学園祭に参加する学生団体を管理するために制作",
-    status: "graduated",
-    slide: "https://docs.google.com/presentation/d/1GJ9rAku8HDjErt069q_jSoJU0gl8k-S8-nX4HNddFO0/edit#slide=id.p1",
-  },
-  {
-    title: "Tracking Parking",
-    videoText: "Tracking\nParking",
-    background: "/works/tracking_parking.png",
-    people: 3,
-    date: "2023/03 - 2024/03",
-    role: "Frontend",
-    description: "学園祭に訪れる車の数を把握するために制作",
-    status: "graduated",
-    slide:
-      "https://docs.google.com/presentation/d/1Juucm7S0rWtzMJnSPszK2CzO9Ry6oWrYJ9KyZFyTsi4/edit#slide=id.g1724dedfe5c_0_54",
-  },
-  {
-    title: "TS Audio Visualizer",
-    videoText: "TS Audio\nVisualizer",
-    background: "/works/ts_audio_visualizer.png",
-    people: 1,
-    date: "2023/07",
-    role: "All",
-    description: "web上でのマイク音声をリアルタイムで可視化するために制作",
-    status: "completed",
-    github: "https://github.com/imaimai17468/ts-audio-visualizer",
-    url: "https://www.npmjs.com/package/ts-audio-visualizer?activeTab=readme",
-  },
-  {
-    title: "AtCoder Team Battle",
-    videoText: "AtCoder\nTeam\nBattle",
-    background: "/works/atcoder_team_battle.png",
-    people: 1,
-    date: "2023/10 -",
-    role: "All",
-    description: "AtCoderのチーム戦を行えるようにしたくて制作",
-    status: "stopped",
-    github: "https://github.com/imaimai17468/atcoder-teambattle",
-  },
-  {
-    title: "Akeome",
-    videoText: "Akeome",
-    background: "/works/akeome.png",
-    people: 1,
-    date: "2023/12",
-    role: "All",
-    description: "2024年のあけおめ用サイト。akeo.meはもう他の人が使ってた :cry:",
-    status: "completed",
-    github: "https://github.com/imaimai17468/akeome",
-    url: "https://akeome-imaimai17468.vercel.app/",
-  },
-  {
     title: "Contrast Color palette",
-    videoText: "Contrast\nColor\npalette",
-    background: "/works/contrast_color_palette.png",
-    people: 1,
-    date: "2024/09 -",
-    role: "All",
+    image: "/works/contrast_color_palette.png",
     description: "ダークテーマを含め、コントラスト比が高いカラーパレットを作れるようにするためのツール",
-    status: "in-progress",
     url: "https://contrast-color-pallet.vercel.app/",
-    github: "https://github.com/imaimai17468/contrast-color-pallet/",
-  },
-  {
-    title: "Silk Weave",
-    videoText: "Silk\nWeave",
-    background: "/works/silk_weave.png",
-    people: 1,
-    date: "2024/10 - 2024/11",
-    role: "All",
-    description: "Slack上のスレッドをNotionにまとめてくれるSlackBot",
-    status: "completed",
-    github: "https://github.com/imaimai17468/silk-weave-slack-bot",
   },
   {
     title: "TsuukinPlace",
-    videoText: "Tsuukin\nPlace",
-    background: "/works/tsuukin-place.png",
-    people: 1,
-    date: "2025/04 -",
-    role: "All",
+    image: "/works/tsuukin-place.png",
     description: "通勤時間や経路を最適化し、効率的な通勤プランを提案するWebアプリケーション",
-    status: "completed",
     url: "https://tsuukin-place.com/",
+  },
+  {
+    title: "Madorism",
+    image: "/works/madorism.png",
+    description: "間取り図さえあれば部屋の寸法や家具を置いたときのシミュレーションができるWebアプリケーション",
+    url: "https://madorism.com/",
+  },
+  {
+    title: "Kowagarasema.show",
+    image: "/works/kowagarasemashow.png",
+    description: "怖がらせましょう！",
+    url: "https://kowagarasema.show/",
   },
 ] satisfies Work[];
