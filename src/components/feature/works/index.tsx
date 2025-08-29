@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Background } from "./background";
 import { WORKS } from "./const";
 import type { Work } from "./const";
 
@@ -8,7 +9,10 @@ export const Works: React.FC = () => {
   const [selectedWork, setSelectedWork] = useState<Work>(WORKS[0]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="relative min-h-screen">
+      <div className="absolute inset-0 -z-10">
+        <Background />
+      </div>
       <div className="container mx-auto px-6 py-12">
         <div className="text-center my-12">
           <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-200 mb-4">Works</h1>
