@@ -30,4 +30,11 @@ export const WORKS = [
     description: "怖がらせましょう！",
     url: "https://kowagarasema.show/",
   },
+  {
+    title: "Digital Agency Icons",
+    image: "/works/digital_agency_icons.png",
+    description:
+      "デジタル庁デザインシステムのアイコンを、React・Vue・Svelteで簡単に使える非公式コンポーネントライブラリ",
+    url: "https://digital-agency-icons-docs.vercel.app/",
+  },
 ] satisfies Work[];
