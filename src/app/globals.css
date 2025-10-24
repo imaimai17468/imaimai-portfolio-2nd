@@ -29,6 +29,14 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
@@ -56,6 +64,32 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Workspace-specific colors */
+    --workspace-bg: 240 10% 3.9%;
+    --workspace-sidebar: 240 8% 6%;
+    --workspace-sidebar-hover: 240 6% 10%;
+    --workspace-sidebar-active: 240 5% 14%;
+    --workspace-preview: 240 7% 8%;
+    --workspace-code-bg: 240 12% 2.5%;
+    --workspace-border-subtle: 240 6% 12%;
+    --workspace-border-strong: 240 5% 18%;
+    --workspace-accent-primary: 217 91% 60%;
+    --workspace-accent-secondary: 142 71% 45%;
+    --workspace-accent-warning: 38 92% 50%;
+    --workspace-accent-hover: 217 91% 70%;
+    --workspace-text-primary: 0 0% 98%;
+    --workspace-text-secondary: 240 5% 84%;
+    --workspace-text-muted: 240 5% 64.9%;
+    --workspace-text-subtle: 240 4% 46%;
   }
 }
 
