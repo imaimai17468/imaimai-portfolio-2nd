@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "check": "biome check --apply src",
+    "check": "biome check --write src",
     "format": "biome format --write src",
     "init:lefthook": "lefthook install",
     "typecheck": "tsc --noEmit"
