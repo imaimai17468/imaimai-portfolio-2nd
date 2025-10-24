@@ -16,6 +16,7 @@ interface WorkspaceContentProps {
 
 export function WorkspaceContent({ component, activeTab, onTabChange }: WorkspaceContentProps) {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [multiSelectValue, setMultiSelectValue] = useState<string[]>(["react", "vue"]);
 
   const handleCopy = (code: string, index: number) => {
     navigator.clipboard.writeText(code);
@@ -24,6 +25,16 @@ export function WorkspaceContent({ component, activeTab, onTabChange }: Workspac
   };
 
   const Component = component.component;
+
+  // MultiSelectCombobox用の動的props
+  const componentProps =
+    component.id === "multiSelectCombobox"
+      ? {
+          ...(component.defaultProps || {}),
+          selected: multiSelectValue,
+          onChange: setMultiSelectValue,
+        }
+      : component.defaultProps || {};
 
   return (
     <div className="flex-1 p-6 lg:p-8">
@@ -63,7 +74,7 @@ export function WorkspaceContent({ component, activeTab, onTabChange }: Workspac
                   backgroundColor: component.previewConfig?.backgroundColor || undefined,
                 }}
               >
-                <Component {...(component.defaultProps || {})} />
+                <Component {...componentProps} />
               </div>
             </CardContent>
           </Card>

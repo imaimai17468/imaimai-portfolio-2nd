@@ -46,21 +46,29 @@ export function MultiSelectCombobox({
   };
 
   return (
-    <div className={cn("w-full space-y-2", className)}>
+    <div className={cn("w-full", className)}>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-between">
+          <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-start gap-2">
             {selected.length > 0 ? (
-              <span className="text-sm">
-                {selected.length} item{selected.length > 1 ? "s" : ""} selected
-              </span>
+              <div className="flex flex-1 flex-wrap gap-1">
+                {selected.map((value) => {
+                  const label = options.find((option) => option.value === value)?.label;
+                  if (!label) return null;
+                  return (
+                    <Badge key={value} variant="secondary" className="font-normal">
+                      {label}
+                    </Badge>
+                  );
+                })}
+              </div>
             ) : (
-              <span className="text-muted-foreground">{placeholder}</span>
+              <span className="flex-1 text-left text-muted-foreground">{placeholder}</span>
             )}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0" align="start">
+        <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
           <Command>
             <CommandInput placeholder={searchPlaceholder} />
             <CommandList>
@@ -77,32 +85,36 @@ export function MultiSelectCombobox({
                 })}
               </CommandGroup>
             </CommandList>
+            {/* Selected items as badges with remove button */}
+            {selected.length > 0 && (
+              <div className="border-t p-2">
+                <div className="flex flex-wrap gap-1">
+                  {selected.map((value) => {
+                    const label = options.find((option) => option.value === value)?.label;
+                    if (!label) return null;
+                    return (
+                      <Badge key={value} variant="secondary" className="gap-1 pr-1">
+                        <span>{label}</span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemove(value);
+                          }}
+                          className="ml-1 rounded-sm opacity-70 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                          aria-label={`Remove ${label}`}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </Command>
         </PopoverContent>
       </Popover>
-
-      {/* Selected items as badges */}
-      {selected.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {selected.map((value) => {
-            const label = options.find((option) => option.value === value)?.label;
-            if (!label) return null;
-            return (
-              <Badge key={value} variant="secondary" className="gap-1 pr-1">
-                <span>{label}</span>
-                <button
-                  type="button"
-                  onClick={() => handleRemove(value)}
-                  className="ml-1 rounded-sm opacity-70 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                  aria-label={`Remove ${label}`}
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            );
-          })}
-        </div>
-      )}
     </div>
   );
 }
