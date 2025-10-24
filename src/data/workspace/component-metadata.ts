@@ -61,7 +61,7 @@ export interface PreviewConfig {
 /**
  * コンポーネントメタデータ
  */
-export interface ComponentMetadata {
+export interface ComponentMetadata<P = unknown> {
   id: string; // 一意の識別子 (例: 'hyperspeed')
   name: string; // 表示名 (例: 'Hyperspeed')
   category: ComponentCategory;
@@ -69,8 +69,8 @@ export interface ComponentMetadata {
   tags: string[];
 
   // ショーケースするコンポーネント
-  component: ComponentType<Record<string, unknown>>;
-  defaultProps?: Record<string, unknown>;
+  component: ComponentType<P>;
+  defaultProps?: Partial<P> | Record<string, unknown>;
 
   // ドキュメント
   props: PropDefinition[];
@@ -95,5 +95,5 @@ export interface ComponentMetadata {
  * コンポーネントレジストリ
  */
 export interface ComponentRegistry {
-  [componentId: string]: ComponentMetadata;
+  [componentId: string]: ComponentMetadata<unknown>;
 }
