@@ -7,6 +7,12 @@ export type Work = {
 
 export const WORKS = [
   {
+    title: "imaimai UI",
+    image: "/works/imaimai_ui.png",
+    description: "他のライブラリにない、必要なコンポーネントを集めたレジストリ",
+    url: "https://imaimai-ui.vercel.app/",
+  },
+  {
     title: "Contrast Color palette",
     image: "/works/contrast_color_palette.png",
     description: "ダークテーマを含め、コントラスト比が高いカラーパレットを作れるようにするためのツール",
