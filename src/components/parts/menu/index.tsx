@@ -29,11 +29,6 @@ const MenuList = ({ onLinkClick }: { onLinkClick?: () => void }) => {
           <p className="font-black">BACKBONE</p>
         </Link>
       </li>
-      <li className="border-b border-zinc-200 hover:bg-zinc-200 hover:text-zinc-800 transition-all duration-300 px-2">
-        <Link href="/workspace" onClick={onLinkClick}>
-          <p className="font-black">WORKSPACE</p>
-        </Link>
-      </li>
     </ul>
   );
 };
