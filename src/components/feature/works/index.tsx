@@ -1,10 +1,11 @@
 "use client";
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import Image from "next/image";
 import { useState } from "react";
 import { Background } from "./background";
-import { WORKS } from "./const";
 import type { Work } from "./const";
+import { WORKS } from "./const";
 
 export const Works: React.FC = () => {
   const [selectedWork, setSelectedWork] = useState<Work>(WORKS[0]);
@@ -53,7 +54,7 @@ export const Works: React.FC = () => {
           {/* PC表示: 右側に固定表示 */}
           <div className="hidden lg:block bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
             <div className="aspect-video bg-gray-200 dark:bg-gray-700 relative overflow-hidden">
-              <img src={selectedWork.image} alt={selectedWork.title} className="w-full h-full object-cover" />
+              <Image src={selectedWork.image} alt={selectedWork.title} fill className="object-cover" />
             </div>
             <div className="p-6">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-3">{selectedWork.title}</h2>
@@ -96,7 +97,7 @@ export const Works: React.FC = () => {
           </DialogHeader>
           <div className="space-y-4">
             <div className="aspect-video bg-gray-200 dark:bg-gray-700 relative overflow-hidden rounded-lg">
-              <img src={selectedWork.image} alt={selectedWork.title} className="w-full h-full object-cover" />
+              <Image src={selectedWork.image} alt={selectedWork.title} fill className="object-cover" />
             </div>
             {selectedWork.url && (
               <a

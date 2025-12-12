@@ -15,5 +15,8 @@
         "useExhaustiveDependencies": "warn"
       }
     }
+  },
+  "files": {
+    "ignore": ["**/*.css"]
   }
 }
