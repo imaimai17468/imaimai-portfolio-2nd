@@ -19,7 +19,7 @@ type Props = {
 };
 
 type SnsImageConfig = {
-  image: StaticImageData;
+  image: StaticImageData | string;
   alt: string;
   width: number;
   height: number;
