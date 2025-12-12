@@ -1,9 +1,9 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useCallback, useEffect, useRef } from "react";
 import { createNoise3D } from "simplex-noise";
+import { cn } from "@/lib/utils";
 
 interface VortexProps {
   children?: React.ReactNode;
@@ -22,6 +22,8 @@ interface VortexProps {
 export const Vortex = (props: VortexProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef(null);
+  const drawRef = useRef<((canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => void) | null>(null);
+  const initParticlesRef = useRef<(() => void) | null>(null);
   const particleCount = props.particleCount || 700;
   const particlePropCount = 9;
   const particlePropsLength = particleCount * particlePropCount;
@@ -63,21 +65,29 @@ export const Vortex = (props: VortexProps) => {
     center[1] = 0.5 * canvas.height;
   }, []);
 
-  const setup = useCallback(() => {
-    const canvas = canvasRef.current;
-    const container = containerRef.current;
-    if (canvas && container) {
-      const ctx = canvas.getContext("2d");
+  // biome-ignore lint/correctness/useExhaustiveDependencies: rand, randRange, particleProps.set, and center are stable references that don't need to be in dependencies
+  const initParticle = useCallback(
+    (i: number) => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
 
-      if (ctx) {
-        resize(canvas);
-        initParticles();
-        draw(canvas, ctx);
-      }
-    }
-  }, [resize]);
+      const x: number = rand(canvas.width);
+      const y: number = center[1] + randRange(rangeY);
+      const vx: number = 0;
+      const vy: number = 0;
+      const life: number = 0;
+      const ttl: number = baseTTL + rand(rangeTTL);
+      const speed: number = baseSpeed + rand(rangeSpeed);
+      const radius: number = baseRadius + rand(rangeRadius);
+      const hue: number = baseHue + rand(rangeHue);
 
-  const initParticles = () => {
+      particleProps.set([x, y, vx, vy, life, ttl, speed, radius, hue], i);
+    },
+    [rangeY, baseTTL, rangeTTL, baseSpeed, rangeSpeed, baseRadius, rangeRadius, baseHue],
+  );
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: tick and particleProps are mutable variables that don't need to be in dependencies
+  const initParticles = useCallback(() => {
     tick = 0;
     // simplex = new SimplexNoise();
     particleProps = new Float32Array(particlePropsLength);
@@ -85,39 +95,44 @@ export const Vortex = (props: VortexProps) => {
     for (let i = 0; i < particlePropsLength; i += particlePropCount) {
       initParticle(i);
     }
-  };
+  }, [particlePropsLength, particlePropCount, initParticle]);
 
-  const initParticle = (i: number) => {
+  const setup = useCallback(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const container = containerRef.current;
+    if (canvas && container) {
+      const ctx = canvas.getContext("2d");
 
-    const x: number = rand(canvas.width);
-    const y: number = center[1] + randRange(rangeY);
-    const vx: number = 0;
-    const vy: number = 0;
-    const life: number = 0;
-    const ttl: number = baseTTL + rand(rangeTTL);
-    const speed: number = baseSpeed + rand(rangeSpeed);
-    const radius: number = baseRadius + rand(rangeRadius);
-    const hue: number = baseHue + rand(rangeHue);
+      if (ctx && initParticlesRef.current && drawRef.current) {
+        resize(canvas);
+        initParticlesRef.current();
+        drawRef.current(canvas, ctx);
+      }
+    }
+  }, [resize]);
 
-    particleProps.set([x, y, vx, vy, life, ttl, speed, radius, hue], i);
-  };
+  // biome-ignore lint/correctness/useExhaustiveDependencies: tick is a mutable variable, drawParticles, renderGlow, and renderToScreen are stable references
+  const draw = useCallback(
+    (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => {
+      tick++;
 
-  const draw = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => {
-    tick++;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = backgroundColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = backgroundColor;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+      drawParticles(ctx);
+      renderGlow(canvas, ctx);
+      renderToScreen(canvas, ctx);
 
-    drawParticles(ctx);
-    renderGlow(canvas, ctx);
-    renderToScreen(canvas, ctx);
-
-    window.requestAnimationFrame(() => draw(canvas, ctx));
-  };
+      window.requestAnimationFrame(() => {
+        if (drawRef.current) {
+          drawRef.current(canvas, ctx);
+        }
+      });
+    },
+    [backgroundColor],
+  );
 
   const drawParticles = (ctx: CanvasRenderingContext2D) => {
     for (let i = 0; i < particlePropsLength; i += particlePropCount) {
@@ -212,6 +227,8 @@ export const Vortex = (props: VortexProps) => {
   };
 
   useEffect(() => {
+    initParticlesRef.current = initParticles;
+    drawRef.current = draw;
     setup();
     window.addEventListener("resize", () => {
       const canvas = canvasRef.current;
@@ -220,7 +237,7 @@ export const Vortex = (props: VortexProps) => {
         resize(canvas);
       }
     });
-  }, [setup, resize]);
+  }, [setup, resize, initParticles, draw]);
 
   return (
     <div className={cn("relative h-full w-full", props.containerClassName)}>

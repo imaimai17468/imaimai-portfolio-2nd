@@ -1,10 +1,11 @@
 "use client";
 
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import Image from "next/image";
 import { useState } from "react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Background } from "./background";
-import { WORKS } from "./const";
 import type { Work } from "./const";
+import { WORKS } from "./const";
 
 export const Works: React.FC = () => {
   const [selectedWork, setSelectedWork] = useState<Work>(WORKS[0]);
@@ -28,17 +29,11 @@ export const Works: React.FC = () => {
         <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
           <div className="space-y-4">
             {WORKS.map((work) => (
-              <div
+              <button
                 key={work.title}
                 onClick={() => handleWorkClick(work)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    handleWorkClick(work);
-                  }
-                }}
-                role="button"
-                tabIndex={0}
-                className={`p-4 rounded-xl cursor-pointer transition-all duration-200 ${
+                type="button"
+                className={`w-full text-left p-4 rounded-xl cursor-pointer transition-all duration-200 ${
                   selectedWork.title === work.title
                     ? "bg-white dark:bg-gray-800 shadow-lg ring-2 ring-blue-500"
                     : "bg-white/50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md"
@@ -46,14 +41,14 @@ export const Works: React.FC = () => {
               >
                 <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">{work.title}</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">{work.description}</p>
-              </div>
+              </button>
             ))}
           </div>
 
           {/* PC表示: 右側に固定表示 */}
           <div className="hidden lg:block bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
             <div className="aspect-video bg-gray-200 dark:bg-gray-700 relative overflow-hidden">
-              <img src={selectedWork.image} alt={selectedWork.title} className="w-full h-full object-cover" />
+              <Image src={selectedWork.image} alt={selectedWork.title} fill className="object-cover" />
             </div>
             <div className="p-6">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-3">{selectedWork.title}</h2>
@@ -96,7 +91,7 @@ export const Works: React.FC = () => {
           </DialogHeader>
           <div className="space-y-4">
             <div className="aspect-video bg-gray-200 dark:bg-gray-700 relative overflow-hidden rounded-lg">
-              <img src={selectedWork.image} alt={selectedWork.title} className="w-full h-full object-cover" />
+              <Image src={selectedWork.image} alt={selectedWork.title} fill className="object-cover" />
             </div>
             {selectedWork.url && (
               <a

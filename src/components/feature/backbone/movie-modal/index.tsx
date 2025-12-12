@@ -1,3 +1,4 @@
+import { InfoIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -7,7 +8,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { InfoIcon } from "lucide-react";
 
 type Props = {
   title?: string;

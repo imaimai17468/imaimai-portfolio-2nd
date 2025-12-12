@@ -1,12 +1,15 @@
-import { SnsLinkButton } from "@/components/parts/sns-link-button";
-import { FlipWords } from "@/components/ui/flip-words";
 import { Cake, Heart } from "lucide-react";
 import Image from "next/image";
+import { SnsLinkButton } from "@/components/parts/sns-link-button";
+import { FlipWords } from "@/components/ui/flip-words";
 import frogImage from "./frog.jpeg";
 
 export const Profile: React.FC = () => {
   return (
-    <div className="max-w-3xl mx-auto font-light h-screen flex justify-center flex-col gap-16" aria-label="私について">
+    <section
+      className="max-w-3xl mx-auto font-light h-screen flex justify-center flex-col gap-16"
+      aria-label="私について"
+    >
       <div className="w-full flex justify-between items-center flex-col-reverse sm:flex-row gap-8 sm:gap-0 px-8">
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-4">
@@ -46,6 +49,6 @@ export const Profile: React.FC = () => {
           height={300}
         />
       </div>
-    </div>
+    </section>
   );
 };
