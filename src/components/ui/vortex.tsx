@@ -1,9 +1,9 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useCallback, useEffect, useRef } from "react";
 import { createNoise3D } from "simplex-noise";
+import { cn } from "@/lib/utils";
 
 interface VortexProps {
   children?: React.ReactNode;
@@ -65,6 +65,28 @@ export const Vortex = (props: VortexProps) => {
     center[1] = 0.5 * canvas.height;
   }, []);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: rand, randRange, particleProps.set, and center are stable references that don't need to be in dependencies
+  const initParticle = useCallback(
+    (i: number) => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      const x: number = rand(canvas.width);
+      const y: number = center[1] + randRange(rangeY);
+      const vx: number = 0;
+      const vy: number = 0;
+      const life: number = 0;
+      const ttl: number = baseTTL + rand(rangeTTL);
+      const speed: number = baseSpeed + rand(rangeSpeed);
+      const radius: number = baseRadius + rand(rangeRadius);
+      const hue: number = baseHue + rand(rangeHue);
+
+      particleProps.set([x, y, vx, vy, life, ttl, speed, radius, hue], i);
+    },
+    [rangeY, baseTTL, rangeTTL, baseSpeed, rangeSpeed, baseRadius, rangeRadius, baseHue],
+  );
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: tick and particleProps are mutable variables that don't need to be in dependencies
   const initParticles = useCallback(() => {
     tick = 0;
     // simplex = new SimplexNoise();
@@ -73,8 +95,7 @@ export const Vortex = (props: VortexProps) => {
     for (let i = 0; i < particlePropsLength; i += particlePropCount) {
       initParticle(i);
     }
-    // biome-ignore lint/correctness/useExhaustiveDependencies: tick, particleProps, and particlePropCount are constants/mutable variables that don't need to be in dependencies
-  }, [particlePropsLength]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [particlePropsLength, particlePropCount, initParticle]);
 
   const setup = useCallback(() => {
     const canvas = canvasRef.current;
@@ -90,41 +111,28 @@ export const Vortex = (props: VortexProps) => {
     }
   }, [resize]);
 
-  const initParticle = (i: number) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+  // biome-ignore lint/correctness/useExhaustiveDependencies: tick is a mutable variable, drawParticles, renderGlow, and renderToScreen are stable references
+  const draw = useCallback(
+    (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => {
+      tick++;
 
-    const x: number = rand(canvas.width);
-    const y: number = center[1] + randRange(rangeY);
-    const vx: number = 0;
-    const vy: number = 0;
-    const life: number = 0;
-    const ttl: number = baseTTL + rand(rangeTTL);
-    const speed: number = baseSpeed + rand(rangeSpeed);
-    const radius: number = baseRadius + rand(rangeRadius);
-    const hue: number = baseHue + rand(rangeHue);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    particleProps.set([x, y, vx, vy, life, ttl, speed, radius, hue], i);
-  };
+      ctx.fillStyle = backgroundColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  const draw = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => {
-    tick++;
+      drawParticles(ctx);
+      renderGlow(canvas, ctx);
+      renderToScreen(canvas, ctx);
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    ctx.fillStyle = backgroundColor;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    drawParticles(ctx);
-    renderGlow(canvas, ctx);
-    renderToScreen(canvas, ctx);
-
-    window.requestAnimationFrame(() => {
-      if (drawRef.current) {
-        drawRef.current(canvas, ctx);
-      }
-    });
-  };
+      window.requestAnimationFrame(() => {
+        if (drawRef.current) {
+          drawRef.current(canvas, ctx);
+        }
+      });
+    },
+    [backgroundColor],
+  );
 
   const drawParticles = (ctx: CanvasRenderingContext2D) => {
     for (let i = 0; i < particlePropsLength; i += particlePropCount) {
@@ -229,8 +237,7 @@ export const Vortex = (props: VortexProps) => {
         resize(canvas);
       }
     });
-    // biome-ignore lint/correctness/useExhaustiveDependencies: draw is stored in ref and doesn't need to be in dependencies
-  }, [setup, resize, initParticles]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [setup, resize, initParticles, draw]);
 
   return (
     <div className={cn("relative h-full w-full", props.containerClassName)}>

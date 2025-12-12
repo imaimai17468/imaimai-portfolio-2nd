@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/button";
 import { LinkIcon, Presentation } from "lucide-react";
-import Image from "next/image";
 import type { StaticImageData } from "next/image";
+import Image from "next/image";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import githubLogo from "./logos/github-mark-white.svg";
 import noteLogo from "./logos/note.svg";
 import speakerdeckLogo from "./logos/speaker-deck.png";

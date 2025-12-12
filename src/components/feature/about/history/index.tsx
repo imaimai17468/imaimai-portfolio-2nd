@@ -1,6 +1,6 @@
+import { Dot, MonitorIcon, Search, Tickets, UserIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Timeline } from "@/components/ui/timeline";
-import { Dot, MonitorIcon, Search, Tickets, UserIcon } from "lucide-react";
 
 const data = [
   {
@@ -238,8 +238,8 @@ const data = [
 ];
 export const History: React.FC = () => {
   return (
-    <div className="max-w-5xl mx-auto font-light flex flex-col gap-16" aria-label="私のこれまで">
+    <section className="max-w-5xl mx-auto font-light flex flex-col gap-16" aria-label="私のこれまで">
       <Timeline data={data} />
-    </div>
+    </section>
   );
 };

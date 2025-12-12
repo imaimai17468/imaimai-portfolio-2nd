@@ -1,7 +1,7 @@
 "use client";
-import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import React, { useRef, useState, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 
 const generateRandomBeams = (count: number) => {
   const heightClasses = ["h-8", "h-10", "h-12", "h-14", "h-16"];
