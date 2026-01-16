@@ -6,6 +6,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "www.cyberpunk.net",
       },
+      {
+        protocol: "https",
+        hostname: "www.google.com",
+      },
     ],
   },
 };

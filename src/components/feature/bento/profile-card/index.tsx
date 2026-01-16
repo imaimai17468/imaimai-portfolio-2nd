@@ -52,16 +52,6 @@ export const ProfileCard: React.FC = () => {
         <p className="text-sm text-muted-foreground text-center leading-relaxed">
           24卒 | フロントエンド | ゆめみ(消滅) → ???
         </p>
-        <div className="pt-2">
-          <Link
-            href="https://github.com/imaimai17468"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-blue-400 hover:text-blue-300 transition-colors flex items-center justify-center gap-1"
-          >
-            <span>github.com/imaimai17468</span>
-          </Link>
-        </div>
       </CardContent>
     </Card>
   );

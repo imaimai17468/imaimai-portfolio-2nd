@@ -9,9 +9,9 @@ type LinkItem = {
 };
 
 /**
- * リンクデータの定義
+ * プロフィール・活動系リンク
  */
-const LINKS: LinkItem[] = [
+const PROFILE_LINKS: LinkItem[] = [
   {
     title: "しずかなインターネット",
     url: "https://sizu.me/imaimai17468",
@@ -32,6 +32,21 @@ const LINKS: LinkItem[] = [
     url: "https://lapras.com/public/imaimai17468",
     description: "エンジニアとしてのキャリアプロフィール",
   },
+];
+
+/**
+ * GitHub
+ */
+const GITHUB_LINK: LinkItem = {
+  title: "GitHub",
+  url: "https://github.com/imaimai17468",
+  description: "ソースコードとプロジェクト",
+};
+
+/**
+ * プロダクト系リンク
+ */
+const PRODUCT_LINKS: LinkItem[] = [
   {
     title: "ツウキンプレイス",
     url: "https://tsuukin-place.com",
@@ -61,18 +76,34 @@ const LINKS: LinkItem[] = [
 export const Bento: React.FC = () => {
   return (
     <BentoLayout>
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-5xl mx-auto space-y-12">
+        {/* プロフィール・活動セクション */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-fr">
           {/* プロフィールカード - モバイルでは通常サイズ、md以上で2行分の高さ */}
           <div className="md:row-span-2">
             <ProfileCard />
           </div>
 
-          {/* リンクカード */}
-          {LINKS.map((link) => (
+          {/* プロフィール・活動系リンク */}
+          {PROFILE_LINKS.map((link) => (
             <LinkCard key={link.url} title={link.title} url={link.url} description={link.description} />
           ))}
         </div>
+
+        {/* GitHubセクション */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <LinkCard title={GITHUB_LINK.title} url={GITHUB_LINK.url} description={GITHUB_LINK.description} />
+        </div>
+
+        {/* プロダクトセクション */}
+        <section className="space-y-6">
+          <h2 className="text-3xl font-bold text-center">Products</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {PRODUCT_LINKS.map((link) => (
+              <LinkCard key={link.url} title={link.title} url={link.url} description={link.description} />
+            ))}
+          </div>
+        </section>
       </div>
     </BentoLayout>
   );
