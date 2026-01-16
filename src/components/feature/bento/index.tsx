@@ -48,6 +48,11 @@ const GITHUB_LINK: LinkItem = {
  */
 const PRODUCT_LINKS: LinkItem[] = [
   {
+    title: "Osampo",
+    url: "https://osampo.vercel.app/",
+    description: "散歩の記録と共有",
+  },
+  {
     title: "ツウキンプレイス",
     url: "https://tsuukin-place.com",
     description: "通勤時間から駅の家賃相場を調べるサービス",
@@ -78,7 +83,7 @@ export const Bento: React.FC = () => {
     <BentoLayout>
       <div className="max-w-5xl mx-auto space-y-12">
         {/* プロフィール・活動セクション */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-fr">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:auto-rows-fr">
           {/* プロフィールカード - モバイルでは通常サイズ、md以上で2行分の高さ */}
           <div className="md:row-span-2">
             <ProfileCard />
