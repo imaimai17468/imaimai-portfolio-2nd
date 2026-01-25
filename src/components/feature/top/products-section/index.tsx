@@ -105,7 +105,8 @@ type ProductCardProps = {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, index, isInView, isLarge = false }) => {
   const domain = new URL(product.url).hostname.replace("www.", "");
-  const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+  // icon.horse API is more reliable for Vercel apps and modern sites
+  const faviconUrl = `https://icon.horse/icon/${domain}`;
 
   return (
     <motion.div

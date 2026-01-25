@@ -75,7 +75,8 @@ type ActivityCardProps = {
 
 const ActivityCard: React.FC<ActivityCardProps> = ({ activity, index, isInView }) => {
   const domain = new URL(activity.url).hostname.replace("www.", "");
-  const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+  // icon.horse API is more reliable for modern sites
+  const faviconUrl = `https://icon.horse/icon/${domain}`;
 
   return (
     <motion.div
