@@ -5,7 +5,7 @@ import { ChevronDown } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
-import avatarImage from "../profile-card/avatar.jpeg";
+import avatarImage from "./avatar.jpeg";
 
 /**
  * Hero Section - プロフィール
