@@ -126,7 +126,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index, isInView, isL
           {/* OGP画像 - 右側にフェード */}
           <div className="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden pointer-events-none">
             <img
-              src={`https://v1.opengraph.11ty.dev/${encodeURIComponent(product.url)}/small/`}
+              src={`https://image.thum.io/get/width/400/crop/800/noanimate/${product.url}`}
               alt=""
               className="absolute right-0 h-full w-auto object-cover opacity-15"
               style={{

@@ -89,7 +89,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, index, isInView }
           {/* OGP画像 - 右側にフェード */}
           <div className="absolute right-0 top-0 bottom-0 w-1/3 overflow-hidden pointer-events-none">
             <img
-              src={`https://v1.opengraph.11ty.dev/${encodeURIComponent(activity.url)}/small/`}
+              src={`https://image.thum.io/get/width/400/crop/800/noanimate/${activity.url}`}
               alt=""
               className="absolute right-0 h-full w-auto object-cover opacity-10"
               style={{
