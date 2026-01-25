@@ -84,14 +84,13 @@ export const About: React.FC = () => {
             period="2024.04 - 2024.12"
             company="株式会社ゆめみ"
             note="会社消滅"
-            roles={["フロントエンドエンジニア", "リクルーター", "技育プロジェクト担当"]}
+            roles={["フロントエンドエンジニア", "リクルーター", "技育Project担当"]}
             projects={[
               "大型漫画掲載サイトのリニューアル",
               "HR系サービスのホームページのリニューアル",
               "求人掲載サービスの管理画面の新規機能開発",
               "飛行機の国際線予約サービスの新規開発",
             ]}
-            sponsorships={["技育CAMPハッカソン", "技育CAMPキャラバン", "技育展"]}
             speaking={["フロントエンドカンファレンス北海道 2024", "TSKaigi 2025", "他多数"]}
           />
         </motion.section>
@@ -152,36 +151,37 @@ export const About: React.FC = () => {
           />
         </motion.section>
 
-        {/* スキル・興味 */}
+        {/* スキル・リンク */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="mb-16"
+          className="border-t border-zinc-800 pt-12"
         >
-          <h2 className="text-sm text-zinc-500 tracking-wider mb-6">SKILLS & INTERESTS</h2>
-          <div className="flex flex-wrap gap-2">
-            {["フロントエンド開発", "UI/UX デザイン", "React/Next.js", "TypeScript"].map((tag) => (
-              <span key={tag} className="px-3 py-1 text-sm text-zinc-400 border border-zinc-800 rounded-full">
-                {tag}
-              </span>
-            ))}
-          </div>
-        </motion.section>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* スキル */}
+            <div>
+              <h2 className="text-sm text-zinc-500 tracking-wider mb-4">SKILLS & INTERESTS</h2>
+              <div className="flex flex-wrap gap-2">
+                {["フロントエンド開発", "UI/UX デザイン", "React/Next.js", "TypeScript"].map((tag) => (
+                  <span key={tag} className="px-3 py-1 text-sm text-zinc-400 border border-zinc-800 rounded-full">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
 
-        {/* リンク */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          <h2 className="text-sm text-zinc-500 tracking-wider mb-6">LINKS</h2>
-          <div className="space-y-3">
-            <LinkItem href="https://github.com/imaimai17468" label="GitHub" />
-            <LinkItem href="https://x.com/imaimai17468" label="X (Twitter)" />
-            <LinkItem href="https://zenn.dev/imaimai17468" label="Zenn" />
-            <LinkItem href="https://note.com/imaimai17468" label="note" />
-            <LinkItem href="https://speakerdeck.com/imaimai17468" label="Speaker Deck" />
+            {/* リンク */}
+            <div>
+              <h2 className="text-sm text-zinc-500 tracking-wider mb-4">LINKS</h2>
+              <div className="space-y-2">
+                <LinkItem href="https://github.com/imaimai17468" label="GitHub" />
+                <LinkItem href="https://x.com/imaimai17468" label="X (Twitter)" />
+                <LinkItem href="https://zenn.dev/imaimai17468" label="Zenn" />
+                <LinkItem href="https://note.com/imaimai17468" label="note" />
+                <LinkItem href="https://speakerdeck.com/imaimai17468" label="Speaker Deck" />
+              </div>
+            </div>
           </div>
         </motion.section>
       </main>
@@ -195,19 +195,10 @@ type CareerSectionProps = {
   note?: string;
   roles: string[];
   projects: string[];
-  sponsorships?: string[];
   speaking?: string[];
 };
 
-const CareerSection: React.FC<CareerSectionProps> = ({
-  period,
-  company,
-  note,
-  roles,
-  projects,
-  sponsorships,
-  speaking,
-}) => {
+const CareerSection: React.FC<CareerSectionProps> = ({ period, company, note, roles, projects, speaking }) => {
   return (
     <div className="space-y-6">
       {/* ヘッダー */}
@@ -223,15 +214,15 @@ const CareerSection: React.FC<CareerSectionProps> = ({
 
       {/* サブセクション */}
       <div className="ml-[136px] space-y-5">
-        {/* 役職 */}
+        {/* 役職 - タグ形式 */}
         <SubSection title="Roles">
-          <ul className="space-y-1">
+          <div className="flex flex-wrap gap-2">
             {roles.map((role) => (
-              <li key={role} className="text-sm text-zinc-400">
+              <span key={role} className="px-2 py-1 text-xs text-zinc-400 border border-zinc-800 rounded">
                 {role}
-              </li>
+              </span>
             ))}
-          </ul>
+          </div>
         </SubSection>
 
         {/* プロジェクト */}
@@ -245,29 +236,10 @@ const CareerSection: React.FC<CareerSectionProps> = ({
           </ul>
         </SubSection>
 
-        {/* イベントスポンサー */}
-        {sponsorships && sponsorships.length > 0 && (
-          <SubSection title="Event Sponsor">
-            <ul className="space-y-1">
-              {sponsorships.map((event) => (
-                <li key={event} className="text-sm text-zinc-400">
-                  {event}
-                </li>
-              ))}
-            </ul>
-          </SubSection>
-        )}
-
-        {/* 登壇 */}
+        {/* 登壇 - インライン形式 */}
         {speaking && speaking.length > 0 && (
           <SubSection title="Speaker">
-            <ul className="space-y-1">
-              {speaking.map((event) => (
-                <li key={event} className="text-sm text-zinc-400">
-                  {event}
-                </li>
-              ))}
-            </ul>
+            <p className="text-sm text-zinc-400">{speaking.join("、")}</p>
           </SubSection>
         )}
       </div>
@@ -329,33 +301,28 @@ const EducationSection: React.FC<EducationSectionProps> = ({
           </SubSection>
         )}
 
-        {/* 実績 */}
+        {/* 実績 - タグ形式 */}
         {achievements && achievements.length > 0 && (
           <SubSection title="Results">
-            <ul className="space-y-1">
+            <div className="flex flex-wrap gap-2">
               {achievements.map((achievement) => (
-                <li key={achievement} className="text-sm text-zinc-400">
+                <span key={achievement} className="px-2 py-1 text-xs text-zinc-400 border border-zinc-800 rounded">
                   {achievement}
-                </li>
+                </span>
               ))}
-            </ul>
+            </div>
           </SubSection>
         )}
 
         {/* 業務委託 */}
         {freelance && freelance.length > 0 && (
           <SubSection title="Freelance">
-            <div className="space-y-3">
+            <div className="space-y-2">
               {freelance.map((item) => (
-                <div key={item.client}>
-                  <p className="text-sm text-zinc-500 mb-1">{item.client}</p>
-                  <ul className="space-y-1 ml-3">
-                    {item.projects.map((project) => (
-                      <li key={project} className="text-sm text-zinc-400">
-                        {project}
-                      </li>
-                    ))}
-                  </ul>
+                <div key={item.client} className="text-sm">
+                  <span className="text-zinc-500">{item.client}</span>
+                  <span className="text-zinc-600 mx-2">·</span>
+                  <span className="text-zinc-400">{item.projects.join("、")}</span>
                 </div>
               ))}
             </div>
