@@ -7,16 +7,17 @@ import Link from "next/link";
 import avatarImage from "../top/hero-section/avatar.jpeg";
 
 /**
- * About Page - シンプルな自己紹介
+ * About Page - 詳細な経歴情報を含む自己紹介
  *
  * design-guidelines:
- * - Typography: 読みやすいテキスト階層
- * - Spatial Composition: 十分な余白、中央寄せ
- * - 装飾を削ぎ落としてコンテンツに集中
+ * - Typography: 読みやすいテキスト階層（見出し → サブセクション → 詳細）
+ * - Spatial Composition: 十分な余白、グルーピングによる視覚的整理
+ * - Progressive disclosure: セクション内でサブセクションに分割
  *
  * UX原則:
- * - Recognition over recall: 必要な情報だけを明確に表示
- * - Progressive disclosure: スクロールで詳細が現れる
+ * - Recognition over recall: 情報をカテゴリ別に整理
+ * - Gestalt grouping: 関連情報を近接配置
+ * - Cognitive load: 情報を小さなチャンクに分割
  */
 export const About: React.FC = () => {
   return (
@@ -70,7 +71,7 @@ export const About: React.FC = () => {
           </p>
         </motion.section>
 
-        {/* 職歴 */}
+        {/* 職歴 - ゆめみ */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -78,17 +79,24 @@ export const About: React.FC = () => {
           className="mb-16"
         >
           <h2 className="text-sm text-zinc-500 tracking-wider mb-6">CAREER</h2>
-          <div className="space-y-6">
-            <CareerItem
-              period="2024.04 - 2024.12"
-              title="株式会社ゆめみ"
-              description="フロントエンドエンジニア / リクルーター / 技育プロジェクト担当"
-              note="会社消滅"
-            />
-          </div>
+
+          <CareerSection
+            period="2024.04 - 2024.12"
+            company="株式会社ゆめみ"
+            note="会社消滅"
+            roles={["フロントエンドエンジニア", "リクルーター", "技育プロジェクト担当"]}
+            projects={[
+              "大型漫画掲載サイトのリニューアル",
+              "HR系サービスのホームページのリニューアル",
+              "求人掲載サービスの管理画面の新規機能開発",
+              "飛行機の国際線予約サービスの新規開発",
+            ]}
+            sponsorships={["技育CAMPハッカソン", "技育CAMPキャラバン", "技育展"]}
+            speaking={["フロントエンドカンファレンス北海道 2024", "TSKaigi 2025", "他多数"]}
+          />
         </motion.section>
 
-        {/* 学歴 */}
+        {/* 学歴 - 長岡技術科学大学 */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -96,20 +104,52 @@ export const About: React.FC = () => {
           className="mb-16"
         >
           <h2 className="text-sm text-zinc-500 tracking-wider mb-6">EDUCATION</h2>
-          <div className="space-y-6">
-            <EducationItem
-              period="2022 - 2024"
-              title="長岡技術科学大学"
-              department="電気電子情報工学課程"
-              research="睡眠時脳波の構造解析"
-            />
-            <EducationItem
-              period="2017 - 2022"
-              title="木更津工業高等専門学校"
-              department="電子制御工学科"
-              research="光学式心拍センサの精度評価"
-            />
-          </div>
+
+          <EducationSection
+            period="2022 - 2024"
+            school="長岡技術科学大学"
+            department="電気電子情報工学課程"
+            research="睡眠時脳波の構造解析"
+            club="学園祭実行委員会 情報局 (NUTMEG)"
+            projects={[
+              "学園祭で使われる資金の管理アプリ",
+              "サークルメンバーの育成管理アプリ",
+              "駐車場空き情報のリアルタイム監視アプリ",
+            ]}
+            achievements={["第一回技育博にNUTMEGの代表として参加", "技育展 2023 企業賞"]}
+            freelance={[
+              {
+                client: "スタートアップA社",
+                projects: ["修理の受注/発注ができるLINEアプリの開発"],
+              },
+              {
+                client: "スタートアップB社",
+                projects: [
+                  "建築関係のマッチングプラットフォームの開発",
+                  "学会の抄録冊子の自動作成サービス",
+                  "履歴書の自動PDF化・管理サービス",
+                ],
+              },
+            ]}
+          />
+
+          <div className="mt-8" />
+
+          <EducationSection
+            period="2017 - 2022"
+            school="木更津工業高等専門学校"
+            department="電子制御工学科"
+            research="光学式心拍センサの精度評価"
+            club="プログラミング研究同好会"
+            projects={["文化祭での自作ゲーム展示", "研究室の鍵のカードキーシステム化", "学校の単位数計算サイト"]}
+            achievements={["Paiza S", "AtCoder 緑"]}
+            freelance={[
+              {
+                client: "paiza Inc.",
+                projects: ["競技プログラミング問題集の作問"],
+              },
+            ]}
+          />
         </motion.section>
 
         {/* スキル・興味 */}
@@ -149,44 +189,193 @@ export const About: React.FC = () => {
   );
 };
 
-type CareerItemProps = {
+type CareerSectionProps = {
   period: string;
-  title: string;
-  description: string;
+  company: string;
   note?: string;
+  roles: string[];
+  projects: string[];
+  sponsorships?: string[];
+  speaking?: string[];
 };
 
-const CareerItem: React.FC<CareerItemProps> = ({ period, title, description, note }) => {
+const CareerSection: React.FC<CareerSectionProps> = ({
+  period,
+  company,
+  note,
+  roles,
+  projects,
+  sponsorships,
+  speaking,
+}) => {
   return (
-    <div className="grid grid-cols-[120px_1fr] gap-4">
-      <span className="text-sm text-zinc-600 font-mono">{period}</span>
-      <div>
-        <div className="flex items-center gap-2">
-          <h3 className="text-zinc-200 font-medium">{title}</h3>
-          {note && <span className="text-xs text-zinc-600">({note})</span>}
+    <div className="space-y-6">
+      {/* ヘッダー */}
+      <div className="grid grid-cols-[120px_1fr] gap-4">
+        <span className="text-sm text-zinc-600 font-mono">{period}</span>
+        <div>
+          <div className="flex items-center gap-2">
+            <h3 className="text-zinc-200 font-medium">{company}</h3>
+            {note && <span className="text-xs text-zinc-600">({note})</span>}
+          </div>
         </div>
-        <p className="text-sm text-zinc-500 mt-1">{description}</p>
+      </div>
+
+      {/* サブセクション */}
+      <div className="ml-[136px] space-y-5">
+        {/* 役職 */}
+        <SubSection title="Roles">
+          <ul className="space-y-1">
+            {roles.map((role) => (
+              <li key={role} className="text-sm text-zinc-400">
+                {role}
+              </li>
+            ))}
+          </ul>
+        </SubSection>
+
+        {/* プロジェクト */}
+        <SubSection title="Projects">
+          <ul className="space-y-1">
+            {projects.map((project) => (
+              <li key={project} className="text-sm text-zinc-400">
+                {project}
+              </li>
+            ))}
+          </ul>
+        </SubSection>
+
+        {/* イベントスポンサー */}
+        {sponsorships && sponsorships.length > 0 && (
+          <SubSection title="Event Sponsor">
+            <ul className="space-y-1">
+              {sponsorships.map((event) => (
+                <li key={event} className="text-sm text-zinc-400">
+                  {event}
+                </li>
+              ))}
+            </ul>
+          </SubSection>
+        )}
+
+        {/* 登壇 */}
+        {speaking && speaking.length > 0 && (
+          <SubSection title="Speaker">
+            <ul className="space-y-1">
+              {speaking.map((event) => (
+                <li key={event} className="text-sm text-zinc-400">
+                  {event}
+                </li>
+              ))}
+            </ul>
+          </SubSection>
+        )}
       </div>
     </div>
   );
 };
 
-type EducationItemProps = {
-  period: string;
-  title: string;
-  department: string;
-  research: string;
+type FreelanceItem = {
+  client: string;
+  projects: string[];
 };
 
-const EducationItem: React.FC<EducationItemProps> = ({ period, title, department, research }) => {
+type EducationSectionProps = {
+  period: string;
+  school: string;
+  department: string;
+  research: string;
+  club?: string;
+  projects?: string[];
+  achievements?: string[];
+  freelance?: FreelanceItem[];
+};
+
+const EducationSection: React.FC<EducationSectionProps> = ({
+  period,
+  school,
+  department,
+  research,
+  club,
+  projects,
+  achievements,
+  freelance,
+}) => {
   return (
-    <div className="grid grid-cols-[120px_1fr] gap-4">
-      <span className="text-sm text-zinc-600 font-mono">{period}</span>
-      <div>
-        <h3 className="text-zinc-200 font-medium">{title}</h3>
-        <p className="text-sm text-zinc-500 mt-1">{department}</p>
-        <p className="text-sm text-zinc-600 mt-1">研究: {research}</p>
+    <div className="space-y-6">
+      {/* ヘッダー */}
+      <div className="grid grid-cols-[120px_1fr] gap-4">
+        <span className="text-sm text-zinc-600 font-mono">{period}</span>
+        <div>
+          <h3 className="text-zinc-200 font-medium">{school}</h3>
+          <p className="text-sm text-zinc-500 mt-1">{department}</p>
+          <p className="text-sm text-zinc-600 mt-1">研究: {research}</p>
+          {club && <p className="text-sm text-zinc-600 mt-1">{club}</p>}
+        </div>
       </div>
+
+      {/* サブセクション */}
+      <div className="ml-[136px] space-y-5">
+        {/* プロジェクト */}
+        {projects && projects.length > 0 && (
+          <SubSection title="Projects">
+            <ul className="space-y-1">
+              {projects.map((project) => (
+                <li key={project} className="text-sm text-zinc-400">
+                  {project}
+                </li>
+              ))}
+            </ul>
+          </SubSection>
+        )}
+
+        {/* 実績 */}
+        {achievements && achievements.length > 0 && (
+          <SubSection title="Results">
+            <ul className="space-y-1">
+              {achievements.map((achievement) => (
+                <li key={achievement} className="text-sm text-zinc-400">
+                  {achievement}
+                </li>
+              ))}
+            </ul>
+          </SubSection>
+        )}
+
+        {/* 業務委託 */}
+        {freelance && freelance.length > 0 && (
+          <SubSection title="Freelance">
+            <div className="space-y-3">
+              {freelance.map((item) => (
+                <div key={item.client}>
+                  <p className="text-sm text-zinc-500 mb-1">{item.client}</p>
+                  <ul className="space-y-1 ml-3">
+                    {item.projects.map((project) => (
+                      <li key={project} className="text-sm text-zinc-400">
+                        {project}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </SubSection>
+        )}
+      </div>
+    </div>
+  );
+};
+
+type SubSectionProps = {
+  title: string;
+  children: React.ReactNode;
+};
+
+const SubSection: React.FC<SubSectionProps> = ({ title, children }) => {
+  return (
+    <div>
+      <h4 className="text-xs text-zinc-600 tracking-wider mb-2">{title}</h4>
+      {children}
     </div>
   );
 };
