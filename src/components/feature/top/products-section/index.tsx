@@ -34,6 +34,11 @@ const PRODUCTS: LinkItem[] = [
     url: "https://imaimai-ui.vercel.app",
     description: "オリジナルUIコンポーネント集",
   },
+  {
+    title: "木更津高専単位カウンター",
+    url: "https://credits-counter-fo-knct.vercel.app/",
+    description: "高専生向けの単位計算ツール",
+  },
 ];
 
 /**

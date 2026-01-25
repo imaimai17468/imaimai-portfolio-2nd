@@ -20,11 +20,6 @@ const ACTIVITIES: LinkItem[] = [
     description: "技術記事やナレッジの共有",
   },
   {
-    title: "Portfolio",
-    url: "https://imaimai.tech",
-    description: "ポートフォリオサイト",
-  },
-  {
     title: "LAPRAS",
     url: "https://lapras.com/public/imaimai17468",
     description: "エンジニアとしてのキャリアプロフィール",
