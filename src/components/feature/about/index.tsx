@@ -71,7 +71,7 @@ export const About: React.FC = () => {
           </p>
         </motion.section>
 
-        {/* 職歴 - ゆめみ */}
+        {/* 職歴 */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -80,19 +80,31 @@ export const About: React.FC = () => {
         >
           <h2 className="text-sm text-zinc-500 tracking-wider mb-6">CAREER</h2>
 
-          <CareerSection
-            period="2024.04 - 2024.12"
-            company="株式会社ゆめみ"
-            note="会社消滅"
-            roles={["フロントエンドエンジニア", "リクルーター", "技育Project担当"]}
-            projects={[
-              "大型漫画掲載サイトのリニューアル",
-              "HR系サービスのホームページのリニューアル",
-              "求人掲載サービスの管理画面の新規機能開発",
-              "飛行機の国際線予約サービスの新規開発",
-            ]}
-            speaking={["フロントエンドカンファレンス北海道 2024", "TSKaigi 2025", "他多数"]}
-          />
+          <div className="space-y-12">
+            {/* アクセンチュア */}
+            <CareerSection
+              period="2024.12 - "
+              company="アクセンチュア株式会社"
+              department="Song D&DP"
+              roles={["プロダクトエンジニア", "リクルーター", "技育Project担当", "Song LT会の主催・運営"]}
+              projects={["MultiAgentSaaS開発・提案"]}
+            />
+
+            {/* ゆめみ */}
+            <CareerSection
+              period="2024.04 - 2024.12"
+              company="株式会社ゆめみ"
+              note="会社消滅"
+              roles={["フロントエンドエンジニア", "リクルーター", "技育Project担当"]}
+              projects={[
+                "大型漫画掲載サイトのリニューアル",
+                "HR系サービスのホームページのリニューアル",
+                "求人掲載サービスの管理画面の新規機能開発",
+                "飛行機の国際線予約サービスの新規開発",
+              ]}
+              speaking={["フロントエンドカンファレンス北海道 2024", "TSKaigi 2025", "他多数"]}
+            />
+          </div>
         </motion.section>
 
         {/* 学歴 - 長岡技術科学大学 */}
@@ -192,13 +204,22 @@ export const About: React.FC = () => {
 type CareerSectionProps = {
   period: string;
   company: string;
+  department?: string;
   note?: string;
   roles: string[];
   projects: string[];
   speaking?: string[];
 };
 
-const CareerSection: React.FC<CareerSectionProps> = ({ period, company, note, roles, projects, speaking }) => {
+const CareerSection: React.FC<CareerSectionProps> = ({
+  period,
+  company,
+  department,
+  note,
+  roles,
+  projects,
+  speaking,
+}) => {
   return (
     <div className="space-y-6">
       {/* ヘッダー */}
@@ -209,6 +230,7 @@ const CareerSection: React.FC<CareerSectionProps> = ({ period, company, note, ro
             <h3 className="text-zinc-200 font-medium">{company}</h3>
             {note && <span className="text-xs text-zinc-600">({note})</span>}
           </div>
+          {department && <p className="text-sm text-zinc-500 mt-1">{department}</p>}
         </div>
       </div>
 
