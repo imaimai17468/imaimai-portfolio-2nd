@@ -123,10 +123,21 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index, isInView, isL
             ${isLarge ? "p-8 md:p-12" : "p-6"}
           `}
         >
-          {/* 背景グラデーション（ホバー時） */}
-          <div className="absolute inset-0 bg-gradient-to-br from-zinc-800/0 to-zinc-800/0 group-hover:from-zinc-800/20 group-hover:to-transparent transition-all duration-500" />
+          {/* OGP画像 - 右側にフェード */}
+          <div className="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden pointer-events-none">
+            <img
+              src={`https://v1.opengraph.11ty.dev/${encodeURIComponent(product.url)}/small/`}
+              alt=""
+              className="absolute right-0 h-full w-auto object-cover opacity-15"
+              style={{
+                maskImage: "linear-gradient(to right, transparent, black 40%)",
+                WebkitMaskImage: "linear-gradient(to right, transparent, black 40%)",
+              }}
+              loading="lazy"
+            />
+          </div>
 
-          <div className="relative">
+          <div className="relative z-10">
             {/* ヘッダー */}
             <div className="flex items-start justify-between mb-4">
               <Image

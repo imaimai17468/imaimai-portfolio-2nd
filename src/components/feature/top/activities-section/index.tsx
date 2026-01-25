@@ -85,24 +85,40 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, index, isInView }
       transition={{ duration: 0.5, delay: index * 0.1 }}
     >
       <Link href={activity.url} target="_blank" rel="noopener noreferrer" className="group block">
-        <div className="flex items-center justify-between p-6 border border-zinc-800 hover:border-zinc-700 rounded-lg transition-all duration-200 hover:bg-zinc-900/50">
-          <div className="flex items-center gap-4">
-            <Image
-              src={faviconUrl}
-              alt={`${activity.title} favicon`}
-              width={24}
-              height={24}
-              className="flex-shrink-0"
-              unoptimized
+        <div className="relative overflow-hidden p-6 border border-zinc-800 hover:border-zinc-700 rounded-lg transition-all duration-200 hover:bg-zinc-900/50">
+          {/* OGP画像 - 右側にフェード */}
+          <div className="absolute right-0 top-0 bottom-0 w-1/3 overflow-hidden pointer-events-none">
+            <img
+              src={`https://v1.opengraph.11ty.dev/${encodeURIComponent(activity.url)}/small/`}
+              alt=""
+              className="absolute right-0 h-full w-auto object-cover opacity-10"
+              style={{
+                maskImage: "linear-gradient(to right, transparent, black 50%)",
+                WebkitMaskImage: "linear-gradient(to right, transparent, black 50%)",
+              }}
+              loading="lazy"
             />
-            <div>
-              <h3 className="text-lg font-medium text-zinc-200 group-hover:text-zinc-100 transition-colors">
-                {activity.title}
-              </h3>
-              <p className="text-sm text-zinc-500">{activity.description}</p>
-            </div>
           </div>
-          <ExternalLink className="w-4 h-4 text-zinc-600 group-hover:text-zinc-400 transition-colors flex-shrink-0" />
+
+          <div className="relative z-10 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Image
+                src={faviconUrl}
+                alt={`${activity.title} favicon`}
+                width={24}
+                height={24}
+                className="flex-shrink-0"
+                unoptimized
+              />
+              <div>
+                <h3 className="text-lg font-medium text-zinc-200 group-hover:text-zinc-100 transition-colors">
+                  {activity.title}
+                </h3>
+                <p className="text-sm text-zinc-500">{activity.description}</p>
+              </div>
+            </div>
+            <ExternalLink className="w-4 h-4 text-zinc-600 group-hover:text-zinc-400 transition-colors flex-shrink-0" />
+          </div>
         </div>
       </Link>
     </motion.div>
