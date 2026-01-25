@@ -1,115 +1,45 @@
-import { BentoLayout } from "./layout";
-import { LinkCard } from "./link-card";
-import { ProfileCard } from "./profile-card";
+"use client";
 
-type LinkItem = {
-  title: string;
-  url: string;
-  description?: string;
-};
-
-/**
- * プロフィール・活動系リンク
- */
-const PROFILE_LINKS: LinkItem[] = [
-  {
-    title: "しずかなインターネット",
-    url: "https://sizu.me/imaimai17468",
-    description: "静かで心地よいインターネット空間での活動",
-  },
-  {
-    title: "いまいまいさんの記事一覧",
-    url: "https://zenn.dev/imaimai17468",
-    description: "技術記事やナレッジの共有",
-  },
-  {
-    title: "imaimai17468's Portfolio 2nd",
-    url: "https://imaimai.tech",
-    description: "ポートフォリオサイト",
-  },
-  {
-    title: "LAPRAS Profile",
-    url: "https://lapras.com/public/imaimai17468",
-    description: "エンジニアとしてのキャリアプロフィール",
-  },
-];
+import { useScroll } from "framer-motion";
+import { useRef } from "react";
+import { ActivitiesSection } from "./activities-section";
+import { HeroSection } from "./hero-section";
+import { ProductsSection } from "./products-section";
+import { ScrollIndicator } from "./scroll-indicator";
 
 /**
- * GitHub
- */
-const GITHUB_LINK: LinkItem = {
-  title: "GitHub",
-  url: "https://github.com/imaimai17468",
-  description: "ソースコードとプロジェクト",
-};
-
-/**
- * プロダクト系リンク
- */
-const PRODUCT_LINKS: LinkItem[] = [
-  {
-    title: "Osampo",
-    url: "https://osampo.vercel.app/",
-    description: "散歩の記録と共有",
-  },
-  {
-    title: "ツウキンプレイス",
-    url: "https://tsuukin-place.com",
-    description: "通勤時間から駅の家賃相場を調べるサービス",
-  },
-  {
-    title: "Contrast Color Palette",
-    url: "https://contrast-color-palette.vercel.app",
-    description: "アクセシブルな色の組み合わせを提案",
-  },
-  {
-    title: "Digital Agency Icons",
-    url: "https://digital-agency-icons-docs.vercel.app",
-    description: "非公式アイコンライブラリ",
-  },
-  {
-    title: "imaimai UI",
-    url: "https://imaimai-ui.vercel.app",
-    description: "オリジナルUIコンポーネント集",
-  },
-];
-
-/**
- * Bentoページのメインコンポーネント
- * bento.meスタイルのリンク集を表示
+ * Vertical Scroll Storytelling ポートフォリオ
+ *
+ * design-guidelines に基づく設計:
+ * - シンプル: 背景アニメーション・グラスモーフィズムなし
+ * - 体験型: スクロールで情報が展開されるナラティブフロー
+ * - 没入感: フルスクリーンセクション、スムーズなトランジション
+ *
+ * UX原則:
+ * - Zeigarnik Effect: 次のセクションへの期待感
+ * - Goal Gradient Effect: 進捗インジケーターで完了への動機付け
+ * - Serial Position Effect: 最初（プロフィール）と最後（プロダクト）を印象的に
  */
 export const Bento: React.FC = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"],
+  });
+
   return (
-    <BentoLayout>
-      <div className="max-w-5xl mx-auto space-y-12">
-        {/* プロフィール・活動セクション */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:auto-rows-fr">
-          {/* プロフィールカード - モバイルでは通常サイズ、md以上で2行分の高さ */}
-          <div className="md:row-span-2">
-            <ProfileCard />
-          </div>
+    <div ref={containerRef} className="relative bg-zinc-950">
+      {/* スクロール進捗インジケーター */}
+      <ScrollIndicator progress={scrollYProgress} />
 
-          {/* プロフィール・活動系リンク */}
-          {PROFILE_LINKS.map((link) => (
-            <LinkCard key={link.url} title={link.title} url={link.url} description={link.description} />
-          ))}
-        </div>
+      {/* Hero: プロフィールセクション */}
+      <HeroSection />
 
-        {/* GitHubセクション */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <LinkCard title={GITHUB_LINK.title} url={GITHUB_LINK.url} description={GITHUB_LINK.description} />
-        </div>
+      {/* Activities: 活動セクション */}
+      <ActivitiesSection />
 
-        {/* プロダクトセクション */}
-        <section className="space-y-6">
-          <h2 className="text-3xl font-bold text-center">Products</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {PRODUCT_LINKS.map((link) => (
-              <LinkCard key={link.url} title={link.title} url={link.url} description={link.description} />
-            ))}
-          </div>
-        </section>
-      </div>
-    </BentoLayout>
+      {/* Products: プロダクトセクション */}
+      <ProductsSection />
+    </div>
   );
 };
