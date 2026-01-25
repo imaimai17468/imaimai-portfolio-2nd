@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
 
-import type { LinkItem } from "@/entities/bento/link-item";
+import type { LinkItem } from "@/entities/top/link-item";
 
 const PRODUCTS: LinkItem[] = [
   {

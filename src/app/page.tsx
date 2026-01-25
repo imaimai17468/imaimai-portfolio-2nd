@@ -1,5 +1,5 @@
-import { Bento } from "@/components/feature/bento";
+import { Top } from "@/components/feature/top";
 
 export default function Home() {
-  return <Bento />;
+  return <Top />;
 }

@@ -20,7 +20,7 @@ import { ScrollIndicator } from "./scroll-indicator";
  * - Goal Gradient Effect: 進捗インジケーターで完了への動機付け
  * - Serial Position Effect: 最初（プロフィール）と最後（プロダクト）を印象的に
  */
-export const Bento: React.FC = () => {
+export const Top: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
