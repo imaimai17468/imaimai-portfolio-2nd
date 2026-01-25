@@ -13,16 +13,20 @@ const ACTIVITIES: LinkItem[] = [
     title: "しずかなインターネット",
     url: "https://sizu.me/imaimai17468",
     description: "静かで心地よいインターネット空間での活動",
+    ogpImageUrl:
+      "https://static.sizu.me/api/og-image/fc6508acc910?avatarUrl=https%3A%2F%2Fr2.sizu.me%2Fusers%2F7797%2Favatar.jpeg%3Fv%3D1700295154064&theme=user&username=imaimai17468",
   },
   {
     title: "Zenn",
     url: "https://zenn.dev/imaimai17468",
     description: "技術記事やナレッジの共有",
+    ogpImageUrl: "https://storage.googleapis.com/zenn-user-upload/avatar/b7fff12588.jpeg",
   },
   {
     title: "LAPRAS",
     url: "https://lapras.com/public/imaimai17468",
     description: "エンジニアとしてのキャリアプロフィール",
+    ogpImageUrl: "https://media.lapras.com/media/public_setting/GMOUC3J/98ff0d156c55451887dc6f791ea34d71.png",
   },
 ];
 
@@ -78,6 +82,9 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, index, isInView }
   // icon.horse API is more reliable for modern sites
   const faviconUrl = `https://icon.horse/icon/${domain}`;
 
+  // OGP画像のURL（手動指定のみ、空文字列の場合は非表示）
+  const ogpImageUrl = activity.ogpImageUrl || "";
+
   return (
     <motion.div
       initial={{ opacity: 0, x: -40 }}
@@ -86,19 +93,24 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, index, isInView }
     >
       <Link href={activity.url} target="_blank" rel="noopener noreferrer" className="group block">
         <div className="relative overflow-hidden p-6 border border-zinc-800 hover:border-zinc-700 rounded-lg transition-all duration-200 hover:bg-zinc-900/50">
-          {/* OGP画像 - 右側にフェード */}
-          <div className="absolute right-0 top-0 bottom-0 w-1/3 overflow-hidden pointer-events-none">
-            <img
-              src={`https://image.thum.io/get/width/400/crop/800/noanimate/${activity.url}`}
-              alt=""
-              className="absolute right-0 h-full w-auto object-cover opacity-10"
-              style={{
-                maskImage: "linear-gradient(to right, transparent, black 50%)",
-                WebkitMaskImage: "linear-gradient(to right, transparent, black 50%)",
-              }}
-              loading="lazy"
-            />
-          </div>
+          {/* OGP画像 - 右側にフェード（ogpImageUrlが空でない場合のみ表示） */}
+          {ogpImageUrl && (
+            <div className="absolute right-0 top-0 bottom-0 w-1/3 overflow-hidden pointer-events-none">
+              <img
+                src={ogpImageUrl}
+                alt=""
+                className="absolute right-0 h-full w-auto object-cover opacity-10"
+                style={{
+                  maskImage: "linear-gradient(to right, transparent, black 50%)",
+                  WebkitMaskImage: "linear-gradient(to right, transparent, black 50%)",
+                }}
+                loading="lazy"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+            </div>
+          )}
 
           <div className="relative z-10 flex items-center justify-between">
             <div className="flex items-center gap-4">

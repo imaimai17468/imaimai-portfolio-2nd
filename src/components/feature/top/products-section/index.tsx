@@ -13,31 +13,37 @@ const PRODUCTS: LinkItem[] = [
     title: "Osampo",
     url: "https://osampo.vercel.app",
     description: "散歩の記録と共有",
+    ogpImageUrl: "https://osampo.vercel.app/ogp-image.png",
   },
   {
     title: "ツウキンプレイス",
     url: "https://tsuukin-place.com",
     description: "通勤時間から駅の家賃相場を調べるサービス",
+    ogpImageUrl: "https://tsuukin-place.com/opengraph-image.png?ec408eb2337b85bc",
   },
   {
     title: "Contrast Color Palette",
     url: "https://contrast-color-palette.vercel.app",
     description: "アクセシブルな色の組み合わせを提案",
+    ogpImageUrl: "https://contrast-color-palette.vercel.app/image/ogp.png",
   },
   {
     title: "Digital Agency Icons",
     url: "https://digital-agency-icons-docs.vercel.app",
     description: "非公式アイコンライブラリ",
+    ogpImageUrl: "",
   },
   {
     title: "imaimai UI",
     url: "https://imaimai-ui.vercel.app",
     description: "オリジナルUIコンポーネント集",
+    ogpImageUrl: "https://imaimai-ui.vercel.app/app-ogp.png",
   },
   {
     title: "木更津高専単位カウンター",
     url: "https://credits-counter-fo-knct.vercel.app",
     description: "高専生向けの単位計算ツール",
+    ogpImageUrl: "https://credits-counter-fo-knct.vercel.app/ogp-image.png",
   },
 ];
 
@@ -108,6 +114,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index, isInView, isL
   // icon.horse API is more reliable for Vercel apps and modern sites
   const faviconUrl = `https://icon.horse/icon/${domain}`;
 
+  // OGP画像のURL（手動指定のみ、空文字列の場合は非表示）
+  const ogpImageUrl = product.ogpImageUrl || "";
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 40 }}
@@ -123,19 +132,24 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index, isInView, isL
             ${isLarge ? "p-8 md:p-12" : "p-6"}
           `}
         >
-          {/* OGP画像 - 右側にフェード */}
-          <div className="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden pointer-events-none">
-            <img
-              src={`https://image.thum.io/get/width/400/crop/800/noanimate/${product.url}`}
-              alt=""
-              className="absolute right-0 h-full w-auto object-cover opacity-15"
-              style={{
-                maskImage: "linear-gradient(to right, transparent, black 40%)",
-                WebkitMaskImage: "linear-gradient(to right, transparent, black 40%)",
-              }}
-              loading="lazy"
-            />
-          </div>
+          {/* OGP画像 - 右側にフェード（ogpImageUrlが空でない場合のみ表示） */}
+          {ogpImageUrl && (
+            <div className="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden pointer-events-none">
+              <img
+                src={ogpImageUrl}
+                alt=""
+                className="absolute right-0 h-full w-auto object-cover opacity-15"
+                style={{
+                  maskImage: "linear-gradient(to right, transparent, black 40%)",
+                  WebkitMaskImage: "linear-gradient(to right, transparent, black 40%)",
+                }}
+                loading="lazy"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+            </div>
+          )}
 
           <div className="relative z-10">
             {/* ヘッダー */}
