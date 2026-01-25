@@ -11,7 +11,7 @@ import type { LinkItem } from "@/entities/top/link-item";
 const PRODUCTS: LinkItem[] = [
   {
     title: "Osampo",
-    url: "https://osampo.vercel.app/",
+    url: "https://osampo.vercel.app",
     description: "散歩の記録と共有",
   },
   {
@@ -36,7 +36,7 @@ const PRODUCTS: LinkItem[] = [
   },
   {
     title: "木更津高専単位カウンター",
-    url: "https://credits-counter-fo-knct.vercel.app/",
+    url: "https://credits-counter-fo-knct.vercel.app",
     description: "高専生向けの単位計算ツール",
   },
 ];
