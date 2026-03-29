@@ -20,18 +20,21 @@ const PRODUCTS: LinkItem[] = [
     url: "https://tsuukin-place.com",
     description: "通勤時間から駅の家賃相場を調べるサービス",
     ogpImageUrl: "https://tsuukin-place.com/opengraph-image.png?ec408eb2337b85bc",
+    iconUrl: "https://tsuukin-place.com/icon.png",
   },
   {
     title: "Contrast Color Palette",
     url: "https://contrast-color-palette.vercel.app",
     description: "アクセシブルな色の組み合わせを提案",
     ogpImageUrl: "https://contrast-color-palette.vercel.app/image/ogp.png",
+    iconUrl: "https://contrast-color-palette.vercel.app/icon.png",
   },
   {
     title: "Digital Agency Icons",
     url: "https://digital-agency-icons-docs.vercel.app",
     description: "非公式アイコンライブラリ",
     ogpImageUrl: "",
+    iconUrl: "https://www.google.com/s2/favicons?domain=digital-agency-icons-docs.vercel.app&sz=64",
   },
   {
     title: "imaimai UI",
@@ -111,8 +114,7 @@ type ProductCardProps = {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, index, isInView, isLarge = false }) => {
   const domain = new URL(product.url).hostname.replace("www.", "");
-  // icon.horse API is more reliable for Vercel apps and modern sites
-  const faviconUrl = `https://icon.horse/icon/${domain}`;
+  const faviconUrl = product.iconUrl || `https://icon.horse/icon/${domain}`;
 
   // OGP画像のURL（手動指定のみ、空文字列の場合は非表示）
   const ogpImageUrl = product.ogpImageUrl || "";
