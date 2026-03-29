@@ -2,10 +2,9 @@
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ChevronDown } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
-import avatarImage from "./avatar.jpeg";
+import { FrogParticles } from "./frog-particles/FrogParticles";
 
 /**
  * Hero Section - プロフィール
@@ -30,23 +29,19 @@ export const HeroSection: React.FC = () => {
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen flex flex-col items-center justify-center px-6">
-      <motion.div className="flex flex-col items-center text-center" style={{ y, opacity }}>
-        {/* アバター */}
+    <section
+      ref={sectionRef}
+      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
+    >
+      <motion.div className="flex flex-col items-center text-center w-full" style={{ y, opacity }}>
+        {/* パーティクルアバター */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="mb-8"
+          className="-mb-4"
         >
-          <Image
-            src={avatarImage}
-            alt="imaimai17468のプロフィール画像"
-            width={140}
-            height={140}
-            className="rounded-full border-2 border-zinc-800"
-            priority
-          />
+          <FrogParticles imageSize={320} />
         </motion.div>
 
         {/* 名前 */}
