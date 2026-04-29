@@ -1,10 +1,10 @@
 import { talks } from "@/app/data/talks";
 
 export const Talks = () => (
-  <section id="06-talks" className="py-12 px-6">
+  <section id="08-talks" className="py-12 px-6">
     <h2 className="text-muted-foreground text-sm mb-6">
       <span className="text-accent">{"// "}</span>
-      06. talks
+      08. talks
     </h2>
     <div className="flex flex-col gap-3">
       {talks.map((talk) => (
