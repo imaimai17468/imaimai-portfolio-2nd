@@ -11,13 +11,11 @@
 #   2. The window since that prompt contains an Agent tool_use whose tool_result
 #      includes a strong partial-completion signal.
 #   3. No new Agent tool_use (re-dispatch) appears after the partial-Agent result.
-#   4. The last user prompt does not contain an explicit override intent.
 #
 # Exceptions (all pass through with exit 0):
 #   - Transcript is unreadable / jq parse fails / unexpected structure
 #   - No strong partial-completion signal found
 #   - Agent was re-dispatched after the partial result
-#   - User explicitly issued an override instruction (e.g. "parent でやって")
 
 set -euo pipefail
 
@@ -50,26 +48,6 @@ fi
 LAST_REAL_USER=$(awk -v start=1 'NR >= start && /"role":"user"/ && !/"tool_use_id"/ && !/<system-reminder>/ && !/<task-notification>/ {print NR}' "$TRANSCRIPT" | tail -1 || true)
 if [ -n "${LAST_REAL_USER:-}" ] && [ "$LAST_REAL_USER" -gt "$START_LINE" ]; then
   START_LINE=$LAST_REAL_USER
-fi
-
-# Extract the last user prompt text for override check
-USER_PROMPT_LINE=$(awk -v start="$START_LINE" 'NR == start' "$TRANSCRIPT" 2>/dev/null || true)
-USER_PROMPT=$(printf '%s' "$USER_PROMPT_LINE" | jq -r '
-  if .content then
-    [ .content[] | select(.type == "text") | .text ] | join(" ")
-  else
-    ""
-  end
-' 2>/dev/null || true)
-
-# Check for an explicit user override.
-# "parent でやって" / "自分でやって" / "直接書いて" etc. allow pass-through.
-if [ -n "$USER_PROMPT" ]; then
-  # "take it over" / "do it yourself" can appear naturally in text, so accept only
-  # word-boundary forms (with "please" or an explicit subject). Bare substring matches are excluded.
-  if printf '%s' "$USER_PROMPT" | grep -qiE '(parent[[:space:]]*でやって|自分でやって|parent[[:space:]]*でやれ|直接書いて|直接実装して|please[[:space:]]+take[[:space:]]+it[[:space:]]+over|you[[:space:]]+take[[:space:]]+it[[:space:]]+over|do[[:space:]]+it[[:space:]]+yourself)'; then
-    exit 0
-  fi
 fi
 
 # Fetch the full window
@@ -127,7 +105,7 @@ else
 fi
 
 # All conditions met — block
-REASON='PreToolUse(Edit|Write|MultiEdit): The parent session is attempting to edit directly after a subagent returned with partial completion. Per .claude/rules/agents.md, remaining work must be delegated to a newly dispatched subagent. To explicitly have the parent take over, ask the user to issue an instruction such as "parent でやって".'
+REASON='PreToolUse(Edit|Write|MultiEdit): The parent session is attempting to edit directly after a subagent returned with partial completion. Per .claude/rules/agents.md, remaining work must be delegated to a newly dispatched subagent.'
 
 jq -n --arg reason "$REASON" '{
   decision: "block",
