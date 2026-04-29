@@ -11,7 +11,7 @@ export const career = [
   },
   {
     company: "ゆめみ",
-    role: "Product Engineer / Recruiter / 技育プロジェクト担当",
+    role: "Frontend Engineer / Recruiter / 技育プロジェクト担当",
     period: "2024.04 - 2024.12",
     highlights: [
       "大規模マンガプラットフォームのリニューアル",
