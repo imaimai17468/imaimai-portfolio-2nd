@@ -13,8 +13,12 @@ export const Hero = () => (
     </h1>
     <p className="text-muted-foreground mb-1">{profile.title}</p>
     <p className="text-muted-foreground text-sm mb-6">{profile.tagline}</p>
-    <div className="border-l-2 border-border pl-4 mb-8">
-      <p className="text-foreground text-sm leading-relaxed">{profile.bio}</p>
+    <div className="border-l-2 border-border pl-4 mb-8 flex flex-col gap-3">
+      {profile.bio.map((paragraph) => (
+        <p key={paragraph} className="text-foreground text-sm leading-relaxed">
+          {paragraph}
+        </p>
+      ))}
     </div>
     <div className="flex flex-col gap-2">
       {socialLinks.map((link) => (
