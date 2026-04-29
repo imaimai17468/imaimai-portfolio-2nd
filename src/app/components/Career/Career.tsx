@@ -15,6 +15,7 @@ export const Career = () => (
           role={entry.role}
           period={entry.period}
           highlights={entry.highlights}
+          talks={entry.talks}
         />
       ))}
     </div>

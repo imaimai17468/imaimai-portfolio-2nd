@@ -4,6 +4,7 @@ export const career = [
     role: "Product Engineer / Recruiter / 技育プロジェクト担当",
     period: "2024.12 - present",
     highlights: ["MultiAgent SaaS の開発と提案"],
+    talks: ["TSKaigi 2025"],
   },
   {
     company: "ゆめみ",
@@ -15,5 +16,6 @@ export const career = [
       "求人サービスの管理画面開発",
       "海外向け航空券予約システム開発",
     ],
+    talks: ["Frontend Conference Hokkaido 2024", "他多数"],
   },
 ] as const;

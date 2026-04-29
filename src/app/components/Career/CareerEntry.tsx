@@ -1,8 +1,11 @@
+import { CareerSpeaker } from "./CareerSpeaker";
+
 type CareerEntryProps = {
   company: string;
   role: string;
   period: string;
   highlights: readonly string[];
+  talks: readonly string[];
 };
 
 export const CareerEntry = ({
@@ -10,6 +13,7 @@ export const CareerEntry = ({
   role,
   period,
   highlights,
+  talks,
 }: CareerEntryProps) => (
   <div className="border-l-2 border-border pl-4 py-2">
     <div className="flex items-start justify-between gap-4 mb-1">
@@ -25,5 +29,6 @@ export const CareerEntry = ({
         </li>
       ))}
     </ul>
+    {talks.length > 0 && <CareerSpeaker talks={talks} />}
   </div>
 );
