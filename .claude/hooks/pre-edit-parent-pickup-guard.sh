@@ -39,7 +39,10 @@ if [ -z "$TRANSCRIPT" ] || [ ! -f "$TRANSCRIPT" ]; then
   exit 0
 fi
 
-# 最後のユーザー入力以降の窓を取り出す (pre-agent-aegis-guard.sh と同じロジック)
+# 最後のユーザー入力以降の窓を取り出す (pre-agent-aegis-guard.sh と同じロジック)。
+# WINDOW_LINES=300 は pre-edit-brainstorming-guard.sh の 200 より大きめに取っている。
+# subagent dispatch + 完了 + 他の tool_use を挟むと 1 ターンで 200 行を超えるケースがあるため、
+# fallback 窓を保守的に広めに設定。
 WINDOW_LINES=300
 TOTAL_LINES=$(wc -l < "$TRANSCRIPT" | tr -d ' ')
 START_LINE=$(( TOTAL_LINES - WINDOW_LINES ))

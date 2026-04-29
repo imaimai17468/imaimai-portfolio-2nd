@@ -97,11 +97,13 @@ fi
 
 WINDOW=$(awk -v start="$START_LINE" 'NR >= start' "$TRANSCRIPT")
 
-# 直近窓内に Agent ツールの完了が存在するか確認
-# (tool_result で Agent ツールに対する応答 = subagent 完了)
-HAS_AGENT_COMPLETION=$(printf '%s' "$WINDOW" | grep -c '"tool_use_id"' || true)
-if [ "$HAS_AGENT_COMPLETION" -eq 0 ]; then
-  # Agent 完了なし = parent が直接書いた変更のみ → block しない
+# 直近窓内に Agent ツールのディスパッチが存在するか確認。
+# 以前は "tool_use_id" の出現数を見ていたが、これだと Bash/Edit/Read など他のツールの
+# tool_result まで「Agent 完了」と誤検知してしまう。Agent dispatch は assistant の
+# tool_use エントリで "name":"Agent" として現れるので、それを直接数える。
+HAS_AGENT_DISPATCH=$(printf '%s' "$WINDOW" | grep -v '"tool_use_id"' | grep -c '"name":"Agent"' || true)
+if [ "$HAS_AGENT_DISPATCH" -eq 0 ]; then
+  # Agent dispatch なし = parent が直接書いた変更のみ → block しない
   exit 0
 fi
 
