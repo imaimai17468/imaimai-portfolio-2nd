@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Stop hook: 新規コンポーネントが実際に画面で動くかを headless Claude + chrome-devtools MCP で検証する。
-# Level 1 (smoke) では拾えない「存在している・見えている・振る舞う」を AI の目で確認する。
+# Stop hook: verify newly added components actually work in the browser via headless Claude + chrome-devtools MCP.
+# Confirms with an AI's eye what Level 1 (smoke) cannot catch: "exists / visible / behaves".
 
 set -uo pipefail
 
-# 再帰ガード
+# Recursion guard
 if [ "${CLAUDE_STOP_HOOK_RECURSION:-}" = "1" ]; then
   exit 0
 fi
@@ -14,56 +14,56 @@ MODEL="claude-opus-4-7"
 
 cd "$ROOT"
 
-# git clean なら完全無音
+# Stay completely silent when git is clean
 if [ -z "$(git status --porcelain)" ]; then
   exit 0
 fi
 
-# 新規 .tsx コンポーネントファイル (untracked or added) を探す
-# - shadcn (src/components/ui/), test ファイル, page.tsx / layout.tsx / route.ts は除外
+# Find newly added .tsx component files (untracked or added)
+# - Exclude shadcn (src/components/ui/), test files, page.tsx / layout.tsx / route.ts
 NEW_FILES=$( (git ls-files --others --exclude-standard; git diff --name-only --diff-filter=A HEAD 2>/dev/null) \
   | grep -E '\.(tsx)$' \
   | grep -v -E '(src/components/ui/|\.test\.tsx$|/page\.tsx$|/layout\.tsx$)' \
   | sort -u || true)
 
 if [ -z "$NEW_FILES" ]; then
-  echo '{"systemMessage":"✅ Stop component verify: 新規コンポーネントなしのためスキップ"}'
+  echo '{"systemMessage":"✅ Stop component verify: no new components, skipped"}'
   exit 0
 fi
 
-# dev server が起動しているか (Playwright と違い、ここでは自動起動させない)
+# Whether dev server is running (unlike Playwright, we do not auto-start it here)
 if ! curl -sf -o /dev/null -m 2 http://localhost:3000; then
-  echo '{"systemMessage":"⚠️ Stop component verify: dev server 未起動のためスキップ（`bun run dev` で起動すると次回から検証されます）"}'
+  echo '{"systemMessage":"⚠️ Stop component verify: dev server not running, skipped (start with `bun run dev` to enable verification next time)"}'
   exit 0
 fi
 
-# headless Claude 呼び出し用プロンプト
+# Prompt for the headless Claude call
 read -r -d '' PROMPT <<EOP || true
-あなたは UI 動作検証エージェントです。このターンで新規追加されたコンポーネントが実際に画面で期待通り動くかをブラウザで確認してください。
+You are a UI behavior verification agent. Confirm in the browser that components newly added in this turn actually work as expected on screen.
 
-**新規コンポーネント一覧**:
+**New components**:
 ${NEW_FILES}
 
-**利用可能な MCP ツール**: chrome-devtools (navigate_page, take_snapshot, list_console_messages, evaluate_script など)
+**Available MCP tools**: chrome-devtools (navigate_page, take_snapshot, list_console_messages, evaluate_script, etc.)
 
-**dev server**: http://localhost:3000 で起動中
+**dev server**: running at http://localhost:3000
 
-**手順**:
-1. 各新規コンポーネントの内容を Read で確認し、何をするコンポーネントかを把握
-2. そのコンポーネントが import されている箇所を Grep で探す（\`src/app/**/page.tsx\` にたどり着くまで）
-3. 使われている page の URL を特定（例: \`src/app/profile/page.tsx\` → \`/profile\`）
-4. chrome-devtools MCP で該当 URL に navigate_page
-5. take_snapshot で DOM 状態を取得し、**コンポーネントの期待される要素・テキストが実在するか** を確認
-6. list_console_messages で実行時エラーがないか確認
-7. 可能なら evaluate_script で動的な振る舞い（setInterval 等）が動いているかも確認
+**Procedure**:
+1. Read each new component to understand what it does
+2. Use Grep to locate where it is imported (until you reach \`src/app/**/page.tsx\`)
+3. Identify the URL of the page that uses it (e.g., \`src/app/profile/page.tsx\` → \`/profile\`)
+4. navigate_page to that URL via chrome-devtools MCP
+5. Run take_snapshot to inspect the DOM and verify **the component's expected elements / text actually exist**
+6. Check list_console_messages for runtime errors
+7. If possible, also use evaluate_script to confirm dynamic behavior (setInterval, etc.)
 
-**どの page にも wire されていないコンポーネント**: 検証不能なので WARN として扱う（block はしない）。
+**Components not wired to any page**: cannot be verified, treat as WARN (do not block).
 
-**出力形式 (厳守)**:
-- 全コンポーネントが正常: 1 行目に \`APPROVE\`
-- どこかで破綻: 1 行目に \`BLOCK: <コンポーネント名 - 具体的な失敗内容と直し方>\`
-- 未 wire のみの場合: 1 行目に \`WARN: <コンポーネント名> is not wired to any page\`
-JSON や余計な説明は一切書かない。
+**Output format (strict)**:
+- All components healthy: write \`APPROVE\` on the first line
+- Something is broken: write \`BLOCK: <component name - concrete failure and fix>\` on the first line
+- Only unwired components: write \`WARN: <component name> is not wired to any page\` on the first line
+Do not write JSON or any extra explanation.
 EOP
 
 RESULT=$(printf '%s' "$PROMPT" \
@@ -72,7 +72,7 @@ RESULT=$(printf '%s' "$PROMPT" \
       --output-format json \
       --allowed-tools "Read Grep Glob Bash(curl:*) mcp__chrome-devtools__*" \
       2>&1) || {
-  echo '{"systemMessage":"⚠️ Stop component verify: claude -p 起動失敗（スキップ）"}'
+  echo '{"systemMessage":"⚠️ Stop component verify: claude -p launch failed (skipped)"}'
   exit 0
 }
 
@@ -86,17 +86,17 @@ FIRST_LINE=$(printf '%s' "$TEXT" | head -n 1)
 if printf '%s' "$FIRST_LINE" | grep -q '^BLOCK'; then
   REASON=$(printf '%s' "$FIRST_LINE" | sed 's/^BLOCK:[[:space:]]*//')
   jq -n --arg r "$REASON" '{
-    systemMessage: ("⛔ Stop component verify: 動作不良 — " + $r),
+    systemMessage: ("⛔ Stop component verify: malfunction — " + $r),
     decision: "block",
-    reason: ("新規コンポーネントの動作検証で問題を検出しました:\n\n" + $r)
+    reason: ("Component verification detected a problem in a new component:\n\n" + $r)
   }'
 elif printf '%s' "$FIRST_LINE" | grep -q '^WARN'; then
   REASON=$(printf '%s' "$FIRST_LINE" | sed 's/^WARN:[[:space:]]*//')
   jq -n --arg r "$REASON" '{systemMessage: ("⚠️ Stop component verify: " + $r)}'
 elif printf '%s' "$FIRST_LINE" | grep -q '^APPROVE'; then
-  echo '{"systemMessage":"✅ Stop component verify: 新規コンポーネント動作確認済み"}'
+  echo '{"systemMessage":"✅ Stop component verify: new components verified"}'
 else
-  jq -n --arg r "$FIRST_LINE" '{systemMessage: ("⚠️ Stop component verify: 予期しない応答 — " + $r)}'
+  jq -n --arg r "$FIRST_LINE" '{systemMessage: ("⚠️ Stop component verify: unexpected response — " + $r)}'
 fi
 
 exit 0

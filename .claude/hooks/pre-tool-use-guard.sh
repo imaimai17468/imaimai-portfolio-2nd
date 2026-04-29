@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# PreToolUse guard: coding-guide の機械判別可能な違反を入口で拒否する。
-# stdin に Claude Code のフック入力 JSON を受け取り、違反があれば deny 判定 JSON を出力して exit 0。
+# PreToolUse guard: Reject mechanically detectable coding-guide violations at the entry point.
+# Reads Claude Code hook input JSON from stdin; outputs a deny-decision JSON when violations are found.
 
 set -euo pipefail
 
@@ -23,7 +23,7 @@ case "$TOOL" in
     ;;
 esac
 
-# shadcn 例外領域はスキップ
+# Skip shadcn exception zones
 case "$FILE" in
   */src/components/ui/*|*/src/lib/utils.ts)
     exit 0

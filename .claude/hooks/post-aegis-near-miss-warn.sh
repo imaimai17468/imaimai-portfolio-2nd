@@ -1,36 +1,36 @@
 #!/usr/bin/env bash
 # PostToolUse(mcp__aegis__aegis_compile_context) hook:
-# aegis_compile_context の返り値に glob_no_match の near_miss_edges が
-# 含まれていたら、target_files と bash の extglob + globstar でクロスマッチし、
-# bash でマッチするのに Aegis で glob_no_match されているケース (suspicious) のみを
-# additionalContext で warning として注入する。
+# When the aegis_compile_context response contains glob_no_match near_miss_edges,
+# cross-match those patterns against target_files using bash extglob + globstar.
+# Inject an additionalContext warning only for patterns that bash matches but
+# Aegis reports as glob_no_match (suspicious — likely an Aegis glob bug).
 #
-# 判定ロジック:
-#   A) bash の extglob + globstar で target_files のいずれかとマッチする pattern
-#      → Aegis と bash の glob 実装差異 = suspicious (bug 確定)
-#   B) bash でもマッチしない → routine な未マッチ → スキップ
-#   C) reason が command_mismatch → 常にスキップ
+# Decision logic:
+#   A) Pattern matches a target_file via bash extglob + globstar
+#      → Divergence between Aegis and bash glob implementations = suspicious (confirmed bug)
+#   B) bash also does not match → routine no-match → skip
+#   C) reason is command_mismatch → always skip
 #
-# 出力:
-#   - suspicious 0 件 → exit 0 (無音)
-#   - 1〜3 件 → 全件リスト
-#   - 4 件以上 → 最初の 3 件 + 「他 N 件」省略表記
+# Output:
+#   - 0 suspicious entries → exit 0 (silent)
+#   - 1-3 entries → full list
+#   - 4+ entries → first 3 + "and N more" abbreviation
 
 set -euo pipefail
 shopt -s extglob globstar nullglob
 
 INPUT=$(cat)
 
-# tool_response がなければ素通り
+# Pass through when tool_response is absent
 TOOL_RESPONSE=$(printf '%s' "$INPUT" | jq -r 'if .tool_response then "present" else "absent" end' 2>/dev/null || true)
 if [ "${TOOL_RESPONSE:-absent}" = "absent" ]; then
   exit 0
 fi
 
-# target_files を配列に取り出す
+# Extract target_files into an array
 mapfile -t TARGET_FILES < <(printf '%s' "$INPUT" | jq -r '.tool_input.target_files // [] | .[]' 2>/dev/null || true)
 
-# near_miss_edges から glob_no_match かつ command_mismatch でないものだけ抽出
+# Extract near_miss_edges that are glob_no_match and not command_mismatch
 NEAR_MISS_JSON=$(printf '%s' "$INPUT" | jq -c '
   .tool_response.debug_info.near_miss_edges // []
   | map(select(.reason == "glob_no_match"))
@@ -42,12 +42,12 @@ if [ -z "$EDGE_COUNT" ] || [ "$EDGE_COUNT" -eq 0 ]; then
   exit 0
 fi
 
-# target_files が空なら素通り
+# Pass through when target_files is empty
 if [ "${#TARGET_FILES[@]}" -eq 0 ]; then
   exit 0
 fi
 
-# suspicious な near_miss を収集する
+# Collect suspicious near_miss entries
 SUSPICIOUS_ITEMS=()
 
 while IFS= read -r EDGE; do
@@ -58,7 +58,7 @@ while IFS= read -r EDGE; do
     continue
   fi
 
-  # 各 target_file に対して bash の extglob + globstar でマッチ判定
+  # Test each target_file against the pattern using bash extglob + globstar
   MATCHED=false
   for TARGET in "${TARGET_FILES[@]}"; do
     # shellcheck disable=SC2053
@@ -79,7 +79,7 @@ if [ "$SUSPICIOUS_COUNT" -eq 0 ]; then
   exit 0
 fi
 
-# メッセージ組み立て
+# Build the warning message
 if [ "$SUSPICIOUS_COUNT" -le 3 ]; then
   LIST=$(printf '%s\n' "${SUSPICIOUS_ITEMS[@]}")
   SUFFIX=""
@@ -87,12 +87,12 @@ else
   LIST=$(printf '%s\n' "${SUSPICIOUS_ITEMS[0]}" "${SUSPICIOUS_ITEMS[1]}" "${SUSPICIOUS_ITEMS[2]}")
   REMAINING=$(( SUSPICIOUS_COUNT - 3 ))
   SUFFIX="
-  ...他 ${REMAINING} 件 (詳細は debug_info.near_miss_edges を直接参照)"
+  ...and ${REMAINING} more (see debug_info.near_miss_edges for the full list)"
 fi
 
-CONTEXT="[Aegis near_miss_edges 警告] 以下の edge_hint は bash (extglob + globstar) では target_files にマッチするにもかかわらず、Aegis 側で glob_no_match となっています。Aegis の glob 実装バグの可能性があります。\`aegis_observe({event_type: \"compile_miss\", ...})\` で報告するか、admin surface (aegis_import_doc / edge 編集) で edge_hint の glob パターンを修正してください。
+CONTEXT="[Aegis near_miss_edges warning] The following edge_hints match target_files in bash (extglob + globstar) but are reported as glob_no_match by Aegis. This is likely an Aegis glob implementation bug. Report via \`aegis_observe({event_type: \"compile_miss\", ...})\` or fix the glob pattern in the admin surface (aegis_import_doc / edge edit).
 
-該当 edge_hint:
+Affected edge_hints:
 ${LIST}${SUFFIX}"
 
 jq -n --arg ctx "$CONTEXT" '{
