@@ -7,8 +7,7 @@ const SECTIONS = [
   { id: "01-hero", label: "01 ─ hero" },
   { id: "02-activities", label: "02 ─ activities" },
   { id: "03-products", label: "03 ─ products" },
-  { id: "04-career", label: "04 ─ career" },
-  { id: "05-education", label: "05 ─ education" },
+  { id: "04-history", label: "04 ─ history" },
 ];
 
 export const SectionIndexContainer = () => {

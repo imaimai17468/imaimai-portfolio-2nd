@@ -17,9 +17,14 @@ export default function Home() {
         <div className="border-t border-border mx-6" />
         <Products />
         <div className="border-t border-border mx-6" />
-        <Career />
-        <div className="border-t border-border mx-6" />
-        <Education />
+        <section id="04-history" className="py-12 px-6">
+          <h2 className="text-muted-foreground text-sm mb-6">
+            <span className="text-accent">{"// "}</span>
+            04. history
+          </h2>
+          <Career />
+          <Education />
+        </section>
         <Footer />
       </main>
     </div>
