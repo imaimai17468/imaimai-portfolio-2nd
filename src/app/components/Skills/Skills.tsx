@@ -1,10 +1,10 @@
 import { skills } from "@/app/data/skills";
 
 export const Skills = () => (
-  <section id="07-skills" className="py-12 px-6">
+  <section id="06-skills" className="py-12 px-6">
     <h2 className="text-muted-foreground text-sm mb-6">
       <span className="text-accent">{"// "}</span>
-      07. skills
+      06. skills
     </h2>
     <ul className="flex flex-col gap-2">
       {skills.map((skill) => (
