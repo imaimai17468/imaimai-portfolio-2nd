@@ -47,7 +47,7 @@ if [ "$START_LINE" -lt 1 ]; then
   START_LINE=1
 fi
 
-LAST_REAL_USER=$(awk -v start=1 'NR >= start && /"role":"user"/ && !/"tool_use_id"/ {print NR}' "$TRANSCRIPT" | tail -1 || true)
+LAST_REAL_USER=$(awk -v start=1 'NR >= start && /"role":"user"/ && !/"tool_use_id"/ && !/<system-reminder>/ && !/<task-notification>/ {print NR}' "$TRANSCRIPT" | tail -1 || true)
 if [ -n "${LAST_REAL_USER:-}" ] && [ "$LAST_REAL_USER" -gt "$START_LINE" ]; then
   START_LINE=$LAST_REAL_USER
 fi
