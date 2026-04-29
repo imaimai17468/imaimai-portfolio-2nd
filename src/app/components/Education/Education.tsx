@@ -14,7 +14,11 @@ export const Education = () => (
           school={entry.school}
           program={entry.program}
           period={entry.period}
-          notes={entry.notes}
+          research={entry.research}
+          organization={entry.organization}
+          projects={entry.projects}
+          results={entry.results}
+          freelance={entry.freelance}
         />
       ))}
     </div>
