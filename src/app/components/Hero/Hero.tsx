@@ -20,20 +20,24 @@ export const Hero = () => (
         </p>
       ))}
     </div>
-    <div className="flex flex-col gap-2">
-      {socialLinks.map((link) => (
-        <Link
-          key={link.label}
-          href={link.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm text-muted-foreground hover:text-accent transition-colors"
-        >
-          <span className="text-accent-soft mr-2">{"$"}</span>
-          <span className="text-muted-foreground mr-2">{link.label}</span>
-          <span className="text-foreground">{link.handle}</span>
-        </Link>
-      ))}
+    <div className="flex flex-col gap-3">
+      <p className="text-sm text-muted-foreground">
+        <span className="text-accent-soft mr-2">{"$"}</span>
+        <span className="text-foreground">~/imaimai17468</span>
+      </p>
+      <div className="flex flex-wrap gap-3">
+        {socialLinks.map((link) => (
+          <Link
+            key={link.label}
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-muted-foreground hover:text-accent transition-colors"
+          >
+            {link.label}
+          </Link>
+        ))}
+      </div>
     </div>
   </section>
 );
