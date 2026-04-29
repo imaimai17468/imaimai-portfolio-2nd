@@ -9,24 +9,22 @@ import { Footer } from "./components/Footer/Footer";
 
 export default function Home() {
   return (
-    <>
+    <div className="mx-auto max-w-7xl flex">
       <SectionIndexContainer />
-      <div className="md:pl-56">
-        <main className="mx-auto max-w-3xl">
-          <Hero />
-          <div className="border-t border-border mx-6" />
-          <Activities />
-          <div className="border-t border-border mx-6" />
-          <Products />
-          <div className="border-t border-border mx-6" />
-          <Career />
-          <div className="border-t border-border mx-6" />
-          <Education />
-          <div className="border-t border-border mx-6" />
-          <Skills />
-          <Footer />
-        </main>
-      </div>
-    </>
+      <main className="flex-1 mx-auto max-w-3xl">
+        <Hero />
+        <div className="border-t border-border mx-6" />
+        <Activities />
+        <div className="border-t border-border mx-6" />
+        <Products />
+        <div className="border-t border-border mx-6" />
+        <Career />
+        <div className="border-t border-border mx-6" />
+        <Education />
+        <div className="border-t border-border mx-6" />
+        <Skills />
+        <Footer />
+      </main>
+    </div>
   );
 }

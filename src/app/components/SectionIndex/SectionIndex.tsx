@@ -11,7 +11,7 @@ type SectionIndexProps = {
 };
 
 export const SectionIndex = ({ sections, activeId }: SectionIndexProps) => (
-  <aside className="hidden md:flex flex-col fixed left-0 top-0 h-screen w-56 border-r border-border bg-background px-4 py-8 gap-1 overflow-y-auto">
+  <aside className="hidden md:flex flex-col sticky top-0 h-screen w-56 shrink-0 border-r border-border px-4 py-8 gap-1 overflow-y-auto">
     <p className="text-muted-foreground text-xs mb-4">{"// index"}</p>
     {sections.map((section) => (
       <Link
