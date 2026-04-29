@@ -1,91 +1,113 @@
-<div align="center">
-  <h1>🎨 Imaimai Portfolio</h1>
-  <p>クリエイティブなポートフォリオサイト</p>
-</div>
+# My App
 
-<div align="center">
+Next.js 16 + TypeScript + Tailwind CSS + shadcn/ui を使用したモダンな Web アプリケーションテンプレートです。
 
-  ![Next.js](https://img.shields.io/badge/Next.js-black?style=for-the-badge&logo=next.js&logoColor=white)
-  ![TypeScript](https://img.shields.io/badge/TypeScript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
-  ![TailwindCSS](https://img.shields.io/badge/Tailwind-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
-  ![Bun](https://img.shields.io/badge/Bun-%23000000.svg?style=for-the-badge&logo=bun&logoColor=white)
+## 技術スタック
 
-</div>
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript (tsgo)
+- **Styling**: Tailwind CSS v4
+- **UI Components**: shadcn/ui (Radix UI primitives)
+- **Authentication**: Better Auth (Google OAuth)
+- **Database**: Cloudflare D1 (SQLite) + Drizzle ORM
+- **Storage**: Cloudflare R2
+- **Hosting**: Cloudflare Workers (@opennextjs/cloudflare)
+- **Code Quality**: oxlint (linting) + oxfmt (formatting)
+- **Testing**: Vitest + Testing Library
+- **Package Manager**: Bun
+- **Git Hooks**: Lefthook
 
-## 🌟 概要
-
-このポートフォリオサイトは、最新のWeb技術を活用して作られた、インタラクティブで魅力的な作品集です。
-モダンなデザインと快適なユーザー体験を提供することを目指しています。
-
-## 🎨 インスピレーション
-
-このポートフォリオサイトは、以下の素晴らしいプロジェクトからインスピレーションを得ています：
-
-- [Aceternity UI](https://ui.aceternity.com/)
-  モダンでインタラクティブなUIコンポーネントとアニメーション
-
-- [React Three Fiber](https://r3f.docs.pmnd.rs/getting-started/introduction)
-  没入感のある3Dグラフィックスとインタラクティブな体験
-
-## ✨ 特徴
-
-- 🎭 **ダイナミックなアニメーション**
-  スムーズな遷移とインタラクティブな要素による没入感のある体験
-
-- 🌓 **ダーク/ライトモード**
-  ユーザーの好みに合わせた快適な閲覧環境
-
-- 📱 **レスポンシブデザイン**
-  あらゆるデバイスで最適な表示を実現
-
-- ⚡ **高速なパフォーマンス**
-  Next.jsとBunによる最適化された読み込み速度
-
-## 🛠️ 技術スタック
-
-- **フレームワーク**: Next.js
-- **言語**: TypeScript
-- **スタイリング**: Tailwind CSS, shadcn/ui
-- **パッケージマネージャー**: Bun
-- **品質管理**: Biome, Lefthook
-
-## 🚀 開発環境のセットアップ
+## クイックスタート
 
 ```bash
-# リポジトリのクローン
-git clone https://github.com/yourusername/imaimai-portfolio.git
-
-# 依存関係のインストール
+git clone <your-repo-url>
+cd <your-repo-name>
 bun install
-
-# 開発サーバーの起動
-bun dev
+cp .env.local.example .env.local
+bun run dev
 ```
 
-## 📂 プロジェクト構成
+http://localhost:3000 でアクセス。`next.config.mjs` の `initOpenNextCloudflareForDev` により、`bun run dev` でも Cloudflare D1 / R2 バインディングが有効です。
+
+データベース・認証・ストレージのセットアップ手順は [docs/DATABASE_SETUP.md](./docs/DATABASE_SETUP.md) を参照。
+
+## Scripts
+
+| Command              | Description                      |
+| -------------------- | -------------------------------- |
+| `bun run dev`        | Start dev server                 |
+| `bun run build`      | Production build                 |
+| `bun run typecheck`  | Type check with tsgo             |
+| `bun run lint`       | Run oxlint                       |
+| `bun run format`     | Check formatting with oxfmt      |
+| `bun run format:fix` | Format with oxfmt                |
+| `bun run knip`       | Detect unused deps/exports/files |
+| `bun run test`       | Run tests with Vitest            |
+| `bun run cf-typegen` | Generate `CloudflareEnv` from `wrangler.toml` |
+
+## Tools
+
+- **[shadcn/ui](https://ui.shadcn.com/)** — UI components (`components.json`)
+- **[tsgo](https://github.com/microsoft/typescript-go)** — Type checker (`@typescript/native-preview`)
+- **[oxlint](https://oxc.rs/docs/guide/usage/linter)** — Linter (`.oxlintrc.json`)
+- **[oxfmt](https://oxc.rs/docs/guide/usage/formatter)** — Formatter (`.oxfmtrc.json`)
+- **[lefthook](https://github.com/evilmartians/lefthook)** — Git hooks (`lefthook.yml`)
+- **[knip](https://knip.dev/)** — Unused deps/exports/files detection (`knip.json`)
+- **[similarity-ts](https://github.com/mizchi/similarity)** — Code similarity detector (Rust の `cargo install similarity-ts` で別途インストール)
+
+## プロジェクト構成
 
 ```
 src/
-├── app/          # ページルーティング
-├── components/   # UIコンポーネント
-│   ├── feature/  # 機能別コンポーネント
-│   ├── parts/    # 再利用可能なパーツ
-│   └── ui/       # 基本UIコンポーネント
-└── styles/       # グローバルスタイル
+├── app/                    # Next.js App Router
+│   ├── api/                # API routes (auth, avatars, ...)
+│   ├── components/         # ページ横断で共有する UI primitives
+│   ├── globals.css         # Tailwind v4 トークン
+│   ├── layout.tsx
+│   └── page.tsx
+├── components/             # shadcn/ui プリミティブ等
+│   └── ui/
+└── lib/
+    ├── auth/               # Better Auth 設定
+    ├── drizzle/            # Drizzle ORM スキーマ
+    ├── storage/            # R2 ストレージ
+    └── utils.ts
 ```
 
-## 🔄 品質管理
+各ページの機能別コンポーネントは `src/app/<route>/components/<Component>/` にコロケーションします (詳細は [`.claude/rules/architecture.md`](./.claude/rules/architecture.md))。
 
-- **コード品質**: Biomeによる自動フォーマットとリント
-- **型チェック**: TypeScriptによる静的型チェック
-- **Git Hooks**: コミット前の自動チェック
+## AI エージェントで開発する
 
-## 📝 ライセンス
+このリポジトリは Claude Code (および superpowers / aegis MCP) を前提に組まれています。フロー全体・hook 構成・aegis / superpowers の役割分担などは:
 
-MIT © Imaimai Portfolio
+- **[docs/agent-workflow.md](./docs/agent-workflow.md)** — タスクの流れ・常時動いている層・メンテナンスループ・特殊フローの全体像
+- **[AGENTS.md](./AGENTS.md)** — 常時ロードされるコーディング規約 (`@include` 経由で `.claude/rules/*.md` を読み込み)
+- **[docs/adr/README.md](./docs/adr/README.md)** — 主要設計判断の長期記録 (なぜ今こう決まっているのか)
 
----
+普段使う slash コマンドは 3 つだけ:
 
-<div align="center">
-  <p>Made with 🐸 by Imaimai</p>
-</div>
+| Command           | When                                 |
+| ----------------- | ------------------------------------ |
+| `/start-workflow` | ticket 粒度の作業を始める時           |
+| `/commit`         | コミット境界で                       |
+| `/pr`             | PR 作成時                            |
+
+trivial な 1 行修正・config 1 値・docs only な変更はこのフローに乗せず直接編集します。
+
+## shadcn/ui
+
+```bash
+bunx shadcn@latest add [component-name]
+```
+
+## 参考リンク
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Tailwind CSS](https://tailwindcss.com/docs)
+- [shadcn/ui](https://ui.shadcn.com/)
+- [Better Auth](https://www.better-auth.com/)
+- [Cloudflare D1](https://developers.cloudflare.com/d1/)
+- [Cloudflare R2](https://developers.cloudflare.com/r2/)
+- [@opennextjs/cloudflare](https://opennext.js.org/cloudflare)
+- [oxc (oxlint/oxfmt)](https://oxc.rs/)
+- [Vitest](https://vitest.dev/)
