@@ -6,10 +6,13 @@ export const Skills = () => (
       <span className="text-accent">{"// "}</span>
       06. skills
     </h2>
-    <ul className="flex flex-col gap-2">
+    <ul className="flex flex-wrap gap-3">
       {skills.map((skill) => (
-        <li key={skill} className="text-muted-foreground text-sm">
-          <span className="text-accent-soft mr-2">{"~"}</span>
+        <li
+          key={skill}
+          className="text-muted-foreground text-sm border border-border rounded px-3 py-1"
+        >
+          <span className="text-accent-soft mr-1">{"~"}</span>
           {skill}
         </li>
       ))}
