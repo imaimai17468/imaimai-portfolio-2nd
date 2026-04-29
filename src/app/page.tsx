@@ -11,20 +11,22 @@ export default function Home() {
   return (
     <>
       <SectionIndexContainer />
-      <main className="md:ml-56 max-w-3xl">
-        <Hero />
-        <div className="border-t border-border mx-6" />
-        <Activities />
-        <div className="border-t border-border mx-6" />
-        <Products />
-        <div className="border-t border-border mx-6" />
-        <Career />
-        <div className="border-t border-border mx-6" />
-        <Education />
-        <div className="border-t border-border mx-6" />
-        <Skills />
-        <Footer />
-      </main>
+      <div className="md:pl-56">
+        <main className="mx-auto max-w-3xl">
+          <Hero />
+          <div className="border-t border-border mx-6" />
+          <Activities />
+          <div className="border-t border-border mx-6" />
+          <Products />
+          <div className="border-t border-border mx-6" />
+          <Career />
+          <div className="border-t border-border mx-6" />
+          <Education />
+          <div className="border-t border-border mx-6" />
+          <Skills />
+          <Footer />
+        </main>
+      </div>
     </>
   );
 }
