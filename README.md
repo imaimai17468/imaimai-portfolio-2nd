@@ -1,6 +1,6 @@
-# My App
+# imaimai17468 — Portfolio
 
-Next.js 16 + TypeScript + Tailwind CSS + shadcn/ui を使用したモダンな Web アプリケーションテンプレートです。
+Next.js 16 + TypeScript + Tailwind CSS v4 で構築するポートフォリオサイト。
 
 ## 技術スタック
 
@@ -8,10 +8,6 @@ Next.js 16 + TypeScript + Tailwind CSS + shadcn/ui を使用したモダンな W
 - **Language**: TypeScript (tsgo)
 - **Styling**: Tailwind CSS v4
 - **UI Components**: shadcn/ui (Radix UI primitives)
-- **Authentication**: Better Auth (Google OAuth)
-- **Database**: Cloudflare D1 (SQLite) + Drizzle ORM
-- **Storage**: Cloudflare R2
-- **Hosting**: Cloudflare Workers (@opennextjs/cloudflare)
 - **Code Quality**: oxlint (linting) + oxfmt (formatting)
 - **Testing**: Vitest + Testing Library
 - **Package Manager**: Bun
@@ -20,16 +16,11 @@ Next.js 16 + TypeScript + Tailwind CSS + shadcn/ui を使用したモダンな W
 ## クイックスタート
 
 ```bash
-git clone <your-repo-url>
-cd <your-repo-name>
 bun install
-cp .env.local.example .env.local
 bun run dev
 ```
 
-http://localhost:3000 でアクセス。`next.config.mjs` の `initOpenNextCloudflareForDev` により、`bun run dev` でも Cloudflare D1 / R2 バインディングが有効です。
-
-データベース・認証・ストレージのセットアップ手順は [docs/DATABASE_SETUP.md](./docs/DATABASE_SETUP.md) を参照。
+http://localhost:3000 でアクセス。
 
 ## Scripts
 
@@ -43,7 +34,6 @@ http://localhost:3000 でアクセス。`next.config.mjs` の `initOpenNextCloud
 | `bun run format:fix` | Format with oxfmt                |
 | `bun run knip`       | Detect unused deps/exports/files |
 | `bun run test`       | Run tests with Vitest            |
-| `bun run cf-typegen` | Generate `CloudflareEnv` from `wrangler.toml` |
 
 ## Tools
 
@@ -60,7 +50,6 @@ http://localhost:3000 でアクセス。`next.config.mjs` の `initOpenNextCloud
 ```
 src/
 ├── app/                    # Next.js App Router
-│   ├── api/                # API routes (auth, avatars, ...)
 │   ├── components/         # ページ横断で共有する UI primitives
 │   ├── globals.css         # Tailwind v4 トークン
 │   ├── layout.tsx
@@ -68,9 +57,6 @@ src/
 ├── components/             # shadcn/ui プリミティブ等
 │   └── ui/
 └── lib/
-    ├── auth/               # Better Auth 設定
-    ├── drizzle/            # Drizzle ORM スキーマ
-    ├── storage/            # R2 ストレージ
     └── utils.ts
 ```
 
@@ -105,9 +91,5 @@ bunx shadcn@latest add [component-name]
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Tailwind CSS](https://tailwindcss.com/docs)
 - [shadcn/ui](https://ui.shadcn.com/)
-- [Better Auth](https://www.better-auth.com/)
-- [Cloudflare D1](https://developers.cloudflare.com/d1/)
-- [Cloudflare R2](https://developers.cloudflare.com/r2/)
-- [@opennextjs/cloudflare](https://opennext.js.org/cloudflare)
 - [oxc (oxlint/oxfmt)](https://oxc.rs/)
 - [Vitest](https://vitest.dev/)
