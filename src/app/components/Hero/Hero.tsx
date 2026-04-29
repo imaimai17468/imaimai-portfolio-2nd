@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { profile } from "@/app/data/profile";
 import { socialLinks } from "@/app/data/links";
@@ -7,12 +8,23 @@ export const Hero = () => (
     <div className="mb-6 text-muted-foreground text-sm">
       <span className="text-accent">{">"}</span> whoami
     </div>
-    <h1 className="text-4xl font-bold text-foreground mb-2">
-      <span className="text-accent">{"@"}</span>
-      {profile.handle}
-    </h1>
-    <p className="text-muted-foreground mb-1">{profile.title}</p>
-    <p className="text-muted-foreground text-sm mb-6">{profile.tagline}</p>
+    <div className="flex items-center gap-4 mb-4">
+      <Image
+        src="/avatar.jpeg"
+        alt="imaimai17468 avatar"
+        width={96}
+        height={96}
+        className="rounded-full border-2 border-border"
+      />
+      <div>
+        <h1 className="text-4xl font-bold text-foreground mb-1">
+          <span className="text-accent">{"@"}</span>
+          {profile.handle}
+        </h1>
+        <p className="text-muted-foreground mb-1">{profile.title}</p>
+        <p className="text-muted-foreground text-sm">{profile.tagline}</p>
+      </div>
+    </div>
     <div className="border-l-2 border-border pl-4 mb-8 flex flex-col gap-3">
       {profile.bio.map((paragraph) => (
         <p key={paragraph} className="text-foreground text-sm leading-relaxed">
