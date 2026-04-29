@@ -1,13 +1,4 @@
-type EducationEntryProps = {
-  period: string;
-  school: string;
-  program: string;
-  research: string;
-  organization: string;
-  projects: readonly string[];
-  results: readonly string[];
-  freelance: readonly string[];
-};
+import type { EducationEntry as EducationEntryProps } from "@/app/data/education";
 
 export const EducationEntry = ({
   period,

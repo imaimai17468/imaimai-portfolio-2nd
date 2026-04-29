@@ -21,10 +21,7 @@ export const education = [
       "サークルメンバーの育成管理アプリ",
       "駐車場空き情報のリアルタイム監視アプリ",
     ],
-    results: [
-      "第一回技育博に NUTMEG の代表として参加",
-      "技育展 2023 企業賞",
-    ],
+    results: ["第一回技育博に NUTMEG の代表として参加", "技育展 2023 企業賞"],
     freelance: [
       "スタートアップ A 社 — 修理の受注 / 発注ができる LINE アプリの開発",
       "スタートアップ B 社 — 建築関係のマッチングプラットフォーム / 学会の抄録冊子の自動作成サービス / 履歴書の自動 PDF 化・管理サービス",
@@ -41,12 +38,7 @@ export const education = [
       "研究室の鍵のカードキーシステム化",
       "学校の単位数計算サイト",
     ],
-    results: [
-      "Paiza S",
-      "AtCoder 緑",
-    ],
-    freelance: [
-      "paiza Inc. — 競技プログラミング問題集の作問",
-    ],
+    results: ["Paiza S", "AtCoder 緑"],
+    freelance: ["paiza Inc. — 競技プログラミング問題集の作問"],
   },
 ] as const;
