@@ -12,7 +12,7 @@ export default function Home() {
   return (
     <>
       <SectionIndexContainer />
-      <main className="md:ml-56">
+      <main className="md:ml-56 max-w-3xl">
         <Hero />
         <div className="border-t border-border mx-6" />
         <Activities />
