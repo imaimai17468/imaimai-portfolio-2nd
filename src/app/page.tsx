@@ -4,7 +4,6 @@ import { Activities } from "./components/Activities/Activities";
 import { Products } from "./components/Products/Products";
 import { Career } from "./components/Career/Career";
 import { Education } from "./components/Education/Education";
-import { Skills } from "./components/Skills/Skills";
 import { Footer } from "./components/Footer/Footer";
 
 export default function Home() {
@@ -21,8 +20,6 @@ export default function Home() {
         <Career />
         <div className="border-t border-border mx-6" />
         <Education />
-        <div className="border-t border-border mx-6" />
-        <Skills />
         <Footer />
       </main>
     </div>

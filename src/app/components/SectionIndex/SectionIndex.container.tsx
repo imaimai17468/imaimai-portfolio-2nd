@@ -9,7 +9,6 @@ const SECTIONS = [
   { id: "03-products", label: "03 ─ products" },
   { id: "04-career", label: "04 ─ career" },
   { id: "05-education", label: "05 ─ education" },
-  { id: "06-skills", label: "06 ─ skills" },
 ];
 
 export const SectionIndexContainer = () => {
