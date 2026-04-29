@@ -9,6 +9,20 @@
 set -euo pipefail
 
 INPUT=$(cat)
+
+# Skip reminder injection in subagent (sidechain) sessions.
+# The "dispatch a subagent" / "do not pick up in parent" guidance is meant for
+# the parent session — a subagent receiving these reminders during its own
+# briefing prompt would interpret them as instructions to dispatch yet another
+# subagent, leading to infinite recursion or stalls.
+# Detect sidechain via the first transcript entry's isSidechain flag.
+TRANSCRIPT=$(printf '%s' "$INPUT" | jq -r '.transcript_path // ""' 2>/dev/null || true)
+if [ -n "$TRANSCRIPT" ] && [ -f "$TRANSCRIPT" ]; then
+  if head -1 "$TRANSCRIPT" 2>/dev/null | grep -q '"isSidechain":true'; then
+    exit 0
+  fi
+fi
+
 PROMPT=$(printf '%s' "$INPUT" | jq -r '.prompt // ""')
 
 # Lowercase copy for trigger matching (Japanese characters are left as-is).
