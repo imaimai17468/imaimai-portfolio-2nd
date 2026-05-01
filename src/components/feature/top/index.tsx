@@ -1,3 +1,4 @@
+import { AboutSection } from "./about-section";
 import { ActivitiesSection } from "./activities-section";
 import { HeroSection } from "./hero-section";
 import { ProductsSection } from "./products-section";
@@ -19,6 +20,9 @@ export const Top: React.FC = () => {
     <div className="relative bg-zinc-950">
       {/* Hero: プロフィールセクション */}
       <HeroSection />
+
+      {/* About: 経歴セクション */}
+      <AboutSection />
 
       {/* Activities: 活動セクション */}
       <ActivitiesSection />

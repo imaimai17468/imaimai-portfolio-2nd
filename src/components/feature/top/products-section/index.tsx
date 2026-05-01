@@ -92,12 +92,8 @@ export const ProductsSection: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : {}}
           transition={{ duration: 0.6, delay: 0.8 }}
-          className="mt-24 flex flex-col items-center gap-6"
+          className="mt-24 flex flex-col items-center"
         >
-          <Link href="/about" className="text-zinc-500 hover:text-zinc-300 text-sm transition-colors">
-            More about me
-            <span className="ml-2">→</span>
-          </Link>
           <p className="text-zinc-700 text-xs">Thanks for scrolling</p>
         </motion.div>
       </div>
