@@ -31,7 +31,7 @@ export const HeroSection: React.FC = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
+      className="relative min-h-screen flex flex-col items-center justify-center pb-24 overflow-hidden"
     >
       <motion.div className="flex flex-col items-center text-center w-full" style={{ y, opacity }}>
         {/* パーティクルアバター */}
