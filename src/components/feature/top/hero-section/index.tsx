@@ -61,27 +61,17 @@ export const HeroSection: React.FC = () => {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="text-xl md:text-2xl text-zinc-400 mb-6"
         >
-          Front-end Developer
-        </motion.p>
-
-        {/* 説明 */}
-        <motion.p
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="text-base text-zinc-500 max-w-md mb-8"
-        >
-          24卒 | フロントエンド | ゆめみ(消滅) → ???
+          Product Builder
         </motion.p>
 
         {/* ソーシャルリンク */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="flex items-center gap-4"
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="flex items-center gap-3 mt-2"
         >
-          <SocialLink
+          <SocialIconLink
             href="https://x.com/imaimai17468"
             label="X (Twitter)"
             icon={
@@ -91,7 +81,7 @@ export const HeroSection: React.FC = () => {
               </svg>
             }
           />
-          <SocialLink
+          <SocialIconLink
             href="https://github.com/imaimai17468"
             label="GitHub"
             icon={
@@ -124,23 +114,22 @@ export const HeroSection: React.FC = () => {
   );
 };
 
-type SocialLinkProps = {
+type SocialIconLinkProps = {
   href: string;
   label: string;
   icon: React.ReactNode;
 };
 
-const SocialLink: React.FC<SocialLinkProps> = ({ href, label, icon }) => {
+const SocialIconLink: React.FC<SocialIconLinkProps> = ({ href, label, icon }) => {
   return (
     <Link
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-center gap-2 px-4 py-2 text-zinc-400 hover:text-zinc-100 border border-zinc-800 hover:border-zinc-600 rounded-lg transition-colors duration-200"
+      className="p-2.5 text-zinc-400 hover:text-zinc-100 border border-zinc-800 hover:border-zinc-600 rounded-full transition-colors duration-200"
       aria-label={label}
     >
       {icon}
-      <span className="text-sm">{label}</span>
     </Link>
   );
 };

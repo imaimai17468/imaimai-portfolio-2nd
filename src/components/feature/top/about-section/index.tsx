@@ -20,7 +20,7 @@ export const AboutSection: React.FC = () => {
               2001年生まれ。木更津高専、長岡技術科学大学を経て、2024年に新卒でゆめみに入社し、現在はアクセンチュアでプロダクトエンジニアとして活動しています。
             </p>
             <p>
-              フロントエンド開発を中心に、大規模サイトのリニューアルや新規サービス開発に携わる傍ら、リクルーターとして採用活動や技育プロジェクトの運営にも取り組んでいます。
+              フロントエンド開発を中心に、大規模サイトの新規開発やリニューアルに携わる傍ら、リクルーターとして採用活動や技育プロジェクトへの企業としての参加にも取り組んでいます。
             </p>
             <p>
               技術カンファレンスでの登壇や、個人開発を通じて得た知見を積極的に発信し、エンジニアコミュニティへの貢献を大切にしています。
@@ -36,21 +36,29 @@ export const AboutSection: React.FC = () => {
               period="2024.12 - "
               company="アクセンチュア株式会社"
               department="Song D&DP"
-              roles={["プロダクトエンジニア", "リクルーター", "技育Project担当", "Song LT会の主催・運営"]}
-              projects={["MultiAgentSaaS開発・提案"]}
+              jobTitle="Product Engineer"
+              other={["技育プロジェクト", "Song LT会主催"]}
+              projects={[
+                "MultiAgentSaaS開発・提案",
+                "社内フットサル大会アプリの開発",
+                "バイクのマイページ系アプリの開発",
+                "アパレル企業の社内イベント向けデジタル展示物の開発",
+              ]}
+              speaking={["技育祭"]}
             />
             <CareerEntry
               period="2024.04 - 2024.12"
               company="株式会社ゆめみ"
               note="会社消滅"
-              roles={["フロントエンドエンジニア", "リクルーター", "技育Project担当"]}
+              jobTitle="Frontend Engineer"
+              other={["リクルーター", "技育プロジェクト"]}
               projects={[
                 "大型漫画掲載サイトのリニューアル",
                 "HR系サービスのホームページのリニューアル",
                 "求人掲載サービスの管理画面の新規機能開発",
                 "飛行機の国際線予約サービスの新規開発",
               ]}
-              speaking={["フロントエンドカンファレンス北海道 2024", "TSKaigi 2025", "他多数"]}
+              speaking={["フロントエンドカンファレンス北海道 2024", "TSKaigi 2025"]}
             />
           </div>
         </div>
@@ -66,11 +74,11 @@ export const AboutSection: React.FC = () => {
               research="睡眠時脳波の構造解析"
               club="学園祭実行委員会 情報局 (NUTMEG)"
               projects={[
-                "学園祭で使われる資金の管理アプリ",
-                "サークルメンバーの育成管理アプリ",
-                "駐車場空き情報のリアルタイム監視アプリ",
+                "学園祭で使われる資金管理アプリの開発",
+                "サークルメンバーの育成管理アプリの開発",
+                "駐車場空き情報のリアルタイム監視アプリの開発",
               ]}
-              achievements={["第一回技育博にNUTMEGの代表として参加", "技育展 2023 企業賞"]}
+              achievements={["技育展 2023 企業賞"]}
               freelance={[
                 { client: "スタートアップA社", projects: ["修理の受注/発注ができるLINEアプリの開発"] },
                 {
@@ -89,7 +97,11 @@ export const AboutSection: React.FC = () => {
               department="電子制御工学科"
               research="光学式心拍センサの精度評価"
               club="プログラミング研究同好会"
-              projects={["文化祭での自作ゲーム展示", "研究室の鍵のカードキーシステム化", "学校の単位数計算サイト"]}
+              projects={[
+                "文化祭での自作ゲーム展示の開発",
+                "研究室の鍵のカードキーシステムの開発",
+                "学校の単位数計算サイトの開発",
+              ]}
               achievements={["Paiza S", "AtCoder 緑"]}
               freelance={[{ client: "paiza Inc.", projects: ["競技プログラミング問題集の作問"] }]}
             />
@@ -105,34 +117,35 @@ type CareerEntryProps = {
   company: string;
   department?: string;
   note?: string;
-  roles: string[];
+  jobTitle: string;
+  other?: string[];
   projects: string[];
   speaking?: string[];
 };
 
-const CareerEntry: React.FC<CareerEntryProps> = ({ period, company, department, note, roles, projects, speaking }) => {
+const CareerEntry: React.FC<CareerEntryProps> = ({
+  period,
+  company,
+  department,
+  note,
+  jobTitle,
+  other,
+  projects,
+  speaking,
+}) => {
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-[100px_1fr] md:grid-cols-[120px_1fr] gap-4">
+      <div>
         <span className="text-sm text-zinc-600 font-mono">{period}</span>
-        <div>
+        <div className="mt-2">
           <div className="flex items-center gap-2">
             <h3 className="text-zinc-200 font-medium">{company}</h3>
             {note && <span className="text-xs text-zinc-600">({note})</span>}
           </div>
-          {department && <p className="text-sm text-zinc-500 mt-1">{department}</p>}
+          <p className="text-sm text-zinc-500 mt-1">{department ? `${department} · ${jobTitle}` : jobTitle}</p>
         </div>
       </div>
-      <div className="ml-0 md:ml-[136px] space-y-4">
-        <DetailBlock title="Roles">
-          <div className="flex flex-wrap gap-2">
-            {roles.map((role) => (
-              <span key={role} className="px-2 py-1 text-xs text-zinc-400 border border-zinc-800 rounded">
-                {role}
-              </span>
-            ))}
-          </div>
-        </DetailBlock>
+      <div className="space-y-4">
         <DetailBlock title="Projects">
           <ul className="space-y-1">
             {projects.map((project) => (
@@ -142,9 +155,26 @@ const CareerEntry: React.FC<CareerEntryProps> = ({ period, company, department, 
             ))}
           </ul>
         </DetailBlock>
+        {other && other.length > 0 && (
+          <DetailBlock title="Other">
+            <ul className="space-y-1">
+              {other.map((item) => (
+                <li key={item} className="text-sm text-zinc-400">
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </DetailBlock>
+        )}
         {speaking && speaking.length > 0 && (
           <DetailBlock title="Speaker">
-            <p className="text-sm text-zinc-400">{speaking.join("、")}</p>
+            <ul className="space-y-1">
+              {speaking.map((item) => (
+                <li key={item} className="text-sm text-zinc-400">
+                  {item}
+                </li>
+              ))}
+            </ul>
           </DetailBlock>
         )}
       </div>
@@ -180,16 +210,16 @@ const EducationEntry: React.FC<EducationEntryProps> = ({
 }) => {
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-[100px_1fr] md:grid-cols-[120px_1fr] gap-4">
+      <div>
         <span className="text-sm text-zinc-600 font-mono">{period}</span>
-        <div>
+        <div className="mt-2">
           <h3 className="text-zinc-200 font-medium">{school}</h3>
           <p className="text-sm text-zinc-500 mt-1">{department}</p>
           <p className="text-sm text-zinc-600 mt-1">研究: {research}</p>
           {club && <p className="text-sm text-zinc-600 mt-1">{club}</p>}
         </div>
       </div>
-      <div className="ml-0 md:ml-[136px] space-y-4">
+      <div className="space-y-4">
         {projects && projects.length > 0 && (
           <DetailBlock title="Projects">
             <ul className="space-y-1">
@@ -203,23 +233,28 @@ const EducationEntry: React.FC<EducationEntryProps> = ({
         )}
         {achievements && achievements.length > 0 && (
           <DetailBlock title="Results">
-            <div className="flex flex-wrap gap-2">
+            <ul className="space-y-1">
               {achievements.map((achievement) => (
-                <span key={achievement} className="px-2 py-1 text-xs text-zinc-400 border border-zinc-800 rounded">
+                <li key={achievement} className="text-sm text-zinc-400">
                   {achievement}
-                </span>
+                </li>
               ))}
-            </div>
+            </ul>
           </DetailBlock>
         )}
         {freelance && freelance.length > 0 && (
           <DetailBlock title="Freelance">
-            <div className="space-y-2">
+            <div className="space-y-3">
               {freelance.map((item) => (
-                <div key={item.client} className="text-sm">
-                  <span className="text-zinc-500">{item.client}</span>
-                  <span className="text-zinc-600 mx-2">·</span>
-                  <span className="text-zinc-400">{item.projects.join("、")}</span>
+                <div key={item.client}>
+                  <p className="text-sm text-zinc-500">{item.client}</p>
+                  <ul className="space-y-1 mt-1">
+                    {item.projects.map((project) => (
+                      <li key={project} className="text-sm text-zinc-400">
+                        {project}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               ))}
             </div>
