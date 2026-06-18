@@ -1,24 +1,162 @@
 {
   "permissions": {
     "allow": [
-      "mcp__*",
-      "Bash(tree:*)",
-      "Bash(bun run:*)",
-      "Bash(lsof:*)",
-      "Bash(xargs kill -9)",
-      "Bash(find:*)",
       "WebSearch",
-      "Bash(.gitignore)",
-      "Bash(nslookup:*)",
-      "Bash(timeout 5 nc:*)",
-      "Bash(echo:*)",
-      "Bash(nc:*)",
+      "WebFetch",
+      "Bash(tree:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
       "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(echo:*)",
+      "Bash(mkdir:*)",
+      "Bash(touch:*)",
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git blame:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git stash:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(gh api:*)",
+      "Bash(gh run view:*)",
+      "Bash(bun run:*)",
+      "Bash(bun add -E:*)",
+      "Bash(bun remove:*)",
+      "Bash(bun pm:*)",
+      "Bash(bun install:*)",
+      "Bash(bunx:*)"
     ],
-    "ask": ["Bash(git push:*)", "Bash(bun add:*)", "Bash(bun remove:*)"]
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(rm -fr:*)",
+      "Bash(rm -r:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git push --force-with-lease:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git clean -fd:*)",
+      "Bash(git clean -fdx:*)",
+      "Bash(git branch -D:*)",
+      "Bash(git checkout .)",
+      "Bash(git checkout --:*)",
+      "Bash(git restore .)",
+      "Bash(git restore --:*)",
+      "Bash(git commit --amend:*)",
+      "Bash(git rebase -i:*)",
+      "Bash(sudo:*)",
+      "Bash(chmod -R:*)",
+      "Read(./.env)",
+      "Read(./.env.local)",
+      "Read(./.env.development)",
+      "Read(./.env.production)",
+      "Write(./.env)",
+      "Write(./.env.local)",
+      "Write(./.env.development)",
+      "Write(./.env.production)",
+      "Edit(./.env)",
+      "Edit(./.env.local)",
+      "Edit(./.env.development)",
+      "Edit(./.env.production)"
+    ],
+    "ask": [
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git merge:*)",
+      "Bash(git rebase:*)",
+      "Bash(git cherry-pick:*)",
+      "Bash(git reset:*)",
+      "Bash(git checkout:*)",
+      "Bash(git revert:*)",
+      "Bash(git tag:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh pr edit:*)",
+      "Bash(gh pr close:*)",
+      "Bash(gh pr merge:*)",
+      "Bash(gh pr comment:*)",
+      "Bash(gh issue:*)",
+      "Bash(bun add:*)",
+      "Bash(rm:*)",
+      "Bash(mv:*)",
+      "Bash(cp:*)"
+    ]
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": ["context7", "serena", "chrome-devtools", "next-devtools", "kiri"]
+  "enabledMcpjsonServers": ["context7"],
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/user-prompt-skill-reminder.sh",
+            "timeout": 5,
+            "statusMessage": "Skill reminder: confirm brainstorming / writing-plans as needed..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/stop-quality-gate.sh",
+            "timeout": 120,
+            "statusMessage": "Quality gate: typecheck / biome / oxlint / knip / similarity (all blocking)..."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/pre-commit-review-reminder.sh",
+            "timeout": 5,
+            "statusMessage": "Review reminder: checking code-reviewer dispatch..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "F=$(jq -r '.tool_input.file_path // \"\"'); case \"$F\" in *.ts|*.tsx|*.js|*.jsx|*.mjs|*.cjs) ;; *) exit 0 ;; esac; cd $CLAUDE_PROJECT_DIR && OUT=$(bun run check 2>&1 && bun run lint 2>&1 && bun run format 2>&1 && bun run typecheck 2>&1); RC=$?; if [ $RC -ne 0 ]; then printf '%s' \"$OUT\" | jq -Rs --arg file \"$F\" '{systemMessage:(\"⛔ PostToolUse block: lint/typecheck 失敗 — \" + $file), decision:\"block\", reason:(\"PostToolUse: 編集後の lint / typecheck が失敗しました。次のツール呼び出し前に直してください。\\n\\n\" + .)}'; fi; exit 0",
+            "timeout": 60,
+            "statusMessage": "Per-edit check: biome + oxlint + oxfmt + tsgo..."
+          }
+        ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/post-agent-review-stamp.sh",
+            "timeout": 3,
+            "statusMessage": "Review stamp: checking if code-reviewer completed..."
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true,
+    "chrome-devtools-mcp@claude-plugins-official": true
+  },
+  "plansDirectory": "./.claude/plans"
 }
