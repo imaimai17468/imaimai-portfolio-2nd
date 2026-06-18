@@ -1,73 +1,21 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
-import localFont from "next/font/local";
+import { ThemeProvider } from "next-themes";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-
-const roboto = localFont({
-  src: [
-    {
-      path: "../fonts/roboto/Roboto-Thin.ttf",
-      weight: "100",
-      style: "normal",
-    },
-    {
-      path: "../fonts/roboto/Roboto-Light.ttf",
-      weight: "300",
-      style: "normal",
-    },
-    {
-      path: "../fonts/roboto/Roboto-Regular.ttf",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "../fonts/roboto/Roboto-Bold.ttf",
-      weight: "700",
-      style: "normal",
-    },
-  ],
-  variable: "--font-roboto",
-});
-
-const raleway = localFont({
-  src: "../fonts/Raleway-Black.ttf",
-  variable: "--font-raleway",
-});
-
-const nakamori = localFont({
-  src: "../fonts/Nakamori.ttf",
-  variable: "--font-nakamori",
-});
-
-const cinecaption = localFont({
-  src: "../fonts/cinecaption.ttf",
-  variable: "--font-cinecaption",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://imaimai.tech"),
   title: "imaimai17468's Portfolio",
   description:
     "imaimai17468のポートフォリオサイト | クリエイティブなWeb開発者として、技術とデザインで新しい体験を創造します",
-  keywords: [
-    "imaimai17468",
-    "portfolio",
-    "web development",
-    "creative coding",
-    "interactive",
-    "UI/UX",
-    "animation",
-    "Next.js",
-    "React",
-    "TypeScript",
-  ],
+  keywords: ["imaimai17468", "portfolio", "web development", "Next.js", "React", "TypeScript"],
   authors: [{ name: "imaimai17468" }],
   creator: "imaimai17468",
   publisher: "imaimai17468",
   robots: "index, follow",
   openGraph: {
-    title: "imaimai17468's Portfolio 2nd",
+    title: "imaimai17468's Portfolio",
     description:
       "imaimai17468のポートフォリオサイト | フロントエンドエンジニアとして、常に自分を示し続けます",
     url: "https://imaimai.tech",
@@ -77,7 +25,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "imaimai17468's Portfolio 2nd",
+    title: "imaimai17468's Portfolio",
     description:
       "imaimai17468のポートフォリオサイト | フロントエンドエンジニアとして、常に自分を示し続けます",
     creator: "@imaimai17468",
@@ -100,12 +48,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="ja"
-      className={`${roboto.variable} ${raleway.variable} ${nakamori.variable} ${cinecaption.variable} font-roboto`}
-    >
-      <body className="dark">
-        <NuqsAdapter>{children}</NuqsAdapter>
+    <html lang="ja" suppressHydrationWarning>
+      <body>
+        <ThemeProvider attribute="class" defaultTheme="dark">
+          <NuqsAdapter>{children}</NuqsAdapter>
+        </ThemeProvider>
         <Analytics />
       </body>
     </html>
