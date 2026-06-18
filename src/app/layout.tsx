@@ -3,7 +3,6 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import localFont from "next/font/local";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-import { MainLayout } from "@/components/layout/main-layout";
 
 const roboto = localFont({
   src: [
@@ -69,7 +68,8 @@ export const metadata: Metadata = {
   robots: "index, follow",
   openGraph: {
     title: "imaimai17468's Portfolio 2nd",
-    description: "imaimai17468のポートフォリオサイト | フロントエンドエンジニアとして、常に自分を示し続けます",
+    description:
+      "imaimai17468のポートフォリオサイト | フロントエンドエンジニアとして、常に自分を示し続けます",
     url: "https://imaimai.tech",
     siteName: "imaimai17468's Portfolio",
     locale: "ja_JP",
@@ -78,7 +78,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "imaimai17468's Portfolio 2nd",
-    description: "imaimai17468のポートフォリオサイト | フロントエンドエンジニアとして、常に自分を示し続けます",
+    description:
+      "imaimai17468のポートフォリオサイト | フロントエンドエンジニアとして、常に自分を示し続けます",
     creator: "@imaimai17468",
   },
 };
@@ -100,13 +101,11 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="ja"
       className={`${roboto.variable} ${raleway.variable} ${nakamori.variable} ${cinecaption.variable} font-roboto`}
     >
       <body className="dark">
-        <NuqsAdapter>
-          <MainLayout>{children}</MainLayout>
-        </NuqsAdapter>
+        <NuqsAdapter>{children}</NuqsAdapter>
         <Analytics />
       </body>
     </html>
