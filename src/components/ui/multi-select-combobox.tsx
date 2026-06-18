@@ -4,7 +4,14 @@ import { Check, ChevronsUpDown, X } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
@@ -49,7 +56,12 @@ export function MultiSelectCombobox({
     <div className={cn("w-full", className)}>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button variant="outline" role="combobox" aria-expanded={open} className="w-full justify-start gap-2">
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-full justify-start gap-2"
+          >
             {selected.length > 0 ? (
               <div className="flex flex-1 flex-wrap gap-1">
                 {selected.map((value) => {
@@ -77,8 +89,14 @@ export function MultiSelectCombobox({
                 {options.map((option) => {
                   const isSelected = selected.includes(option.value);
                   return (
-                    <CommandItem key={option.value} value={option.value} onSelect={() => handleSelect(option.value)}>
-                      <Check className={cn("mr-2 h-4 w-4", isSelected ? "opacity-100" : "opacity-0")} />
+                    <CommandItem
+                      key={option.value}
+                      value={option.value}
+                      onSelect={() => handleSelect(option.value)}
+                    >
+                      <Check
+                        className={cn("mr-2 h-4 w-4", isSelected ? "opacity-100" : "opacity-0")}
+                      />
                       {option.label}
                     </CommandItem>
                   );

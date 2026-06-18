@@ -6,11 +6,18 @@ interface AuroraBackgroundProps extends React.HTMLProps<HTMLDivElement> {
   showRadialGradient?: boolean;
 }
 
-export const AuroraBackground = ({ className, showRadialGradient = true, ...props }: AuroraBackgroundProps) => {
+export const AuroraBackground = ({
+  className,
+  showRadialGradient = true,
+  ...props
+}: AuroraBackgroundProps) => {
   return (
     <main className="fixed inset-0 w-full h-screen -z-10">
       <div
-        className={cn("relative flex flex-col  h-[100vh] items-center justify-center transition-bg", className)}
+        className={cn(
+          "relative flex flex-col  h-[100vh] items-center justify-center transition-bg",
+          className,
+        )}
         {...props}
       >
         <div className="absolute inset-0 overflow-hidden">
@@ -30,7 +37,8 @@ export const AuroraBackground = ({ className, showRadialGradient = true, ...prop
             pointer-events-none
             absolute -inset-[10px] opacity-50 will-change-transform`,
 
-              showRadialGradient && "[mask-image:radial-gradient(ellipse_at_100%_0%,black_10%,var(--transparent)_70%)]",
+              showRadialGradient &&
+                "[mask-image:radial-gradient(ellipse_at_100%_0%,black_10%,var(--transparent)_70%)]",
             )}
           />
         </div>
