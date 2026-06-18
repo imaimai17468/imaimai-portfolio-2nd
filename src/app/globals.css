@@ -59,9 +59,15 @@
 
   body {
     @apply bg-background text-foreground;
-    cursor: none;
   }
 
+  [data-mode="pointer"] .scope-crosshair {
+    display: none;
+  }
+}
+
+@media (pointer: fine) {
+  body,
   a,
   button {
     cursor: none;
@@ -83,12 +89,12 @@
 ::view-transition-new(root) {
   animation: theme-reveal 1s ease-in-out forwards;
   -webkit-mask-image: radial-gradient(
-    circle at 72px 72px,
+    circle at var(--reveal-x, 72px) var(--reveal-y, 72px),
     black calc(var(--reveal-size) - 40px),
     transparent var(--reveal-size)
   );
   mask-image: radial-gradient(
-    circle at 72px 72px,
+    circle at var(--reveal-x, 72px) var(--reveal-y, 72px),
     black calc(var(--reveal-size) - 40px),
     transparent var(--reveal-size)
   );

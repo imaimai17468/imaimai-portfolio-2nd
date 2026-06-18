@@ -24,7 +24,6 @@ export const ScopeCursor: React.FC = () => {
   const snappedRef = useRef<Element | null>(null);
   const visibleRef = useRef(false);
   const [visible, setVisible] = useState(false);
-  const [mode, setMode] = useState<CursorMode>("default");
   const [hasPointer, setHasPointer] = useState(false);
 
   useEffect(() => {
@@ -77,6 +76,13 @@ export const ScopeCursor: React.FC = () => {
       const snapped = snappedRef.current;
       if (!snapped) return;
       if (snapped.contains(e.target instanceof Node ? e.target : null)) return;
+
+      const rect = snapped.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dist = Math.sqrt((e.clientX - cx) ** 2 + (e.clientY - cy) ** 2);
+      if (dist > MAGNET_RADIUS) return;
+
       e.preventDefault();
       e.stopPropagation();
       if (snapped instanceof HTMLElement) {
@@ -119,7 +125,6 @@ export const ScopeCursor: React.FC = () => {
         };
         if (prevMode !== "pointer") {
           prevMode = "pointer";
-          setMode("pointer");
         }
       } else {
         pos.current.x += (mouse.current.x - pos.current.x) * LERP_SPEED;
@@ -128,7 +133,6 @@ export const ScopeCursor: React.FC = () => {
         dims.current = { w: CURSOR_SIZE, h: CURSOR_SIZE };
         if (prevMode !== "default") {
           prevMode = "default";
-          setMode("default");
         }
       }
 
@@ -136,6 +140,41 @@ export const ScopeCursor: React.FC = () => {
       cursor.style.transform = `translate(${pos.current.x - w / 2}px, ${pos.current.y - h / 2}px)`;
       cursor.style.width = `${w}px`;
       cursor.style.height = `${h}px`;
+      cursor.dataset.mode = prevMode;
+
+      const svg = cursor.querySelector("svg");
+      if (svg) {
+        svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+        const c = 6;
+        const paths = svg.querySelectorAll("[data-corner]");
+        paths[0]?.setAttribute("d", `M${c},0 L0,0 L0,${c}`);
+        paths[1]?.setAttribute("d", `M${w - c},0 L${w},0 L${w},${c}`);
+        paths[2]?.setAttribute("d", `M0,${h - c} L0,${h} L${c},${h}`);
+        paths[3]?.setAttribute("d", `M${w},${h - c} L${w},${h} L${w - c},${h}`);
+
+        if (prevMode === "default") {
+          const hw = w / 2;
+          const hh = h / 2;
+          const g = 3;
+          const lines = svg.querySelectorAll("[data-cross]");
+          lines[0]?.setAttribute("x1", String(hw));
+          lines[0]?.setAttribute("y1", String(g));
+          lines[0]?.setAttribute("x2", String(hw));
+          lines[0]?.setAttribute("y2", String(hh - g));
+          lines[1]?.setAttribute("x1", String(hw));
+          lines[1]?.setAttribute("y1", String(hh + g));
+          lines[1]?.setAttribute("x2", String(hw));
+          lines[1]?.setAttribute("y2", String(h - g));
+          lines[2]?.setAttribute("x1", String(g));
+          lines[2]?.setAttribute("y1", String(hh));
+          lines[2]?.setAttribute("x2", String(hw - g));
+          lines[2]?.setAttribute("y2", String(hh));
+          lines[3]?.setAttribute("x1", String(hw + g));
+          lines[3]?.setAttribute("y1", String(hh));
+          lines[3]?.setAttribute("x2", String(w - g));
+          lines[3]?.setAttribute("y2", String(hh));
+        }
+      }
 
       rafRef.current = requestAnimationFrame(animate);
     };
@@ -164,44 +203,82 @@ export const ScopeCursor: React.FC = () => {
         transition: "opacity 0.15s, width 0.15s, height 0.15s",
       }}
     >
-      <ScopeSvg mode={mode} />
+      <ScopeSvg />
     </div>
   );
 };
 
-const ScopeSvg: React.FC<{ mode: CursorMode }> = ({ mode }) => {
-  const corner = 6;
+const ScopeSvg: React.FC = () => {
+  const s = CURSOR_SIZE;
+  const c = 6;
+  const g = 3;
+  const hw = s / 2;
+  const hh = s / 2;
 
   return (
-    <svg width="100%" height="100%" viewBox="0 0 100 100" fill="none" preserveAspectRatio="none">
-      {mode === "default" && (
-        <>
-          <line x1={50} y1={6} x2={50} y2={44} className="stroke-foreground/60" strokeWidth={2} />
-          <line x1={50} y1={56} x2={50} y2={94} className="stroke-foreground/60" strokeWidth={2} />
-          <line x1={6} y1={50} x2={44} y2={50} className="stroke-foreground/60" strokeWidth={2} />
-          <line x1={56} y1={50} x2={94} y2={50} className="stroke-foreground/60" strokeWidth={2} />
-        </>
-      )}
+    <svg width="100%" height="100%" viewBox={`0 0 ${s} ${s}`} fill="none">
+      <g className="scope-crosshair">
+        <line
+          data-cross=""
+          x1={hw}
+          y1={g}
+          x2={hw}
+          y2={hh - g}
+          className="stroke-foreground/60"
+          strokeWidth={1}
+        />
+        <line
+          data-cross=""
+          x1={hw}
+          y1={hh + g}
+          x2={hw}
+          y2={s - g}
+          className="stroke-foreground/60"
+          strokeWidth={1}
+        />
+        <line
+          data-cross=""
+          x1={g}
+          y1={hh}
+          x2={hw - g}
+          y2={hh}
+          className="stroke-foreground/60"
+          strokeWidth={1}
+        />
+        <line
+          data-cross=""
+          x1={hw + g}
+          y1={hh}
+          x2={s - g}
+          y2={hh}
+          className="stroke-foreground/60"
+          strokeWidth={1}
+        />
+      </g>
 
       <path
-        d={`M${corner * 2},0 L0,0 L0,${corner * 2}`}
+        data-corner=""
+        d={`M${c},0 L0,0 L0,${c}`}
         className="stroke-foreground/80"
-        strokeWidth={3}
+        strokeWidth={1.5}
       />
       <path
-        d={`M${100 - corner * 2},0 L100,0 L100,${corner * 2}`}
+        data-corner=""
+        d={`M${s - c},0 L${s},0 L${s},${c}`}
         className="stroke-foreground/80"
-        strokeWidth={3}
+        strokeWidth={1.5}
       />
       <path
-        d={`M0,${100 - corner * 2} L0,100 L${corner * 2},100`}
+        data-corner=""
+        d={`M0,${s - c} L0,${s} L${c},${s}`}
         className="stroke-foreground/80"
-        strokeWidth={3}
+        strokeWidth={1.5}
       />
       <path
-        d={`M100,${100 - corner * 2} L100,100 L${100 - corner * 2},100`}
+        data-corner=""
+        d={`M${s},${s - c} L${s},${s} L${s - c},${s}`}
         className="stroke-foreground/80"
-        strokeWidth={3}
+        strokeWidth={1.5}
       />
     </svg>
   );

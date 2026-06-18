@@ -90,8 +90,20 @@ export const SymbolGridBackground: React.FC = () => {
     [triggerRipple],
   );
 
+  const totalCells = dimensions.cols * dimensions.rows;
+  const isMobile = dimensions.cols > 0 && dimensions.cols * CELL_SIZE < 768;
+  const toggleIndex = isMobile ? dimensions.cols + (dimensions.cols - 3) : dimensions.cols + 1;
+
+  const toggleCol = dimensions.cols > 0 ? toggleIndex % dimensions.cols : 0;
+  const toggleRow = dimensions.cols > 0 ? Math.floor(toggleIndex / dimensions.cols) : 0;
+  const toggleCenterX = toggleCol * CELL_SIZE + CELL_SIZE / 2;
+  const toggleCenterY = toggleRow * CELL_SIZE + CELL_SIZE / 2;
+
   const handleToggle = useCallback(() => {
     const targetTheme = resolvedTheme === "dark" ? "light" : "dark";
+
+    document.documentElement.style.setProperty("--reveal-x", `${toggleCenterX}px`);
+    document.documentElement.style.setProperty("--reveal-y", `${toggleCenterY}px`);
 
     if (hasViewTransition(document)) {
       document.startViewTransition(() => {
@@ -100,10 +112,7 @@ export const SymbolGridBackground: React.FC = () => {
     } else {
       setTheme(targetTheme);
     }
-  }, [resolvedTheme, setTheme]);
-
-  const totalCells = dimensions.cols * dimensions.rows;
-  const toggleIndex = dimensions.cols + 1;
+  }, [resolvedTheme, setTheme, toggleCenterX, toggleCenterY]);
 
   return (
     <div

@@ -21,8 +21,6 @@ type CareerEntry = {
   freelance?: FreelanceItem[];
 };
 
-const PERIOD_WIDTH = "10rem";
-
 const CAREER: CareerEntry[] = [
   {
     period: "2024.12 -",
@@ -144,11 +142,8 @@ const CareerItem: React.FC<{ entry: CareerEntry }> = ({ entry }) => {
 
   return (
     <div>
-      <div className="flex items-baseline gap-3">
-        <span
-          className="text-xs text-muted-foreground font-mono flex-shrink-0"
-          style={{ width: PERIOD_WIDTH }}
-        >
+      <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3">
+        <span className="text-xs text-muted-foreground font-mono flex-shrink-0 sm:w-[10rem]">
           {entry.period}
         </span>
         <div className="min-w-0">
