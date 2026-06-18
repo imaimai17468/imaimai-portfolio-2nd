@@ -90,7 +90,6 @@
     ]
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": ["context7"],
   "hooks": {
     "UserPromptSubmit": [
       {
@@ -156,7 +155,9 @@
   },
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
-    "chrome-devtools-mcp@claude-plugins-official": true
+    "chrome-devtools-mcp@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true
   },
   "plansDirectory": "./.claude/plans"
 }
