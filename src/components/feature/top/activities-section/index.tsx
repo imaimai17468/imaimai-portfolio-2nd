@@ -26,21 +26,11 @@ const ACTIVITIES: LinkItem[] = [
     title: "LAPRAS",
     url: "https://lapras.com/public/imaimai17468",
     description: "エンジニアとしてのキャリアプロフィール",
-    ogpImageUrl: "https://media.lapras.com/media/public_setting/GMOUC3J/98ff0d156c55451887dc6f791ea34d71.png",
+    ogpImageUrl:
+      "https://media.lapras.com/media/public_setting/GMOUC3J/98ff0d156c55451887dc6f791ea34d71.png",
   },
 ];
 
-/**
- * Activities Section - 活動
- *
- * design-guidelines:
- * - Spatial Composition: スタッガードアニメーションでリズム感
- * - Typography: セクションタイトルの視覚的階層
- *
- * UX原則:
- * - Progressive Disclosure: スクロールで順番に表示
- * - Immediate Feedback: ホバーで視覚的フィードバック
- */
 export const ActivitiesSection: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
@@ -48,7 +38,6 @@ export const ActivitiesSection: React.FC = () => {
   return (
     <section ref={sectionRef} className="min-h-screen flex flex-col justify-center px-6 py-24">
       <div className="max-w-4xl mx-auto w-full">
-        {/* セクションタイトル */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -56,14 +45,20 @@ export const ActivitiesSection: React.FC = () => {
           className="mb-16"
         >
           <span className="text-sm text-zinc-500 tracking-wider mb-2 block">01</span>
-          <h2 className="text-4xl md:text-5xl font-bold text-zinc-100 tracking-tight">Activities</h2>
+          <h2 className="text-4xl md:text-5xl font-bold text-zinc-100 tracking-tight">
+            Activities
+          </h2>
           <p className="text-zinc-500 mt-4 max-w-lg">執筆活動やコミュニティでの発信</p>
         </motion.div>
 
-        {/* アクティビティリスト */}
         <div className="space-y-4">
           {ACTIVITIES.map((activity, index) => (
-            <ActivityCard key={activity.url} activity={activity} index={index} isInView={isInView} />
+            <ActivityCard
+              key={activity.url}
+              activity={activity}
+              index={index}
+              isInView={isInView}
+            />
           ))}
         </div>
       </div>
@@ -82,7 +77,6 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, index, isInView }
   // icon.horse API is more reliable for modern sites
   const faviconUrl = `https://icon.horse/icon/${domain}`;
 
-  // OGP画像のURL（手動指定のみ、空文字列の場合は非表示）
   const ogpImageUrl = activity.ogpImageUrl || "";
 
   return (
@@ -93,18 +87,18 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, index, isInView }
     >
       <Link href={activity.url} target="_blank" rel="noopener noreferrer" className="group block">
         <div className="relative overflow-hidden p-6 border border-zinc-800 hover:border-zinc-700 rounded-lg transition-all duration-200 hover:bg-zinc-900/50">
-          {/* OGP画像 - 右側にフェード（ogpImageUrlが空でない場合のみ表示） */}
           {ogpImageUrl && (
             <div className="absolute right-0 top-0 bottom-0 w-1/3 overflow-hidden pointer-events-none">
-              <img
+              <Image
                 src={ogpImageUrl}
                 alt=""
-                className="absolute right-0 h-full w-auto object-cover opacity-10"
+                fill
+                className="object-cover object-right opacity-10"
                 style={{
                   maskImage: "linear-gradient(to right, transparent, black 50%)",
                   WebkitMaskImage: "linear-gradient(to right, transparent, black 50%)",
                 }}
-                loading="lazy"
+                unoptimized
                 onError={(e) => {
                   e.currentTarget.style.display = "none";
                 }}

@@ -50,17 +50,6 @@ const PRODUCTS: LinkItem[] = [
   },
 ];
 
-/**
- * Products Section - プロダクト
- *
- * design-guidelines:
- * - Spatial Composition: グリッドレイアウトで視覚的な興味
- * - Motion: スタッガードアニメーション
- *
- * UX原則:
- * - Serial Position Effect: 最後のセクションとして印象的に
- * - Peak-End Rule: 体験の終わりを強く印象付ける
- */
 export const ProductsSection: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
@@ -68,7 +57,6 @@ export const ProductsSection: React.FC = () => {
   return (
     <section ref={sectionRef} className="min-h-screen flex flex-col justify-center px-6 py-24">
       <div className="max-w-5xl mx-auto w-full">
-        {/* セクションタイトル */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -80,14 +68,18 @@ export const ProductsSection: React.FC = () => {
           <p className="text-zinc-500 mt-4 max-w-lg">個人で開発しているプロダクト</p>
         </motion.div>
 
-        {/* プロダクトグリッド */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {PRODUCTS.map((product, index) => (
-            <ProductCard key={product.url} product={product} index={index} isInView={isInView} isLarge={index === 0} />
+            <ProductCard
+              key={product.url}
+              product={product}
+              index={index}
+              isInView={isInView}
+              isLarge={index === 0}
+            />
           ))}
         </div>
 
-        {/* フッター */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : {}}
@@ -112,7 +104,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index, isInView, isL
   const domain = new URL(product.url).hostname.replace("www.", "");
   const faviconUrl = product.iconUrl || `https://icon.horse/icon/${domain}`;
 
-  // OGP画像のURL（手動指定のみ、空文字列の場合は非表示）
   const ogpImageUrl = product.ogpImageUrl || "";
 
   return (
@@ -122,7 +113,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index, isInView, isL
       transition={{ duration: 0.5, delay: index * 0.1 }}
       className={isLarge ? "md:col-span-2" : ""}
     >
-      <Link href={product.url} target="_blank" rel="noopener noreferrer" className="group block h-full">
+      <Link
+        href={product.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group block h-full"
+      >
         <div
           className={`
             relative overflow-hidden border border-zinc-800 hover:border-zinc-700 rounded-xl
@@ -130,18 +126,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index, isInView, isL
             ${isLarge ? "p-8 md:p-12" : "p-6"}
           `}
         >
-          {/* OGP画像 - 右側にフェード（ogpImageUrlが空でない場合のみ表示） */}
           {ogpImageUrl && (
             <div className="absolute right-0 top-0 bottom-0 w-1/2 overflow-hidden pointer-events-none">
-              <img
+              <Image
                 src={ogpImageUrl}
                 alt=""
-                className="absolute right-0 h-full w-auto object-cover opacity-15"
+                fill
+                className="object-cover object-right opacity-15"
                 style={{
                   maskImage: "linear-gradient(to right, transparent, black 40%)",
                   WebkitMaskImage: "linear-gradient(to right, transparent, black 40%)",
                 }}
-                loading="lazy"
+                unoptimized
                 onError={(e) => {
                   e.currentTarget.style.display = "none";
                 }}
@@ -150,7 +146,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index, isInView, isL
           )}
 
           <div className="relative z-10">
-            {/* ヘッダー */}
             <div className="flex items-start justify-between mb-4">
               <Image
                 src={faviconUrl}
@@ -163,7 +158,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index, isInView, isL
               <ArrowUpRight className="w-5 h-5 text-zinc-600 group-hover:text-zinc-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200" />
             </div>
 
-            {/* コンテンツ */}
             <h3
               className={`
                 font-semibold text-zinc-200 group-hover:text-zinc-100 transition-colors mb-2
@@ -181,7 +175,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index, isInView, isL
               {product.description}
             </p>
 
-            {/* ドメイン表示 */}
             <div className="mt-4 pt-4 border-t border-zinc-800/50">
               <span className="text-xs text-zinc-600">{domain}</span>
             </div>

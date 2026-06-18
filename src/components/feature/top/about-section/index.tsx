@@ -12,7 +12,6 @@ export const AboutSection: React.FC = () => {
         viewport={{ once: true, margin: "-100px" }}
         className="max-w-2xl w-full space-y-16"
       >
-        {/* 自己紹介 */}
         <div>
           <h2 className="text-sm text-zinc-500 tracking-wider mb-4">ABOUT</h2>
           <div className="text-zinc-300 leading-relaxed space-y-4">
@@ -28,7 +27,6 @@ export const AboutSection: React.FC = () => {
           </div>
         </div>
 
-        {/* 職歴 */}
         <div>
           <h2 className="text-sm text-zinc-500 tracking-wider mb-6">CAREER</h2>
           <div className="space-y-12">
@@ -63,7 +61,6 @@ export const AboutSection: React.FC = () => {
           </div>
         </div>
 
-        {/* 学歴 */}
         <div>
           <h2 className="text-sm text-zinc-500 tracking-wider mb-6">EDUCATION</h2>
           <div className="space-y-8">
@@ -80,7 +77,10 @@ export const AboutSection: React.FC = () => {
               ]}
               achievements={["技育展 2023 企業賞"]}
               freelance={[
-                { client: "スタートアップA社", projects: ["修理の受注/発注ができるLINEアプリの開発"] },
+                {
+                  client: "スタートアップA社",
+                  projects: ["修理の受注/発注ができるLINEアプリの開発"],
+                },
                 {
                   client: "スタートアップB社",
                   projects: [
@@ -142,7 +142,9 @@ const CareerEntry: React.FC<CareerEntryProps> = ({
             <h3 className="text-zinc-200 font-medium">{company}</h3>
             {note && <span className="text-xs text-zinc-600">({note})</span>}
           </div>
-          <p className="text-sm text-zinc-500 mt-1">{department ? `${department} · ${jobTitle}` : jobTitle}</p>
+          <p className="text-sm text-zinc-500 mt-1">
+            {department ? `${department} · ${jobTitle}` : jobTitle}
+          </p>
         </div>
       </div>
       <div className="space-y-4">
@@ -265,7 +267,10 @@ const EducationEntry: React.FC<EducationEntryProps> = ({
   );
 };
 
-const DetailBlock: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => {
+const DetailBlock: React.FC<{ title: string; children: React.ReactNode }> = ({
+  title,
+  children,
+}) => {
   return (
     <div>
       <h4 className="text-xs text-zinc-600 tracking-wider mb-2">{title}</h4>
