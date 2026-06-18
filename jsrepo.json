@@ -4,7 +4,6 @@
   "includeTests": false,
   "includeDocs": false,
   "watermark": true,
-  "formatter": "biome",
   "configFiles": {},
   "paths": {
     "*": "./src/blocks"

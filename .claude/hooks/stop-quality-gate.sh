@@ -12,14 +12,14 @@ if [ -z "$(git status --porcelain)" ]; then
   exit 0
 fi
 
-# ---- Layer 1: typecheck / biome / oxlint / oxfmt (blocking gate) ----
-OUT=$(bun run typecheck 2>&1 && bun run check 2>&1 && bun run lint 2>&1 && bun run format 2>&1)
+# ---- Layer 1: typecheck / oxlint / oxfmt (blocking gate) ----
+OUT=$(bun run typecheck 2>&1 && bun run lint 2>&1 && bun run format 2>&1)
 RC=$?
 if [ $RC -ne 0 ]; then
   printf '%s' "$OUT" | jq -Rs '{
-    systemMessage: "⛔ Stop block: typecheck / biome / oxlint / oxfmt failed",
+    systemMessage: "⛔ Stop block: typecheck / oxlint / oxfmt failed",
     decision: "block",
-    reason: ("Stop hook: typecheck / biome / oxlint / oxfmt failed. Fix before ending the turn.\n\n" + .)
+    reason: ("Stop hook: typecheck / oxlint / oxfmt failed. Fix before ending the turn.\n\n" + .)
   }'
   exit 0
 fi
@@ -82,5 +82,5 @@ ${SIM}
 fi
 
 # All clean
-echo '{"systemMessage":"✅ Stop quality gate: typecheck / biome / oxlint pass (knip/similarity: clean)"}'
+echo '{"systemMessage":"✅ Stop quality gate: typecheck / oxlint / oxfmt pass (knip/similarity: clean)"}'
 exit 0
