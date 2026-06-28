@@ -10,7 +10,8 @@
 - **UI Documentation**: Storybook
 - **Backend**: Supabase (PostgreSQL, Auth)
 - **Build**: Bun
-- **Lint/Format**: Biome
+- **Lint/Format**: OxLint + OxFmt (custom JS plugins)
+- **Type Check**: tsgo
 
 ## ディレクトリ構造
 
@@ -157,9 +158,13 @@ bun run start            # ビルド後のサーバー起動
 
 ### 品質チェック
 ```bash
-bun run typecheck        # TypeScript型チェック
-bun run check            # Biome lint/format チェック
-bun run check:fix        # Biome lint/format 自動修正
+bun run typecheck        # TypeScript型チェック (tsgo)
+bun run lint             # OxLint (type-aware)
+bun run lint:fix         # OxLint 自動修正
+bun run format           # OxFmt チェック
+bun run format:fix       # OxFmt 自動修正
+bun run check            # OxLint + OxFmt 一括チェック
+bun run check:fix        # OxLint + OxFmt 一括修正
 bun run test             # Vitest テスト実行
 ```
 

@@ -1,0 +1,89 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "typescript",
+    "unicorn",
+    "oxc",
+    "react",
+    "vitest",
+    "import",
+    "jsx-a11y"
+  ],
+  "jsPlugins": [
+    "./tools/oxlint-plugins/style-rules.js",
+    "./tools/oxlint-plugins/arch-rules.js"
+  ],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error"
+  },
+  "rules": {
+    "complexity": "error",
+    "prefer-const": "error",
+    "no-var": "error",
+    "no-param-reassign": "error",
+    "no-mutable-exports": "error",
+    "prefer-readonly": "error",
+    "@typescript-eslint/no-explicit-any": "error",
+    "react/react-in-jsx-scope": "off",
+    "react/rules-of-hooks": "error",
+    "react/button-has-type": "error",
+    "react/checked-requires-onchange-or-readonly": "error",
+    "react/jsx-no-target-blank": "error",
+    "react/no-array-index-key": "warn",
+    "react/self-closing-comp": "error",
+    "react/jsx-boolean-value": "error",
+    "react/jsx-curly-brace-presence": "error",
+    "react/jsx-no-useless-fragment": "error",
+    "react/jsx-pascal-case": "error",
+    "eqeqeq": ["error", "always", { "null": "ignore" }],
+    "no-console": "warn",
+    "@typescript-eslint/ban-ts-comment": "error",
+    "@typescript-eslint/no-non-null-assertion": "error",
+    "@typescript-eslint/switch-exhaustiveness-check": "error",
+    "@typescript-eslint/no-misused-promises": "warn",
+    "@typescript-eslint/consistent-type-imports": "error",
+    "unicorn/throw-new-error": "error",
+    "oxc/no-accumulating-spread": "error",
+    "import/no-unassigned-import": "off",
+    "style-rules/no-loops": "error",
+    "style-rules/no-tailwind-arbitrary": "error",
+    "style-rules/no-tailwind-opacity": "error",
+    "arch-rules/no-size-props": "error",
+    "arch-rules/one-component-per-file": "error",
+    "arch-rules/component-file-naming": "error",
+    "arch-rules/test-naming-format": "error",
+    "arch-rules/single-expect": "error"
+  },
+  "env": {
+    "builtin": true,
+    "browser": true,
+    "node": true
+  },
+  "ignorePatterns": [
+    "node_modules",
+    ".next",
+    "dist",
+    "build",
+    "*.config.js",
+    "*.config.ts"
+  ],
+  "overrides": [
+    {
+      "files": ["**/*.d.ts"],
+      "rules": {
+        "unicorn/require-module-specifiers": "off"
+      }
+    },
+    {
+      "files": ["src/components/ui/**"],
+      "rules": {
+        "style-rules/no-tailwind-arbitrary": "off",
+        "style-rules/no-tailwind-opacity": "off",
+        "style-rules/no-loops": "off",
+        "arch-rules/one-component-per-file": "off",
+        "arch-rules/component-file-naming": "off"
+      }
+    }
+  ]
+}

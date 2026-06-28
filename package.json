@@ -6,12 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "lint": "oxlint --type-aware src",
+    "lint:fix": "oxlint --type-aware --fix src",
     "format": "oxfmt --check src",
     "format:fix": "oxfmt --write src",
-    "lint": "oxlint src",
-    "lint:fix": "oxlint --fix src",
-    "init:lefthook": "lefthook install",
-    "typecheck": "tsgo --noEmit"
+    "check": "oxlint --type-aware src && oxfmt --check src",
+    "check:fix": "oxlint --type-aware --fix src && oxfmt --write src",
+    "typecheck": "tsgo --noEmit",
+    "init:lefthook": "lefthook install"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "1.1.15",
@@ -46,14 +48,15 @@
     "tailwindcss-animate": "1.0.7"
   },
   "devDependencies": {
-    "typescript": "5.5.4",
     "@types/node": "20.16.1",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
     "@typescript/native-preview": "7.0.0-dev.20260617.2",
     "oxfmt": "0.55.0",
     "oxlint": "1.42.0",
+    "oxlint-tsgolint": "0.23.0",
     "postcss": "8.4.41",
-    "tailwindcss": "3.4.10"
+    "tailwindcss": "3.4.10",
+    "typescript": "5.5.4"
   }
 }

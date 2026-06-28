@@ -98,7 +98,13 @@
     ]
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": ["context7", "serena", "chrome-devtools", "next-devtools", "kiri"],
+  "enabledMcpjsonServers": [
+    "context7",
+    "serena",
+    "chrome-devtools",
+    "next-devtools",
+    "kiri"
+  ],
   "hooks": {
     "PostToolUse": [
       {
@@ -106,9 +112,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "F=$(jq -r '.tool_input.file_path // \"\"'); case \"$F\" in *.ts|*.tsx|*.js|*.jsx|*.mjs|*.cjs) ;; *) exit 0 ;; esac; cd $CLAUDE_PROJECT_DIR && OUT=$(bun run check 2>&1 && bun run typecheck 2>&1); RC=$?; if [ $RC -ne 0 ]; then printf '%s' \"$OUT\" | jq -Rs --arg file \"$F\" '{systemMessage:(\"\\u26d4 PostToolUse block: lint/typecheck \\u5931\\u6557 \\u2014 \" + $file), decision:\"block\", reason:(\"PostToolUse: \\u7de8\\u96c6\\u5f8c\\u306e lint / typecheck \\u304c\\u5931\\u6557\\u3057\\u307e\\u3057\\u305f\\u3002\\u6b21\\u306e\\u30c4\\u30fc\\u30eb\\u547c\\u3073\\u51fa\\u3057\\u524d\\u306b\\u76f4\\u3057\\u3066\\u304f\\u3060\\u3055\\u3044\\u3002\\n\\n\" + .)}'; fi; exit 0",
+            "command": "F=$(jq -r '.tool_input.file_path // \"\"'); case \"$F\" in *.ts|*.tsx|*.js|*.jsx|*.mjs|*.cjs) ;; *) exit 0 ;; esac; cd $CLAUDE_PROJECT_DIR && OUT=$(bun run lint 2>&1 && bun run typecheck 2>&1); RC=$?; if [ $RC -ne 0 ]; then printf '%s' \"$OUT\" | jq -Rs --arg file \"$F\" '{systemMessage:(\"\\u26d4 PostToolUse block: lint/typecheck \\u5931\\u6557 \\u2014 \" + $file), decision:\"block\", reason:(\"PostToolUse: \\u7de8\\u96c6\\u5f8c\\u306e lint / typecheck \\u304c\\u5931\\u6557\\u3057\\u307e\\u3057\\u305f\\u3002\\u6b21\\u306e\\u30c4\\u30fc\\u30eb\\u547c\\u3073\\u51fa\\u3057\\u524d\\u306b\\u76f4\\u3057\\u3066\\u304f\\u3060\\u3055\\u3044\\u3002\\n\\n\" + .)}'; fi; exit 0",
             "timeout": 60,
-            "statusMessage": "Per-edit check: lint + typecheck..."
+            "statusMessage": "Per-edit check: oxlint + tsgo..."
           }
         ]
       }

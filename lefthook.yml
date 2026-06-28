@@ -1,12 +1,12 @@
 pre-commit:
   commands:
-    format:
-      glob: "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}"
-      run: bun biome format --write --no-errors-on-unmatched {staged_files}
+    lint:
+      glob: "*.{js,ts,jsx,tsx}"
+      run: bunx oxlint --fix {staged_files}
       stage_fixed: true
-    check:
-      glob: "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}"
-      run: bun biome check --write --no-errors-on-unmatched {staged_files}
+    format:
+      glob: "*.{js,ts,jsx,tsx,json}"
+      run: bunx oxfmt --write {staged_files}
       stage_fixed: true
 pre-push:
   commands:
