@@ -66,6 +66,39 @@
   }
 }
 
+@layer utilities {
+  .text-foreground-strong {
+    color: hsl(var(--foreground) / 0.8);
+  }
+  .text-foreground-muted-alpha {
+    color: hsl(var(--foreground) / 0.6);
+  }
+  .text-foreground-faint {
+    color: hsl(var(--foreground) / 0.3);
+  }
+  .stroke-foreground-strong {
+    stroke: hsl(var(--foreground) / 0.8);
+  }
+  .stroke-foreground-muted {
+    stroke: hsl(var(--foreground) / 0.6);
+  }
+  .border-foreground-faint {
+    border-color: hsl(var(--foreground) / 0.2);
+  }
+  .list-dot {
+    position: relative;
+  }
+  .list-dot::before {
+    content: "·";
+    position: absolute;
+    left: -0.75rem;
+    color: hsl(var(--muted-foreground));
+  }
+  .z-cursor {
+    z-index: 9999;
+  }
+}
+
 @media (pointer: fine) {
   body,
   a,

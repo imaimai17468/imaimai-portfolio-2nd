@@ -46,9 +46,8 @@ export const SymbolGridBackground: React.FC = () => {
           ? getComputedStyle(firstCell).color
           : "currentColor";
 
-      for (let i = 0; i < cells.length; i++) {
-        const cell = cells[i];
-        if (!(cell instanceof HTMLElement)) continue;
+      Array.from(cells).forEach((cell, i) => {
+        if (!(cell instanceof HTMLElement)) return;
 
         const col = i % dimensions.cols;
         const row = Math.floor(i / dimensions.cols);
@@ -82,7 +81,7 @@ export const SymbolGridBackground: React.FC = () => {
           ],
           { duration: 1000, delay, easing: "ease-in-out", fill: "none" }
         );
-      }
+      });
     },
     [dimensions.cols]
   );
@@ -151,7 +150,7 @@ export const SymbolGridBackground: React.FC = () => {
               <button
                 type="button"
                 key={i}
-                className="flex items-center justify-center text-xs border border-foreground/20 text-foreground/30 m-auto"
+                className="flex items-center justify-center text-xs border border-foreground-faint text-foreground-faint m-auto"
                 style={{ width: TOGGLE_SIZE, height: TOGGLE_SIZE }}
                 onClick={(e) => {
                   e.stopPropagation();

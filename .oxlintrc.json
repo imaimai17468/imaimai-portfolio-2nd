@@ -18,7 +18,7 @@
     "suspicious": "error"
   },
   "rules": {
-    "complexity": "warn",
+    "complexity": "error",
     "prefer-const": "error",
     "no-var": "error",
     "no-param-reassign": "error",
@@ -46,12 +46,12 @@
     "unicorn/throw-new-error": "error",
     "oxc/no-accumulating-spread": "error",
     "import/no-unassigned-import": "off",
-    "style-rules/no-loops": "warn",
-    "style-rules/no-tailwind-arbitrary": "warn",
-    "style-rules/no-tailwind-opacity": "warn",
-    "arch-rules/no-size-props": "warn",
+    "style-rules/no-loops": "error",
+    "style-rules/no-tailwind-arbitrary": "error",
+    "style-rules/no-tailwind-opacity": "error",
+    "arch-rules/no-size-props": "error",
     "arch-rules/one-component-per-file": "error",
-    "arch-rules/component-file-naming": "warn",
+    "arch-rules/component-file-naming": "error",
     "arch-rules/test-naming-format": "error",
     "arch-rules/single-expect": "error"
   },

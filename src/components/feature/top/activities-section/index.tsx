@@ -20,7 +20,7 @@ export const ActivitiesSection: React.FC = () => {
               href={activity.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 py-1 text-sm text-foreground/80"
+              className="inline-flex items-center gap-1.5 py-1 text-sm text-foreground-strong"
             >
               {activity.title}
               <ExternalLink className="w-3 h-3 text-muted-foreground" />

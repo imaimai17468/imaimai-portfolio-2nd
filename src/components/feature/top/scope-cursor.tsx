@@ -15,6 +15,36 @@ type CursorDimensions = {
   h: number;
 };
 
+const updateSvgCorners = (svg: Element, w: number, h: number, c: number) => {
+  const paths = svg.querySelectorAll("[data-corner]");
+  paths[0]?.setAttribute("d", `M${c},0 L0,0 L0,${c}`);
+  paths[1]?.setAttribute("d", `M${w - c},0 L${w},0 L${w},${c}`);
+  paths[2]?.setAttribute("d", `M0,${h - c} L0,${h} L${c},${h}`);
+  paths[3]?.setAttribute("d", `M${w},${h - c} L${w},${h} L${w - c},${h}`);
+};
+
+const updateSvgCrosshair = (svg: Element, w: number, h: number, g: number) => {
+  const hw = w / 2;
+  const hh = h / 2;
+  const lines = svg.querySelectorAll("[data-cross]");
+  lines[0]?.setAttribute("x1", String(hw));
+  lines[0]?.setAttribute("y1", String(g));
+  lines[0]?.setAttribute("x2", String(hw));
+  lines[0]?.setAttribute("y2", String(hh - g));
+  lines[1]?.setAttribute("x1", String(hw));
+  lines[1]?.setAttribute("y1", String(hh + g));
+  lines[1]?.setAttribute("x2", String(hw));
+  lines[1]?.setAttribute("y2", String(h - g));
+  lines[2]?.setAttribute("x1", String(g));
+  lines[2]?.setAttribute("y1", String(hh));
+  lines[2]?.setAttribute("x2", String(hw - g));
+  lines[2]?.setAttribute("y2", String(hh));
+  lines[3]?.setAttribute("x1", String(hw + g));
+  lines[3]?.setAttribute("y1", String(hh));
+  lines[3]?.setAttribute("x2", String(w - g));
+  lines[3]?.setAttribute("y2", String(hh));
+};
+
 export const ScopeCursor: React.FC = () => {
   const cursorRef = useRef<HTMLDivElement>(null);
   const mouse = useRef({ x: 0, y: 0 });
@@ -32,21 +62,20 @@ export const ScopeCursor: React.FC = () => {
 
   const findNearestInteractive = useCallback((x: number, y: number) => {
     const elements = document.querySelectorAll("a, button");
-    let nearest: { el: Element; dist: number; rect: DOMRect } | null = null;
-
-    for (let i = 0; i < elements.length; i++) {
-      const el = elements[i];
+    return Array.from(elements).reduce<{
+      el: Element;
+      dist: number;
+      rect: DOMRect;
+    } | null>((nearest, el) => {
       const rect = el.getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
       const cy = rect.top + rect.height / 2;
       const dist = Math.sqrt((x - cx) ** 2 + (y - cy) ** 2);
-
       if (dist < MAGNET_RADIUS && (!nearest || dist < nearest.dist)) {
-        nearest = { el, dist, rect };
+        return { el, dist, rect };
       }
-    }
-
-    return nearest;
+      return nearest;
+    }, null);
   }, []);
 
   useEffect(() => {
@@ -123,17 +152,13 @@ export const ScopeCursor: React.FC = () => {
           w: target.rect.width + SNAP_PADDING * 2,
           h: target.rect.height + SNAP_PADDING * 2,
         };
-        if (prevMode !== "pointer") {
-          prevMode = "pointer";
-        }
+        prevMode = "pointer";
       } else {
         pos.current.x += (mouse.current.x - pos.current.x) * LERP_SPEED;
         pos.current.y += (mouse.current.y - pos.current.y) * LERP_SPEED;
         snappedRef.current = null;
         dims.current = { w: CURSOR_SIZE, h: CURSOR_SIZE };
-        if (prevMode !== "default") {
-          prevMode = "default";
-        }
+        prevMode = "default";
       }
 
       const { w, h } = dims.current;
@@ -145,34 +170,9 @@ export const ScopeCursor: React.FC = () => {
       const svg = cursor.querySelector("svg");
       if (svg) {
         svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
-        const c = 6;
-        const paths = svg.querySelectorAll("[data-corner]");
-        paths[0]?.setAttribute("d", `M${c},0 L0,0 L0,${c}`);
-        paths[1]?.setAttribute("d", `M${w - c},0 L${w},0 L${w},${c}`);
-        paths[2]?.setAttribute("d", `M0,${h - c} L0,${h} L${c},${h}`);
-        paths[3]?.setAttribute("d", `M${w},${h - c} L${w},${h} L${w - c},${h}`);
-
+        updateSvgCorners(svg, w, h, 6);
         if (prevMode === "default") {
-          const hw = w / 2;
-          const hh = h / 2;
-          const g = 3;
-          const lines = svg.querySelectorAll("[data-cross]");
-          lines[0]?.setAttribute("x1", String(hw));
-          lines[0]?.setAttribute("y1", String(g));
-          lines[0]?.setAttribute("x2", String(hw));
-          lines[0]?.setAttribute("y2", String(hh - g));
-          lines[1]?.setAttribute("x1", String(hw));
-          lines[1]?.setAttribute("y1", String(hh + g));
-          lines[1]?.setAttribute("x2", String(hw));
-          lines[1]?.setAttribute("y2", String(h - g));
-          lines[2]?.setAttribute("x1", String(g));
-          lines[2]?.setAttribute("y1", String(hh));
-          lines[2]?.setAttribute("x2", String(hw - g));
-          lines[2]?.setAttribute("y2", String(hh));
-          lines[3]?.setAttribute("x1", String(hw + g));
-          lines[3]?.setAttribute("y1", String(hh));
-          lines[3]?.setAttribute("x2", String(w - g));
-          lines[3]?.setAttribute("y2", String(hh));
+          updateSvgCrosshair(svg, w, h, 3);
         }
       }
 
@@ -195,7 +195,7 @@ export const ScopeCursor: React.FC = () => {
   return (
     <div
       ref={cursorRef}
-      className="fixed top-0 left-0 z-[9999] pointer-events-none"
+      className="fixed top-0 left-0 z-cursor pointer-events-none"
       style={{
         width: CURSOR_SIZE,
         height: CURSOR_SIZE,
@@ -224,7 +224,7 @@ const ScopeSvg: React.FC = () => {
           y1={g}
           x2={hw}
           y2={hh - g}
-          className="stroke-foreground/60"
+          className="stroke-foreground-muted"
           strokeWidth={1}
         />
         <line
@@ -233,7 +233,7 @@ const ScopeSvg: React.FC = () => {
           y1={hh + g}
           x2={hw}
           y2={s - g}
-          className="stroke-foreground/60"
+          className="stroke-foreground-muted"
           strokeWidth={1}
         />
         <line
@@ -242,7 +242,7 @@ const ScopeSvg: React.FC = () => {
           y1={hh}
           x2={hw - g}
           y2={hh}
-          className="stroke-foreground/60"
+          className="stroke-foreground-muted"
           strokeWidth={1}
         />
         <line
@@ -251,7 +251,7 @@ const ScopeSvg: React.FC = () => {
           y1={hh}
           x2={s - g}
           y2={hh}
-          className="stroke-foreground/60"
+          className="stroke-foreground-muted"
           strokeWidth={1}
         />
       </g>
@@ -259,25 +259,25 @@ const ScopeSvg: React.FC = () => {
       <path
         data-corner=""
         d={`M${c},0 L0,0 L0,${c}`}
-        className="stroke-foreground/80"
+        className="stroke-foreground-strong"
         strokeWidth={1.5}
       />
       <path
         data-corner=""
         d={`M${s - c},0 L${s},0 L${s},${c}`}
-        className="stroke-foreground/80"
+        className="stroke-foreground-strong"
         strokeWidth={1.5}
       />
       <path
         data-corner=""
         d={`M0,${s - c} L0,${s} L${c},${s}`}
-        className="stroke-foreground/80"
+        className="stroke-foreground-strong"
         strokeWidth={1.5}
       />
       <path
         data-corner=""
         d={`M${s},${s - c} L${s},${s} L${s - c},${s}`}
-        className="stroke-foreground/80"
+        className="stroke-foreground-strong"
         strokeWidth={1.5}
       />
     </svg>

@@ -15,7 +15,20 @@ const noSizeProps = {
           return;
         }
         if (elementName.type === "JSXIdentifier") {
-          const firstChar = elementName.name[0];
+          const name = elementName.name;
+          const SIZE_ALLOWED = new Set([
+            "Image",
+            "img",
+            "video",
+            "canvas",
+            "svg",
+            "iframe",
+            "embed",
+            "object",
+            "source",
+          ]);
+          if (SIZE_ALLOWED.has(name)) return;
+          const firstChar = name[0];
           if (
             firstChar === firstChar.toUpperCase() &&
             firstChar !== firstChar.toLowerCase()
@@ -242,7 +255,18 @@ const singleExpect = {
   },
 };
 
-const SKIP_STEMS = new Set(["index"]);
+const SKIP_STEMS = new Set([
+  "index",
+  "page",
+  "layout",
+  "loading",
+  "error",
+  "not-found",
+  "template",
+  "default",
+  "route",
+  "middleware",
+]);
 
 const componentFileNaming = {
   create(context) {
@@ -261,7 +285,12 @@ const componentFileNaming = {
 
     const expectedName = withoutExt
       .split(".")
-      .map((s) => s[0].toUpperCase() + s.slice(1))
+      .map((segment) =>
+        segment
+          .split("-")
+          .map((s) => s[0].toUpperCase() + s.slice(1))
+          .join("")
+      )
       .join("");
 
     if (!isComponentName(expectedName)) return {};

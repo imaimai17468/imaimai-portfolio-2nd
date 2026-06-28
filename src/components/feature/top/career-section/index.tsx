@@ -145,7 +145,7 @@ const CareerItem: React.FC<{ entry: CareerEntry }> = ({ entry }) => {
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3">
-        <span className="text-xs text-muted-foreground font-mono flex-shrink-0 sm:w-[10rem]">
+        <span className="text-xs text-muted-foreground font-mono flex-shrink-0 sm:w-40">
           {entry.period}
         </span>
         <div className="min-w-0">
@@ -169,12 +169,15 @@ const CareerItem: React.FC<{ entry: CareerEntry }> = ({ entry }) => {
             aria-expanded={open}
             aria-label={open ? "Close details" : "Open details"}
           >
-            <span className="text-xs leading-none translate-y-[-0.5px]">
+            <span
+              className="text-xs leading-none"
+              style={{ transform: "translateY(-0.5px)" }}
+            >
               {open ? "−" : "+"}
             </span>
           </button>
           <div
-            className="overflow-hidden transition-[max-height] duration-300 ease-in-out"
+            className="overflow-hidden transition-all duration-300 ease-in-out"
             style={{ maxHeight: open ? "200rem" : "0" }}
           >
             <div className="flex flex-col items-start">
@@ -190,7 +193,7 @@ const CareerItem: React.FC<{ entry: CareerEntry }> = ({ entry }) => {
                     {detail.values.map((value) => (
                       <li
                         key={value}
-                        className="text-sm text-foreground/80 relative before:content-['·'] before:absolute before:-left-3 before:text-muted-foreground"
+                        className="text-sm text-foreground-strong list-dot"
                       >
                         {value}
                       </li>
@@ -206,14 +209,14 @@ const CareerItem: React.FC<{ entry: CareerEntry }> = ({ entry }) => {
                   <div className="space-y-3 pl-3">
                     {entry.freelance.map((item) => (
                       <div key={item.client}>
-                        <p className="text-xs text-foreground/60 mb-1">
+                        <p className="text-xs text-foreground-muted-alpha mb-1">
                           {item.client}
                         </p>
                         <ul className="space-y-1">
                           {item.projects.map((project) => (
                             <li
                               key={project}
-                              className="text-sm text-foreground/80 relative before:content-['·'] before:absolute before:-left-3 before:text-muted-foreground"
+                              className="text-sm text-foreground-strong list-dot"
                             >
                               {project}
                             </li>
