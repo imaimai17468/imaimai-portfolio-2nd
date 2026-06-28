@@ -10,7 +10,9 @@ const ACTIVITIES = [
 export const ActivitiesSection: React.FC = () => {
   return (
     <section className="px-6 py-12">
-      <h2 className="text-sm text-muted-foreground tracking-wider mb-6">ACTIVITIES</h2>
+      <h2 className="text-sm text-muted-foreground tracking-wider mb-6">
+        ACTIVITIES
+      </h2>
       <ul className="space-y-3">
         {ACTIVITIES.map((activity) => (
           <li key={activity.url}>

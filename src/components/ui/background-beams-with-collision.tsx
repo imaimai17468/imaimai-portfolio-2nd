@@ -14,7 +14,8 @@ const generateRandomBeams = (count: number) => {
       duration: Math.random() * 10 + 3,
       repeatDelay: Math.random() * 5 + 1,
       delay: Math.random() * 3,
-      className: heightClasses[Math.floor(Math.random() * heightClasses.length)],
+      className:
+        heightClasses[Math.floor(Math.random() * heightClasses.length)],
     };
   });
 };
@@ -37,7 +38,7 @@ export const BackgroundBeamsWithCollision = ({
       className={cn(
         "h-96 md:h-[40rem] bg-gradient-to-b from-white to-neutral-100 dark:from-neutral-950 dark:to-neutral-800 relative flex items-center w-full justify-center overflow-hidden",
         // h-screen if you want bigger
-        className,
+        className
       )}
     >
       {beams.map((beam, index) => (
@@ -93,13 +94,19 @@ const CollisionMechanism = React.forwardRef<
 
   useEffect(() => {
     const checkCollision = () => {
-      if (beamRef.current && containerRef.current && parentRef.current && !cycleCollisionDetected) {
+      if (
+        beamRef.current &&
+        containerRef.current &&
+        parentRef.current &&
+        !cycleCollisionDetected
+      ) {
         const beamRect = beamRef.current.getBoundingClientRect();
         const containerRect = containerRef.current.getBoundingClientRect();
         const parentRect = parentRef.current.getBoundingClientRect();
 
         if (beamRect.bottom >= containerRect.top) {
-          const relativeX = beamRect.left - parentRect.left + beamRect.width / 2;
+          const relativeX =
+            beamRect.left - parentRect.left + beamRect.width / 2;
           const relativeY = beamRect.bottom - parentRect.top;
 
           setCollision({
@@ -117,7 +124,7 @@ const CollisionMechanism = React.forwardRef<
     const animationInterval = setInterval(checkCollision, 50);
 
     return () => clearInterval(animationInterval);
-  }, [cycleCollisionDetected, containerRef, parentRef.current]);
+  }, [cycleCollisionDetected, containerRef]);
 
   useEffect(() => {
     if (collision.detected && collision.coordinates) {
@@ -160,7 +167,7 @@ const CollisionMechanism = React.forwardRef<
         }}
         className={cn(
           "absolute left-0 top-20 m-auto h-14 w-px rounded-full bg-gradient-to-t from-indigo-500 via-green-500 to-transparent",
-          beamOptions.className,
+          beamOptions.className
         )}
       />
       <AnimatePresence>

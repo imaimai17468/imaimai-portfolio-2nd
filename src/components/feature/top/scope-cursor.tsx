@@ -93,7 +93,7 @@ export const ScopeCursor: React.FC = () => {
               cancelable: true,
               clientX: pos.current.x,
               clientY: pos.current.y,
-            }),
+            })
           );
         });
       }

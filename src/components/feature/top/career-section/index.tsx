@@ -123,7 +123,9 @@ const CAREER: CareerEntry[] = [
 export const CareerSection: React.FC = () => {
   return (
     <section className="px-6 py-12">
-      <h2 className="text-sm text-muted-foreground tracking-wider mb-8">CAREER</h2>
+      <h2 className="text-sm text-muted-foreground tracking-wider mb-8">
+        CAREER
+      </h2>
       <div className="space-y-6">
         {CAREER.map((entry) => (
           <CareerItem key={entry.period} entry={entry} />
@@ -148,17 +150,28 @@ const CareerItem: React.FC<{ entry: CareerEntry }> = ({ entry }) => {
         </span>
         <div className="min-w-0">
           <div className="flex items-baseline gap-2">
-            <span className="text-sm font-medium text-foreground">{entry.title}</span>
-            {entry.note && <span className="text-xs text-muted-foreground">({entry.note})</span>}
+            <span className="text-sm font-medium text-foreground">
+              {entry.title}
+            </span>
+            {entry.note && (
+              <span className="text-xs text-muted-foreground">
+                ({entry.note})
+              </span>
+            )}
           </div>
-          <p className="text-xs text-muted-foreground mt-0.5">{entry.subtitle}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {entry.subtitle}
+          </p>
           <button
+            type="button"
             className="flex items-center justify-center w-6 h-6 border border-border bg-background text-muted-foreground mt-2"
             onClick={toggle}
             aria-expanded={open}
             aria-label={open ? "Close details" : "Open details"}
           >
-            <span className="text-xs leading-none translate-y-[-0.5px]">{open ? "−" : "+"}</span>
+            <span className="text-xs leading-none translate-y-[-0.5px]">
+              {open ? "−" : "+"}
+            </span>
           </button>
           <div
             className="overflow-hidden transition-[max-height] duration-300 ease-in-out"
@@ -193,7 +206,9 @@ const CareerItem: React.FC<{ entry: CareerEntry }> = ({ entry }) => {
                   <div className="space-y-3 pl-3">
                     {entry.freelance.map((item) => (
                       <div key={item.client}>
-                        <p className="text-xs text-foreground/60 mb-1">{item.client}</p>
+                        <p className="text-xs text-foreground/60 mb-1">
+                          {item.client}
+                        </p>
                         <ul className="space-y-1">
                           {item.projects.map((project) => (
                             <li

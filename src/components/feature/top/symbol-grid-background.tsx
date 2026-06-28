@@ -8,7 +8,7 @@ const TOGGLE_SIZE = 28;
 const RIPPLE_SPEED = 0.001;
 
 function hasViewTransition(
-  doc: Document,
+  doc: Document
 ): doc is Document & { startViewTransition: (cb: () => void) => void } {
   return "startViewTransition" in doc;
 }
@@ -42,7 +42,9 @@ export const SymbolGridBackground: React.FC = () => {
       const cells = grid.children;
       const firstCell = cells[0];
       const baseColor =
-        firstCell instanceof HTMLElement ? getComputedStyle(firstCell).color : "currentColor";
+        firstCell instanceof HTMLElement
+          ? getComputedStyle(firstCell).color
+          : "currentColor";
 
       for (let i = 0; i < cells.length; i++) {
         const cell = cells[i];
@@ -62,10 +64,14 @@ export const SymbolGridBackground: React.FC = () => {
         cell.animate(
           [
             { transform: "translateZ(0) scale(1)" },
-            { transform: "translateZ(30px) scale(1.15)", opacity: "0.6", offset: 0.35 },
+            {
+              transform: "translateZ(30px) scale(1.15)",
+              opacity: "0.6",
+              offset: 0.35,
+            },
             { transform: "translateZ(0) scale(1)" },
           ],
-          { duration: 800, delay, easing: "ease-out", fill: "none" },
+          { duration: 800, delay, easing: "ease-out", fill: "none" }
         );
         cell.animate(
           [
@@ -74,11 +80,11 @@ export const SymbolGridBackground: React.FC = () => {
             { color: `hsl(${hue} 70% 65% / 0.3)`, offset: 0.5 },
             { color: baseColor },
           ],
-          { duration: 1000, delay, easing: "ease-in-out", fill: "none" },
+          { duration: 1000, delay, easing: "ease-in-out", fill: "none" }
         );
       }
     },
-    [dimensions.cols],
+    [dimensions.cols]
   );
 
   const handleClick = useCallback(
@@ -87,23 +93,32 @@ export const SymbolGridBackground: React.FC = () => {
       if (!rect) return;
       triggerRipple(e.clientX - rect.left, e.clientY - rect.top);
     },
-    [triggerRipple],
+    [triggerRipple]
   );
 
   const totalCells = dimensions.cols * dimensions.rows;
   const isMobile = dimensions.cols > 0 && dimensions.cols * CELL_SIZE < 768;
-  const toggleIndex = isMobile ? dimensions.cols + (dimensions.cols - 3) : dimensions.cols + 1;
+  const toggleIndex = isMobile
+    ? dimensions.cols + (dimensions.cols - 3)
+    : dimensions.cols + 1;
 
   const toggleCol = dimensions.cols > 0 ? toggleIndex % dimensions.cols : 0;
-  const toggleRow = dimensions.cols > 0 ? Math.floor(toggleIndex / dimensions.cols) : 0;
+  const toggleRow =
+    dimensions.cols > 0 ? Math.floor(toggleIndex / dimensions.cols) : 0;
   const toggleCenterX = toggleCol * CELL_SIZE + CELL_SIZE / 2;
   const toggleCenterY = toggleRow * CELL_SIZE + CELL_SIZE / 2;
 
   const handleToggle = useCallback(() => {
     const targetTheme = resolvedTheme === "dark" ? "light" : "dark";
 
-    document.documentElement.style.setProperty("--reveal-x", `${toggleCenterX}px`);
-    document.documentElement.style.setProperty("--reveal-y", `${toggleCenterY}px`);
+    document.documentElement.style.setProperty(
+      "--reveal-x",
+      `${toggleCenterX}px`
+    );
+    document.documentElement.style.setProperty(
+      "--reveal-y",
+      `${toggleCenterY}px`
+    );
 
     if (hasViewTransition(document)) {
       document.startViewTransition(() => {
@@ -117,6 +132,7 @@ export const SymbolGridBackground: React.FC = () => {
   return (
     <div
       ref={containerRef}
+      role="presentation"
       className="fixed inset-0 z-0 overflow-hidden"
       style={{ perspective: "600px" }}
       onClick={handleClick}
@@ -133,6 +149,7 @@ export const SymbolGridBackground: React.FC = () => {
           if (i === toggleIndex) {
             return (
               <button
+                type="button"
                 key={i}
                 className="flex items-center justify-center text-xs border border-foreground/20 text-foreground/30 m-auto"
                 style={{ width: TOGGLE_SIZE, height: TOGGLE_SIZE }}

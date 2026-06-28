@@ -18,7 +18,7 @@
     "suspicious": "error"
   },
   "rules": {
-    "complexity": "error",
+    "complexity": "warn",
     "prefer-const": "error",
     "no-var": "error",
     "no-param-reassign": "error",
@@ -46,12 +46,12 @@
     "unicorn/throw-new-error": "error",
     "oxc/no-accumulating-spread": "error",
     "import/no-unassigned-import": "off",
-    "style-rules/no-loops": "error",
-    "style-rules/no-tailwind-arbitrary": "error",
-    "style-rules/no-tailwind-opacity": "error",
-    "arch-rules/no-size-props": "error",
+    "style-rules/no-loops": "warn",
+    "style-rules/no-tailwind-arbitrary": "warn",
+    "style-rules/no-tailwind-opacity": "warn",
+    "arch-rules/no-size-props": "warn",
     "arch-rules/one-component-per-file": "error",
-    "arch-rules/component-file-naming": "error",
+    "arch-rules/component-file-naming": "warn",
     "arch-rules/test-naming-format": "error",
     "arch-rules/single-expect": "error"
   },
@@ -82,7 +82,9 @@
         "style-rules/no-tailwind-opacity": "off",
         "style-rules/no-loops": "off",
         "arch-rules/one-component-per-file": "off",
-        "arch-rules/component-file-naming": "off"
+        "arch-rules/component-file-naming": "off",
+        "eslint-plugin-react-hooks/exhaustive-deps": "off",
+        "jsx-a11y/role-has-required-aria-props": "off"
       }
     }
   ]

@@ -57,12 +57,15 @@ export const FlipWords = ({
           scale: 2,
           position: "absolute",
         }}
-        className={cn("z-10 inline-block relative text-left text-zinc-100 px-2", className)}
+        className={cn(
+          "z-10 inline-block relative text-left text-zinc-100 px-2",
+          className
+        )}
         key={currentWord}
       >
         {currentWord.split(" ").map((word, wordIndex) => (
           <motion.span
-            key={`${word}`}
+            key={word}
             initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             transition={{

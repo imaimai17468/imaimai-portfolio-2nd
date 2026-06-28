@@ -9,7 +9,14 @@ export const metadata: Metadata = {
   title: "imaimai17468's Portfolio",
   description:
     "imaimai17468のポートフォリオサイト | クリエイティブなWeb開発者として、技術とデザインで新しい体験を創造します",
-  keywords: ["imaimai17468", "portfolio", "web development", "Next.js", "React", "TypeScript"],
+  keywords: [
+    "imaimai17468",
+    "portfolio",
+    "web development",
+    "Next.js",
+    "React",
+    "TypeScript",
+  ],
   authors: [{ name: "imaimai17468" }],
   creator: "imaimai17468",
   publisher: "imaimai17468",

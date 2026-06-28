@@ -12,7 +12,11 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
 export interface MultiSelectOption {
@@ -65,22 +69,33 @@ export function MultiSelectCombobox({
             {selected.length > 0 ? (
               <div className="flex flex-1 flex-wrap gap-1">
                 {selected.map((value) => {
-                  const label = options.find((option) => option.value === value)?.label;
+                  const label = options.find(
+                    (option) => option.value === value
+                  )?.label;
                   if (!label) return null;
                   return (
-                    <Badge key={value} variant="secondary" className="font-normal">
+                    <Badge
+                      key={value}
+                      variant="secondary"
+                      className="font-normal"
+                    >
                       {label}
                     </Badge>
                   );
                 })}
               </div>
             ) : (
-              <span className="flex-1 text-left text-muted-foreground">{placeholder}</span>
+              <span className="flex-1 text-left text-muted-foreground">
+                {placeholder}
+              </span>
             )}
             <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+        <PopoverContent
+          className="w-[var(--radix-popover-trigger-width)] p-0"
+          align="start"
+        >
           <Command>
             <CommandInput placeholder={searchPlaceholder} />
             <CommandList>
@@ -95,7 +110,10 @@ export function MultiSelectCombobox({
                       onSelect={() => handleSelect(option.value)}
                     >
                       <Check
-                        className={cn("mr-2 h-4 w-4", isSelected ? "opacity-100" : "opacity-0")}
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          isSelected ? "opacity-100" : "opacity-0"
+                        )}
                       />
                       {option.label}
                     </CommandItem>
@@ -108,10 +126,16 @@ export function MultiSelectCombobox({
               <div className="border-t p-2">
                 <div className="flex flex-wrap gap-1">
                   {selected.map((value) => {
-                    const label = options.find((option) => option.value === value)?.label;
+                    const label = options.find(
+                      (option) => option.value === value
+                    )?.label;
                     if (!label) return null;
                     return (
-                      <Badge key={value} variant="secondary" className="gap-1 pr-1">
+                      <Badge
+                        key={value}
+                        variant="secondary"
+                        className="gap-1 pr-1"
+                      >
                         <span>{label}</span>
                         <button
                           type="button"
