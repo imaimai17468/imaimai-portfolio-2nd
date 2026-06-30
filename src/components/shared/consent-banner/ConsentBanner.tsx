@@ -20,15 +20,15 @@ export const ConsentBanner: React.FC = () => {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background px-6 py-2">
-      <div className="max-w-2xl mx-auto flex items-center justify-between gap-4">
+    <div className="border-t border-border bg-background px-4 py-2 sm:px-6">
+      <div className="flex items-center justify-between gap-4">
         <p className="text-xs text-muted-foreground">
           UX改善のためにページ閲覧データを収集しています
         </p>
         <button
           type="button"
           onClick={accept}
-          className="flex-shrink-0 px-3 py-1 text-xs border border-border bg-background text-foreground hover:bg-secondary focus-visible:ring-1 focus-visible:ring-foreground active:opacity-80 transition-colors"
+          className="flex-shrink-0 min-h-11 min-w-11 px-3 py-1 text-xs border border-border bg-background text-foreground hover:bg-secondary focus-visible:ring-1 focus-visible:ring-foreground active:opacity-80 disabled:opacity-50 disabled:pointer-events-none transition-colors"
         >
           OK
         </button>

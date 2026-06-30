@@ -63,9 +63,11 @@ export default function RootLayout({
           <div className="min-h-screen flex flex-col max-w-2xl mx-auto">
             <Header />
             <main className="flex-1">{children}</main>
-            <AiWidget />
+            <footer>
+              <AiWidget />
+              <ConsentBanner />
+            </footer>
           </div>
-          <ConsentBanner />
         </ThemeProvider>
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID ?? ""} />
       </body>
