@@ -60,10 +60,6 @@
   body {
     @apply bg-background text-foreground;
   }
-
-  [data-mode="pointer"] .scope-crosshair {
-    display: none;
-  }
 }
 
 @layer utilities {
@@ -76,12 +72,6 @@
   .text-foreground-faint {
     color: hsl(var(--foreground) / 0.3);
   }
-  .stroke-foreground-strong {
-    stroke: hsl(var(--foreground) / 0.8);
-  }
-  .stroke-foreground-muted {
-    stroke: hsl(var(--foreground) / 0.6);
-  }
   .border-foreground-faint {
     border-color: hsl(var(--foreground) / 0.2);
   }
@@ -93,51 +83,5 @@
     position: absolute;
     left: -0.75rem;
     color: hsl(var(--muted-foreground));
-  }
-  .z-cursor {
-    z-index: 9999;
-  }
-}
-
-@media (pointer: fine) {
-  body,
-  a,
-  button {
-    cursor: none;
-  }
-}
-
-@property --reveal-size {
-  syntax: "<length>";
-  initial-value: 0px;
-  inherits: false;
-}
-
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
-}
-
-::view-transition-new(root) {
-  animation: theme-reveal 1s ease-in-out forwards;
-  -webkit-mask-image: radial-gradient(
-    circle at var(--reveal-x, 72px) var(--reveal-y, 72px),
-    black calc(var(--reveal-size) - 40px),
-    transparent var(--reveal-size)
-  );
-  mask-image: radial-gradient(
-    circle at var(--reveal-x, 72px) var(--reveal-y, 72px),
-    black calc(var(--reveal-size) - 40px),
-    transparent var(--reveal-size)
-  );
-}
-
-@keyframes theme-reveal {
-  from {
-    --reveal-size: 0px;
-  }
-  to {
-    --reveal-size: 8000px;
   }
 }

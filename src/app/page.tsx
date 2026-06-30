@@ -1,5 +1,5 @@
-import { Top } from "@/components/feature/top";
+import { HeroSection } from "@/components/feature/top/hero-section";
 
-export default function Home() {
-  return <Top />;
+export default function Page() {
+  return <HeroSection />;
 }

@@ -1,8 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { AiWidget } from "@/components/shared/ai-widget/AiWidget";
+import { ConsentBanner } from "@/components/shared/consent-banner/ConsentBanner";
+import { Header } from "@/components/shared/header/Header";
+import { PageTracker } from "@/components/shared/page-tracker/PageTracker";
 import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "next-themes";
-import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://imaimai.tech"),
@@ -58,7 +61,13 @@ export default function RootLayout({
     <html lang="ja" suppressHydrationWarning>
       <body>
         <ThemeProvider attribute="class" defaultTheme="dark">
-          <NuqsAdapter>{children}</NuqsAdapter>
+          <div className="max-w-2xl mx-auto">
+            <Header />
+            <main>{children}</main>
+          </div>
+          <PageTracker />
+          <AiWidget />
+          <ConsentBanner />
         </ThemeProvider>
         <Analytics />
       </body>
