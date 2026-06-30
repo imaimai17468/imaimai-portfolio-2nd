@@ -1,7 +1,35 @@
 import { isFeedbackRequest } from "@/entities/feedback/feedbackRequest";
 import { NextResponse } from "next/server";
 
+const WINDOW_MS = 60 * 60 * 1000;
+const MAX_REQUESTS = 3;
+const hits = new Map<string, number[]>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const timestamps = (hits.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
+  if (timestamps.length >= MAX_REQUESTS) {
+    hits.set(ip, timestamps);
+    return true;
+  }
+  if (timestamps.length === 0 && hits.has(ip)) {
+    hits.delete(ip);
+  }
+  timestamps.push(now);
+  hits.set(ip, timestamps);
+  return false;
+}
+
 export async function POST(request: Request) {
+  const ip =
+    request.headers.get("x-real-ip") ??
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    "unknown";
+
+  if (isRateLimited(ip)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   const body: unknown = await request.json();
 
   if (!isFeedbackRequest(body)) {
