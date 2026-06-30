@@ -28,7 +28,7 @@ Phase 3: 自動改善
 
 ## Phase 1: データ収集
 
-1. `curl -s https://imaimai.ai/api/analytics` で GA4 Data API 経由の昨日データ取得
+1. `curl -s https://imaim.ai/api/analytics` で GA4 Data API 経由の昨日データ取得
 2. `gh issue list -l feedback --state open` でフィードバック Issue 確認
 3. 各 Issue の内容を `gh issue view` で取得
 

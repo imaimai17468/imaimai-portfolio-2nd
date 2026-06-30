@@ -7,7 +7,7 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import { ThemeProvider } from "next-themes";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://imaimai.ai"),
+  metadataBase: new URL("https://imaim.ai"),
   title: "imaimai17468's Portfolio",
   description:
     "imaimai17468のポートフォリオサイト | クリエイティブなWeb開発者として、技術とデザインで新しい体験を創造します",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     title: "imaimai17468's Portfolio",
     description:
       "imaimai17468のポートフォリオサイト | フロントエンドエンジニアとして、常に自分を示し続けます",
-    url: "https://imaimai.ai",
+    url: "https://imaim.ai",
     siteName: "imaimai17468's Portfolio",
     locale: "ja_JP",
     type: "website",
