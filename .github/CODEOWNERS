@@ -1,0 +1,8 @@
+# All changes require owner approval
+* @imaimai17468
+
+# Critical files require extra attention
+package.json @imaimai17468
+bun.lockb @imaimai17468
+.github/ @imaimai17468
+.env* @imaimai17468
