@@ -1,15 +1,21 @@
-# Daily Analytics Routine
+# Daily Analytics & Auto-Improvement Routine
 
-Claude.ai ルーティンによる日次アナリティクスレポートの構成と設定。
+Claude.ai ルーティンによる日次アナリティクス分析と自動改善 PR 作成。
 
 ## 概要
 
-毎日 0:00 UTC (日本時間 9:00) に Claude.ai が GA4 データとフィードバック Issue を分析し、GitHub Issue にレポートを投稿する。
+毎日 0:00 UTC (日本時間 9:00) に Claude.ai が GA4 データとフィードバック Issue を分析し、改善 PR を自動作成する。
 
 ```
-GA4 (収集) → /api/analytics (データ取得) → Claude.ai routine (分析) → GitHub Issue
-                                                  ↑
-                                          feedback Issue も参照
+Phase 1: データ収集
+  GA4 → /api/analytics → データ取得
+  GitHub Issues (feedback ラベル) → フィードバック収集
+
+Phase 2: 分析・レポート
+  データ分析 → GitHub Issue に投稿 (analytics-report ラベル)
+
+Phase 3: 自動改善
+  改善箇所を特定 → コード修正 → PR 作成
 ```
 
 ## ルーティン設定
@@ -20,31 +26,48 @@ GA4 (収集) → /api/analytics (データ取得) → Claude.ai routine (分析)
 | モード | 毎回新規セッション (create_new_session_on_fire) |
 | 環境 | Default |
 
-## 処理フロー
+## Phase 1: データ収集
 
 1. `curl -s https://imaimai.ai/api/analytics` で GA4 Data API 経由の昨日データ取得
 2. `gh issue list -l feedback --state open` でフィードバック Issue 確認
 3. 各 Issue の内容を `gh issue view` で取得
-4. データ分析（3セクション構成）
-5. `gh` CLI で GitHub Issue に投稿（`analytics-report` ラベル）
 
-## レポート構成
+## Phase 2: 分析・レポート
 
-### 1. アナリティクス
+GitHub Issue (`analytics-report` ラベル) にレポートを投稿。
+
+### レポート構成
+
+**アナリティクス:**
 - 総ページビュー数・ユニークユーザー数
 - ページ別アクセスランキング
-- トラフィックソース（流入元の内訳）
-- 平均セッション時間
-- 注目すべきトレンドや改善点
+- トラフィックソース、平均セッション時間
+- 注目すべきトレンド
 
-### 2. フィードバック
+**フィードバック:**
 - 新着フィードバックの要約
 - 共通する要望やパターン
-- 対応優先度の提案
 
-### 3. 改善提案
-- アナリティクスとフィードバックを総合した改善案
-- デザインシステム・React ルールに準拠した提案
+**改善提案:**
+- 具体的な修正箇所（ファイルパス・行番号）を含む改善案
+- デザインシステム・React ルールに準拠
+
+## Phase 3: 自動改善 PR 作成
+
+分析に基づいてコードを修正し PR を作成する。
+
+### 手順
+1. リポジトリをクローン + `bun install`
+2. `fix/daily-improvement-YYYY-MM-DD` ブランチを作成
+3. 改善を実装（1 PR = 1 改善、複数あれば複数 PR）
+4. `bun run check` + `bun run typecheck` を通す
+5. コミット + PR 作成（analytics-report / feedback Issue へのリンクを含む）
+
+### 制約
+- 改善が見つからない場合は Phase 2 のレポートのみで終了
+- 大規模な変更は避け、小さく安全な改善を優先
+- デザインシステムに違反する変更は行わない
+- AI デザインクリシェに該当する変更は行わない
 
 ## 埋め込み知識
 
