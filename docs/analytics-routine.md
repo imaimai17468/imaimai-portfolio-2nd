@@ -1,77 +1,88 @@
 # Daily Analytics & Auto-Improvement Routine
 
-Claude.ai ルーティンによる日次アナリティクス分析と自動改善 PR 作成。
+Claude.ai ルーティンによる日次アナリティクス分析、自動改善 PR 作成、自動レビュー・マージ。
 
 ## 概要
 
-毎日 0:00 UTC (日本時間 9:00) に Claude.ai が GA4 データとフィードバック Issue を分析し、改善 PR を自動作成する。
+毎日 2 つのルーティンが連携して、ポートフォリオサイトを継続的に改善する。
 
 ```
-Phase 1: データ収集
-  GA4 → /api/analytics → データ取得
-  GitHub Issues (feedback ラベル) → フィードバック収集
+9:00 JST  ルーティンA: Daily GA4 Analytics + Auto PR
+  Phase 1: データ収集 (GA4 + feedback Issue)
+  Phase 2: 分析・レポート → GitHub Issue (analytics-report)
+  Phase 3: コード修正 → PR 作成
 
-Phase 2: 分析・レポート
-  データ分析 → GitHub Issue に投稿 (analytics-report ラベル)
-
-Phase 3: 自動改善
-  改善箇所を特定 → コード修正 → PR 作成
+9:30 JST  ルーティンB: PR Review + Auto Merge
+  CI 確認 → コードレビュー → 判定
+    ├── 問題なし → マージ
+    ├── 軽微な問題 → 自動修正(1回) → 再レビュー → マージ or エスカレーション
+    └── 重大な問題 → @imaimai17468 にエスカレーション
 ```
 
-## ルーティン設定
+## ルーティン A: Daily GA4 Analytics + Auto PR
 
 | 項目 | 値 |
 |------|-----|
-| スケジュール | `0 0 * * *` (毎日 0:00 UTC) |
-| モード | 毎回新規セッション (create_new_session_on_fire) |
-| 環境 | Default |
+| スケジュール | `0 0 * * *` (毎日 0:00 UTC / 9:00 JST) |
+| モード | 毎回新規セッション |
 
-## Phase 1: データ収集
+### Phase 1: データ収集
 
-1. `curl -s https://imaim.ai/api/analytics` で GA4 Data API 経由の昨日データ取得
+1. `curl -s https://imaim.ai/api/analytics` で GA4 データ取得
+   - ページ別: PV, ユーザー数, 滞在時間, 直帰率, エンゲージメント率, エンゲージメント時間
+   - オーディエンス別: デバイス種別, 流入元, 新規/リピーター
 2. `gh issue list -l feedback --state open` でフィードバック Issue 確認
-3. 各 Issue の内容を `gh issue view` で取得
 
-## Phase 2: 分析・レポート
+### Phase 2: 分析・レポート
 
 GitHub Issue (`analytics-report` ラベル) にレポートを投稿。
 
-### レポート構成
+- アナリティクス: ページ別パフォーマンス、トラフィックソース、トレンド
+- フィードバック: 新着の要約、共通パターン
+- 改善提案: 具体的な修正箇所（ファイルパス・行番号）
 
-**アナリティクス:**
-- 総ページビュー数・ユニークユーザー数
-- ページ別アクセスランキング
-- トラフィックソース、平均セッション時間
-- 注目すべきトレンド
+### Phase 3: 自動改善 PR 作成
 
-**フィードバック:**
-- 新着フィードバックの要約
-- 共通する要望やパターン
-
-**改善提案:**
-- 具体的な修正箇所（ファイルパス・行番号）を含む改善案
-- デザインシステム・React ルールに準拠
-
-## Phase 3: 自動改善 PR 作成
-
-分析に基づいてコードを修正し PR を作成する。
-
-### 手順
-1. リポジトリをクローン + `bun install`
-2. `fix/daily-improvement-YYYY-MM-DD` ブランチを作成
-3. 改善を実装（1 PR = 1 改善、複数あれば複数 PR）
-4. `bun run check` + `bun run typecheck` を通す
-5. コミット + PR 作成（analytics-report / feedback Issue へのリンクを含む）
-
-### 制約
+- `fix/daily-improvement-YYYY-MM-DD` ブランチを作成
+- 1 PR = 1 改善（複数あれば複数 PR）
+- `bun run check` + `bun run typecheck` を通す
 - 改善が見つからない場合は Phase 2 のレポートのみで終了
-- 大規模な変更は避け、小さく安全な改善を優先
-- デザインシステムに違反する変更は行わない
-- AI デザインクリシェに該当する変更は行わない
+
+## ルーティン B: PR Review + Auto Merge
+
+| 項目 | 値 |
+|------|-----|
+| スケジュール | `30 0 * * *` (毎日 0:30 UTC / 9:30 JST) |
+| モード | 毎回新規セッション |
+
+### レビューフロー
+
+1. open PR を取得（daily-improvement / fix/ ブランチ）
+2. CI ステータス確認
+3. コードレビュー（デザインシステム、React ルール、型安全）
+
+### 判定とアクション
+
+| 判定 | アクション |
+|------|----------|
+| 問題なし | approve → squash merge → ブランチ削除 |
+| 軽微な問題 | 自動修正（1回のみ）→ 再レビュー → 通過ならマージ |
+| 重大な問題 | PR open のまま @imaimai17468 にメンションで報告 |
+| 修正2回目でも問題あり | PR open のまま @imaimai17468 にメンションで報告 |
+| セキュリティ制約違反 | PR open のまま @imaimai17468 にメンションで報告 |
+
+### セキュリティ制約
+
+| 制約 | 内容 |
+|------|------|
+| 変更可能ファイル | `src/components/`, `src/app/globals.css` のみ |
+| 変更禁止ファイル | `route.ts`, `layout.tsx`, 設定ファイル, `package.json`, `.env*` |
+| diff 上限 | 100 行を超える PR はマージしない |
+| 修正回数 | 最大 1 回。2 回目の問題発見でエスカレーション |
 
 ## 埋め込み知識
 
-ルーティンは毎回フリーセッションで起動するため、プロンプトに以下の知識を埋め込んでいる。
+両ルーティンは毎回フリーセッションで起動するため、プロンプトに以下の知識を埋め込んでいる。
 
 ### AGENTS.md
 - Next.js 14 (App Router) + Tailwind CSS + shadcn/ui
@@ -99,6 +110,10 @@ GitHub Issue (`analytics-report` ラベル) にレポートを投稿。
 - コロケーション優先
 - パススルーレイヤー禁止
 
+### コーディング規約（ルーティン B のみ）
+- Tailwind arbitrary value 禁止（トークンを使う）
+- Tailwind opacity modifier 禁止（専用トークンを定義する）
+
 ## 必要なインフラ
 
 ### Vercel 環境変数
@@ -124,8 +139,15 @@ GitHub Issue (`analytics-report` ラベル) にレポートを投稿。
 
 環境が変わった場合、Claude Code で以下の手順で再作成:
 
+### ルーティン A
 1. `create_trigger` で新規トリガーを作成
-2. cron: `0 0 * * *`
-3. `create_new_session_on_fire: true`
-4. プロンプトに上記の知識とタスクを含める
-5. 環境変数が全て設定されていることを確認
+2. cron: `0 0 * * *`, `create_new_session_on_fire: true`
+3. プロンプトに AGENTS.md + デザインシステム + React ルールの知識を含める
+4. Phase 1-3 のタスクを記載
+
+### ルーティン B
+1. `create_trigger` で新規トリガーを作成
+2. cron: `30 0 * * *`, `create_new_session_on_fire: true`
+3. プロンプトにデザインシステム + React ルール + コーディング規約 + セキュリティ制約を含める
+4. レビューフロー + 判定アクション + エスカレーション手順を記載
+5. エスカレーション先: @imaimai17468
