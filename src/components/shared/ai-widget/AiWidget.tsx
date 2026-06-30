@@ -115,6 +115,16 @@ export const AiWidget: React.FC = () => {
                   下のフォームから改善のアイデアを送ることもできます。送信された内容はGitHub
                   Issueとして記録され、AIの改善材料になります。
                 </p>
+                <p>
+                  <a
+                    href="https://github.com/imaimai17468/imaimai-portfolio-2nd/blob/main/docs/analytics-routine.md"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline hover:text-foreground transition-colors"
+                  >
+                    仕組みの詳細
+                  </a>
+                </p>
               </div>
               <button
                 type="button"
