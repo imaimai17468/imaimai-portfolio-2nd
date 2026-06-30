@@ -47,7 +47,7 @@ cp .env.local.example .env.local
 | 変数 | 説明 |
 |------|------|
 | `NEXT_PUBLIC_GA_ID` | GA4 測定 ID |
-| `GITHUB_TOKEN` | GitHub PAT (フィードバック Issue 投稿用) |
+| `GITHUB_TOKEN` | GitHub PAT (フィードバック PR 作成用) |
 | `GITHUB_REPO` | 対象リポジトリ (デフォルト: `imaimai17468/imaimai-portfolio-2nd`) |
 | `GOOGLE_SA_KEY` | GCP サービスアカウント JSON の base64 (日次レポート用) |
 | `GA4_PROPERTY_ID` | GA4 プロパティ ID (日次レポート用) |
@@ -99,7 +99,7 @@ src/
 
 ## アナリティクス
 
-GA4 でユーザー行動を収集し、Claude Code Remote のルーティン (cron) が毎朝 9:00 (JST) に `/api/analytics` 経由でデータを取得、分析レポートを GitHub Issue に投稿します。
+GA4 でユーザー行動を収集し、Claude Code Remote のルーティン (cron) が毎朝 9:00 (JST) に `/api/analytics` 経由でデータを取得、分析レポートを PR として作成します。
 
 ```
 ユーザー → GA4 (収集)
@@ -107,7 +107,7 @@ GA4 でユーザー行動を収集し、Claude Code Remote のルーティン (c
 Claude Code Remote routine (毎朝 9:00 JST)
   1. /api/analytics → GA4 Data API でページ別・オーディエンス指標を取得
   2. レポート分析・要約
-  3. GitHub Issue に投稿
+  3. GitHub PR を作成
 ```
 
 ## ライセンス
