@@ -65,7 +65,7 @@ export const AiWidget: React.FC = () => {
   }, [message, pathname]);
 
   return (
-    <div className="fixed bottom-6 right-6 z-40 flex items-end gap-3">
+    <div className="flex items-end gap-3 p-4 sm:p-6 justify-end">
       <div className="flex items-end gap-1 flex-shrink-0 mb-1">
         <Image src="/frog_large.png" alt="" width={28} height={28} />
         <span ref={penRef} className="text-lg text-muted-foreground">
@@ -80,7 +80,7 @@ export const AiWidget: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowInfo((prev) => !prev)}
-            className="p-2 -m-2 text-muted-foreground hover:text-foreground bg-transparent transition-colors focus-visible:ring-1 focus-visible:ring-foreground active:opacity-80"
+            className="p-3.5 -m-3.5 text-muted-foreground hover:text-foreground bg-transparent transition-colors focus-visible:ring-1 focus-visible:ring-foreground active:opacity-80"
             aria-label="仕組みについて"
           >
             <span className="w-4 h-4 flex items-center justify-center text-xs border border-border">
@@ -146,15 +146,15 @@ export const AiWidget: React.FC = () => {
                   }
                 }}
                 placeholder="改善のアイデアを送る..."
-                className="w-full max-w-52 min-h-14 px-2 py-1.5 text-sm bg-transparent text-foreground placeholder:text-muted-foreground resize-none break-words focus:outline-none border-b border-border focus:border-foreground"
+                className="flex-1 min-h-14 px-2 py-1.5 text-sm bg-transparent text-foreground placeholder:text-muted-foreground resize-none break-words focus:outline-none border-b border-border hover:border-muted-foreground focus-visible:border-foreground disabled:opacity-50 disabled:pointer-events-none transition-colors"
               />
               <button
                 type="button"
                 onClick={handleSubmit}
                 disabled={status === "sending"}
-                className="px-2 py-1 text-xs border border-border bg-background text-muted-foreground hover:text-foreground hover:border-foreground focus-visible:ring-1 focus-visible:ring-foreground active:opacity-80 disabled:opacity-50 disabled:pointer-events-none transition-colors mb-0.5"
+                className="flex-shrink-0 px-4 py-1.5 text-xs border border-border bg-background text-muted-foreground hover:text-foreground hover:border-foreground focus-visible:ring-1 focus-visible:ring-foreground active:opacity-80 disabled:opacity-50 disabled:pointer-events-none transition-colors mb-0.5"
               >
-                {status === "sending" ? "送信中" : "送信"}
+                {status === "sending" ? "送信中..." : "送信"}
               </button>
             </div>
             {error && <p className="text-xs text-destructive">{error}</p>}

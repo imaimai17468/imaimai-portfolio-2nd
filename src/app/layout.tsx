@@ -61,12 +61,12 @@ export default function RootLayout({
     <html lang="ja" suppressHydrationWarning>
       <body>
         <ThemeProvider attribute="class" defaultTheme="dark">
-          <div className="max-w-2xl mx-auto">
+          <div className="min-h-screen flex flex-col max-w-2xl mx-auto">
             <Header />
-            <main>{children}</main>
+            <main className="flex-1">{children}</main>
+            <AiWidget />
           </div>
           <PageTracker />
-          <AiWidget />
           <ConsentBanner />
         </ThemeProvider>
         <Analytics />
