@@ -25,6 +25,15 @@ export const AiWidget: React.FC = () => {
     return () => cancelAnimationFrame(frame);
   }, []);
 
+  useEffect(() => {
+    if (!showInfo) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setShowInfo(false);
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [showInfo]);
+
   const handleSubmit = useCallback(() => {
     const trimmed = message.trim();
     if (trimmed.length === 0) {
@@ -56,7 +65,7 @@ export const AiWidget: React.FC = () => {
   }, [message, pathname]);
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex items-end gap-3">
+    <div className="fixed bottom-6 right-6 z-40 flex items-end gap-3">
       <div className="flex items-end gap-1 flex-shrink-0 mb-1">
         <Image src="/frog_large.png" alt="" width={28} height={28} />
         <span ref={penRef} className="text-lg text-muted-foreground">
@@ -71,19 +80,18 @@ export const AiWidget: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowInfo((prev) => !prev)}
-            className="w-4 h-4 flex items-center justify-center text-xs border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+            className="p-2 -m-2 text-muted-foreground hover:text-foreground bg-transparent transition-colors focus-visible:ring-1 focus-visible:ring-foreground active:opacity-80"
             aria-label="仕組みについて"
           >
-            ?
+            <span className="w-4 h-4 flex items-center justify-center text-xs border border-border">
+              ?
+            </span>
           </button>
         </div>
         {showInfo && (
           <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-background"
             onClick={() => setShowInfo(false)}
-            onKeyDown={(e) => {
-              if (e.key === "Escape") setShowInfo(false);
-            }}
             role="presentation"
           >
             <div
@@ -111,7 +119,7 @@ export const AiWidget: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowInfo(false)}
-                className="mt-4 px-3 py-1 text-xs border border-border text-foreground hover:bg-secondary transition-colors"
+                className="mt-4 px-3 py-1 text-xs border border-border bg-background text-foreground hover:bg-secondary focus-visible:ring-1 focus-visible:ring-foreground active:opacity-80 transition-colors"
               >
                 閉じる
               </button>
@@ -138,12 +146,13 @@ export const AiWidget: React.FC = () => {
                   }
                 }}
                 placeholder="改善のアイデアを送る..."
-                className="w-52 h-14 px-2 py-1.5 text-sm bg-transparent text-foreground placeholder:text-muted-foreground resize-none focus:outline-none border-b border-border focus:border-foreground"
+                className="w-full max-w-52 min-h-14 px-2 py-1.5 text-sm bg-transparent text-foreground placeholder:text-muted-foreground resize-none break-words focus:outline-none border-b border-border focus:border-foreground"
               />
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="px-2 py-1 text-xs border border-border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors mb-0.5"
+                disabled={status === "sending"}
+                className="px-2 py-1 text-xs border border-border bg-background text-muted-foreground hover:text-foreground hover:border-foreground focus-visible:ring-1 focus-visible:ring-foreground active:opacity-80 disabled:opacity-50 disabled:pointer-events-none transition-colors mb-0.5"
               >
                 {status === "sending" ? "送信中" : "送信"}
               </button>

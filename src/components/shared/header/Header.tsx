@@ -32,7 +32,7 @@ export const Header: React.FC = () => {
           <Link
             key={item.href}
             href={item.href}
-            className={`text-sm transition-colors ${
+            className={`text-sm transition-colors focus-visible:underline focus-visible:outline-none ${
               pathname === item.href
                 ? "font-medium text-foreground"
                 : "text-muted-foreground hover:text-foreground"
@@ -45,7 +45,7 @@ export const Header: React.FC = () => {
       <button
         type="button"
         onClick={toggleTheme}
-        className="flex items-center justify-center w-8 h-8 border border-border text-sm text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+        className="flex items-center justify-center w-8 h-8 border border-border bg-background text-sm text-muted-foreground hover:text-foreground hover:border-foreground focus-visible:ring-1 focus-visible:ring-foreground active:opacity-80 transition-colors"
         aria-label="Toggle theme"
       >
         {mounted ? (resolvedTheme === "dark" ? "☀" : "☾") : ""}

@@ -1,11 +1,25 @@
+import {
+  isAnalyticsEvent,
+  type AnalyticsEvent,
+} from "@/entities/analytics/analyticsEvent";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  const body = await request.json();
-  const { events } = body;
+  const body: unknown = await request.json();
 
-  if (!Array.isArray(events) || events.length === 0) {
+  if (typeof body !== "object" || body === null || !("events" in body)) {
     return NextResponse.json({ error: "Events required" }, { status: 400 });
+  }
+
+  const rawEvents: unknown = body.events;
+  if (!Array.isArray(rawEvents)) {
+    return NextResponse.json({ error: "Events required" }, { status: 400 });
+  }
+
+  const events = rawEvents.filter(isAnalyticsEvent);
+
+  if (events.length === 0) {
+    return NextResponse.json({ error: "No valid events" }, { status: 400 });
   }
 
   const token = process.env.GITHUB_TOKEN;
@@ -20,17 +34,10 @@ export async function POST(request: Request) {
 
   const date = new Date().toISOString().slice(0, 10);
   const rows = events
-    .map(
-      (e: {
-        type: string;
-        path?: string;
-        from?: string;
-        to?: string;
-        dwell_seconds?: number;
-      }) =>
-        e.type === "dwell"
-          ? `| dwell | ${e.path} | ${e.dwell_seconds}s | |`
-          : `| transition | ${e.from} | | ${e.from} → ${e.to} |`
+    .map((e: AnalyticsEvent) =>
+      e.type === "dwell"
+        ? `| dwell | ${e.path} | ${e.dwell_seconds}s | |`
+        : `| transition | ${e.from} | | ${e.from} → ${e.to} |`
     )
     .join("\n");
 
@@ -47,10 +54,16 @@ export async function POST(request: Request) {
   );
 
   if (listRes.ok) {
-    const existing = await listRes.json();
-    if (Array.isArray(existing) && existing.length > 0) {
+    const existing: unknown = await listRes.json();
+    if (
+      Array.isArray(existing) &&
+      existing.length > 0 &&
+      typeof existing[0] === "object" &&
+      existing[0] !== null &&
+      "number" in existing[0]
+    ) {
       await fetch(
-        `https://api.github.com/repos/${repo}/issues/${existing[0].number}/comments`,
+        `https://api.github.com/repos/${repo}/issues/${String(existing[0].number)}/comments`,
         {
           method: "POST",
           headers: {
@@ -73,7 +86,7 @@ export async function POST(request: Request) {
       Accept: "application/vnd.github+json",
     },
     body: JSON.stringify({
-      title: `[Analytics] User engagement data`,
+      title: "[Analytics] User engagement data",
       body: issueBody,
       labels: ["analytics"],
     }),

@@ -1,37 +1,30 @@
 "use client";
 
+import type { AnalyticsEvent } from "@/entities/analytics/analyticsEvent";
 import { track } from "@vercel/analytics";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef } from "react";
 
-const sendToGitHub = (
-  events: Array<{
-    type: string;
-    path?: string;
-    from?: string;
-    to?: string;
-    dwell_seconds?: number;
-  }>
-) => {
+const sendToGitHub = (events: AnalyticsEvent[]) => {
   navigator.sendBeacon(
     "/api/analytics",
     new Blob([JSON.stringify({ events })], { type: "application/json" })
   );
 };
 
+const hasConsent = () =>
+  typeof window !== "undefined" &&
+  localStorage.getItem("tracking-consent") === "accepted";
+
 export const PageTracker: React.FC = () => {
   const pathname = usePathname();
-  const startTime = useRef(Date.now());
+  const startTime = useRef(0);
   const prevPath = useRef(pathname);
-  const buffer = useRef<
-    Array<{
-      type: string;
-      path?: string;
-      from?: string;
-      to?: string;
-      dwell_seconds?: number;
-    }>
-  >([]);
+  const buffer = useRef<AnalyticsEvent[]>([]);
+
+  useEffect(() => {
+    startTime.current = Date.now();
+  }, []);
 
   const flush = useCallback(() => {
     if (buffer.current.length === 0) return;
@@ -40,6 +33,8 @@ export const PageTracker: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    if (!hasConsent()) return;
+
     const now = Date.now();
     const dwellMs = now - startTime.current;
 
@@ -65,12 +60,14 @@ export const PageTracker: React.FC = () => {
 
     prevPath.current = pathname;
     startTime.current = now;
-  }, [pathname]);
+  }, [pathname, flush]);
 
   useEffect(() => {
     const interval = setInterval(flush, 60_000);
 
     const handleBeforeUnload = () => {
+      if (!hasConsent()) return;
+
       const dwellMs = Date.now() - startTime.current;
       if (dwellMs > 1000) {
         const dwellSeconds = Math.round(dwellMs / 1000);

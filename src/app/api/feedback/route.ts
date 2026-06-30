@@ -1,18 +1,19 @@
+import { isFeedbackRequest } from "@/entities/feedback/feedbackRequest";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  const body = await request.json();
-  const { message, page } = body;
+  const body: unknown = await request.json();
 
-  if (!message || typeof message !== "string") {
+  if (!isFeedbackRequest(body)) {
     return NextResponse.json({ error: "Message is required" }, { status: 400 });
   }
+
+  const { message, page } = body;
 
   const token = process.env.GITHUB_TOKEN;
   const repo = process.env.GITHUB_REPO || "imaimai17468/imaimai-portfolio-2nd";
 
   if (!token) {
-    console.error("GITHUB_TOKEN is not set");
     return NextResponse.json(
       { error: "Server configuration error" },
       { status: 500 }
@@ -37,7 +38,6 @@ export async function POST(request: Request) {
   });
 
   if (!res.ok) {
-    console.error("Failed to create issue:", await res.text());
     return NextResponse.json(
       { error: "Failed to submit feedback" },
       { status: 500 }
