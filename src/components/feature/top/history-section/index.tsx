@@ -145,7 +145,7 @@ const HistoryItem: React.FC<{ entry: HistoryEntry }> = ({ entry }) => {
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3">
-        <span className="text-xs text-muted-foreground font-mono flex-shrink-0 sm:w-40">
+        <span className="text-xs text-muted-foreground font-mono shrink-0 sm:w-40">
           {entry.period}
         </span>
         <div className="min-w-0">

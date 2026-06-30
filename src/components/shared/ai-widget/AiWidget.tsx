@@ -66,7 +66,7 @@ export const AiWidget: React.FC = () => {
 
   return (
     <div className="flex items-end gap-3 p-4 sm:p-6 justify-end">
-      <div className="flex items-end gap-1 flex-shrink-0 mb-1">
+      <div className="flex items-end gap-1 shrink-0 mb-1">
         <Image src="/frog_large.png" alt="" width={28} height={28} />
         <span ref={penRef} className="text-lg text-muted-foreground">
           ✎
@@ -156,13 +156,13 @@ export const AiWidget: React.FC = () => {
                   }
                 }}
                 placeholder="改善のアイデアを送る..."
-                className="flex-1 min-h-14 px-2 py-1.5 text-sm bg-transparent text-foreground placeholder:text-muted-foreground resize-none break-words focus:outline-none border-b border-border hover:border-muted-foreground focus-visible:border-foreground disabled:opacity-50 disabled:pointer-events-none transition-colors"
+                className="flex-1 min-h-14 px-2 py-1.5 text-sm bg-transparent text-foreground placeholder:text-muted-foreground resize-none wrap-break-word focus:outline-hidden border-b border-border hover:border-muted-foreground focus-visible:border-foreground disabled:opacity-50 disabled:pointer-events-none transition-colors"
               />
               <button
                 type="button"
                 onClick={handleSubmit}
                 disabled={status === "sending"}
-                className="flex-shrink-0 px-4 py-1.5 text-xs border border-border bg-background text-muted-foreground hover:text-foreground hover:border-foreground focus-visible:ring-1 focus-visible:ring-foreground active:opacity-80 disabled:opacity-50 disabled:pointer-events-none transition-colors mb-0.5"
+                className="shrink-0 px-4 py-1.5 text-xs border border-border bg-background text-muted-foreground hover:text-foreground hover:border-foreground focus-visible:ring-1 focus-visible:ring-foreground active:opacity-80 disabled:opacity-50 disabled:pointer-events-none transition-colors mb-0.5"
               >
                 {status === "sending" ? "送信中..." : "送信"}
               </button>
