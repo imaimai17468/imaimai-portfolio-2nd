@@ -1,7 +1,7 @@
-import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 
-const PRODUCTS = [
+const PROJECTS = [
+  { title: "wbsb", url: "https://wbsb.dev" },
   { title: "Osampo", url: "https://osampo.vercel.app" },
   { title: "ツウキンプレイス", url: "https://tsuukin-place.com" },
   {
@@ -19,23 +19,23 @@ const PRODUCTS = [
   },
 ];
 
-export const ProductsSection: React.FC = () => {
+export const ProjectsSection: React.FC = () => {
   return (
     <section className="px-6 py-12">
       <h2 className="text-sm text-muted-foreground tracking-wider mb-6">
-        PRODUCTS
+        PROJECTS
       </h2>
       <ul className="space-y-3">
-        {PRODUCTS.map((product) => (
-          <li key={product.url}>
+        {PROJECTS.map((project) => (
+          <li key={project.url}>
             <Link
-              href={product.url}
+              href={project.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 py-1 text-sm text-foreground-strong"
+              className="inline-flex items-center gap-1.5 py-1 text-sm text-foreground-strong hover:text-foreground focus-visible:underline focus-visible:outline-none transition-colors"
             >
-              {product.title}
-              <ExternalLink className="w-3 h-3 text-muted-foreground" />
+              {project.title}
+              <span className="text-muted-foreground text-xs">↗</span>
             </Link>
           </li>
         ))}

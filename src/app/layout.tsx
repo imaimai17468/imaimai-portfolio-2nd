@@ -1,11 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { Analytics } from "@vercel/analytics/react";
+import { AiWidget } from "@/components/shared/ai-widget/AiWidget";
+import { ConsentBanner } from "@/components/shared/consent-banner/ConsentBanner";
+import { Header } from "@/components/shared/header/Header";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { ThemeProvider } from "next-themes";
-import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://imaimai.tech"),
+  metadataBase: new URL("https://imaimai.ai"),
   title: "imaimai17468's Portfolio",
   description:
     "imaimai17468のポートフォリオサイト | クリエイティブなWeb開発者として、技術とデザインで新しい体験を創造します",
@@ -25,7 +27,7 @@ export const metadata: Metadata = {
     title: "imaimai17468's Portfolio",
     description:
       "imaimai17468のポートフォリオサイト | フロントエンドエンジニアとして、常に自分を示し続けます",
-    url: "https://imaimai.tech",
+    url: "https://imaimai.ai",
     siteName: "imaimai17468's Portfolio",
     locale: "ja_JP",
     type: "website",
@@ -58,9 +60,16 @@ export default function RootLayout({
     <html lang="ja" suppressHydrationWarning>
       <body>
         <ThemeProvider attribute="class" defaultTheme="dark">
-          <NuqsAdapter>{children}</NuqsAdapter>
+          <div className="min-h-screen flex flex-col max-w-2xl mx-auto">
+            <Header />
+            <main className="flex-1">{children}</main>
+            <footer>
+              <AiWidget />
+              <ConsentBanner />
+            </footer>
+          </div>
         </ThemeProvider>
-        <Analytics />
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID ?? ""} />
       </body>
     </html>
   );

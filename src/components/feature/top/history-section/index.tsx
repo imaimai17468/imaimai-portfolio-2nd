@@ -12,7 +12,7 @@ type FreelanceItem = {
   projects: string[];
 };
 
-type CareerEntry = {
+type HistoryEntry = {
   period: string;
   title: string;
   subtitle: string;
@@ -21,7 +21,7 @@ type CareerEntry = {
   freelance?: FreelanceItem[];
 };
 
-const CAREER: CareerEntry[] = [
+const HISTORY: HistoryEntry[] = [
   {
     period: "2024.12 -",
     title: "アクセンチュア株式会社",
@@ -120,22 +120,22 @@ const CAREER: CareerEntry[] = [
   },
 ];
 
-export const CareerSection: React.FC = () => {
+export const HistorySection: React.FC = () => {
   return (
     <section className="px-6 py-12">
       <h2 className="text-sm text-muted-foreground tracking-wider mb-8">
-        CAREER
+        HISTORY
       </h2>
       <div className="space-y-6">
-        {CAREER.map((entry) => (
-          <CareerItem key={entry.period} entry={entry} />
+        {HISTORY.map((entry) => (
+          <HistoryItem key={entry.period} entry={entry} />
         ))}
       </div>
     </section>
   );
 };
 
-const CareerItem: React.FC<{ entry: CareerEntry }> = ({ entry }) => {
+const HistoryItem: React.FC<{ entry: HistoryEntry }> = ({ entry }) => {
   const [open, setOpen] = useState(false);
 
   const toggle = useCallback(() => {
@@ -164,7 +164,7 @@ const CareerItem: React.FC<{ entry: CareerEntry }> = ({ entry }) => {
           </p>
           <button
             type="button"
-            className="flex items-center justify-center w-6 h-6 border border-border bg-background text-muted-foreground mt-2"
+            className="flex items-center justify-center w-6 h-6 border border-border bg-background text-muted-foreground mt-2 focus-visible:ring-1 focus-visible:ring-foreground active:opacity-80"
             onClick={toggle}
             aria-expanded={open}
             aria-label={open ? "Close details" : "Open details"}

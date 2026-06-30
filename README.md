@@ -1,91 +1,116 @@
 <div align="center">
-  <h1>🎨 Imaimai Portfolio</h1>
-  <p>クリエイティブなポートフォリオサイト</p>
+  <h1>Imaimai Portfolio</h1>
+  <p><a href="https://imaimai.ai">imaimai.ai</a></p>
 </div>
 
 <div align="center">
 
-  ![Next.js](https://img.shields.io/badge/Next.js-black?style=for-the-badge&logo=next.js&logoColor=white)
+  ![Next.js](https://img.shields.io/badge/Next.js_14-black?style=for-the-badge&logo=next.js&logoColor=white)
   ![TypeScript](https://img.shields.io/badge/TypeScript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
   ![TailwindCSS](https://img.shields.io/badge/Tailwind-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
   ![Bun](https://img.shields.io/badge/Bun-%23000000.svg?style=for-the-badge&logo=bun&logoColor=white)
 
 </div>
 
-## 🌟 概要
+## 概要
 
-このポートフォリオサイトは、最新のWeb技術を活用して作られた、インタラクティブで魅力的な作品集です。
-モダンなデザインと快適なユーザー体験を提供することを目指しています。
+imaimai17468 のポートフォリオサイト。和色 (Wairo) をベースにしたデザインシステムで構築。
 
-## 🎨 インスピレーション
+## 技術スタック
 
-このポートフォリオサイトは、以下の素晴らしいプロジェクトからインスピレーションを得ています：
+| カテゴリ | 技術 |
+|---------|------|
+| Framework | Next.js 14 (App Router) |
+| Language | TypeScript (strict) |
+| Styling | Tailwind CSS, shadcn/ui |
+| Build | Bun |
+| Lint / Format | OxLint + OxFmt |
+| Type Check | tsgo |
+| Analytics | Google Analytics 4 |
 
-- [Aceternity UI](https://ui.aceternity.com/)
-  モダンでインタラクティブなUIコンポーネントとアニメーション
-
-- [React Three Fiber](https://r3f.docs.pmnd.rs/getting-started/introduction)
-  没入感のある3Dグラフィックスとインタラクティブな体験
-
-## ✨ 特徴
-
-- 🎭 **ダイナミックなアニメーション**
-  スムーズな遷移とインタラクティブな要素による没入感のある体験
-
-- 🌓 **ダーク/ライトモード**
-  ユーザーの好みに合わせた快適な閲覧環境
-
-- 📱 **レスポンシブデザイン**
-  あらゆるデバイスで最適な表示を実現
-
-- ⚡ **高速なパフォーマンス**
-  Next.jsとBunによる最適化された読み込み速度
-
-## 🛠️ 技術スタック
-
-- **フレームワーク**: Next.js
-- **言語**: TypeScript
-- **スタイリング**: Tailwind CSS, shadcn/ui
-- **パッケージマネージャー**: Bun
-- **品質管理**: Biome, Lefthook
-
-## 🚀 開発環境のセットアップ
+## セットアップ
 
 ```bash
-# リポジトリのクローン
-git clone https://github.com/yourusername/imaimai-portfolio.git
-
-# 依存関係のインストール
+git clone https://github.com/imaimai17468/imaimai-portfolio-2nd.git
+cd imaimai-portfolio-2nd
 bun install
-
-# 開発サーバーの起動
-bun dev
 ```
 
-## 📂 プロジェクト構成
+### 環境変数
+
+`.env.local.example` をコピーして `.env.local` を作成し、値を設定:
+
+```bash
+cp .env.local.example .env.local
+```
+
+| 変数 | 説明 |
+|------|------|
+| `NEXT_PUBLIC_GA_ID` | GA4 測定 ID |
+| `GITHUB_TOKEN` | GitHub PAT (フィードバック Issue 投稿用) |
+| `GITHUB_REPO` | 対象リポジトリ (デフォルト: `imaimai17468/imaimai-portfolio-2nd`) |
+| `GOOGLE_SA_KEY` | GCP サービスアカウント JSON の base64 (日次レポート用) |
+| `GA4_PROPERTY_ID` | GA4 プロパティ ID (日次レポート用) |
+
+### 開発サーバー
+
+```bash
+bun run dev
+```
+
+## コマンド
+
+```bash
+bun run dev              # 開発サーバー
+bun run build            # プロダクションビルド
+bun run typecheck        # 型チェック (tsgo)
+bun run check            # OxLint + OxFmt 一括チェック
+bun run check:fix        # OxLint + OxFmt 一括修正
+```
+
+## プロジェクト構成
 
 ```
 src/
-├── app/          # ページルーティング
-├── components/   # UIコンポーネント
-│   ├── feature/  # 機能別コンポーネント
-│   ├── parts/    # 再利用可能なパーツ
-│   └── ui/       # 基本UIコンポーネント
-└── styles/       # グローバルスタイル
+├── app/
+│   ├── page.tsx                  # トップページ
+│   ├── history/                  # 経歴ページ
+│   ├── projects/                 # プロジェクトページ
+│   ├── skills/                   # スキルページ
+│   └── api/
+│       ├── analytics/            # GA4 Data API (日次レポート用)
+│       └── feedback/             # フィードバック → GitHub Issue
+├── components/
+│   ├── feature/top/              # セクションコンポーネント
+│   │   ├── hero-section/
+│   │   ├── history-section/
+│   │   ├── projects-section/
+│   │   └── skills-section/
+│   ├── shared/                   # 共有コンポーネント
+│   │   ├── ai-widget/            # AI チャットウィジェット
+│   │   ├── consent-banner/       # トラッキング同意バナー
+│   │   └── header/               # ヘッダーナビゲーション
+│   └── ui/                       # shadcn/ui プリミティブ
+├── entities/                     # Zod スキーマ + 型定義
+├── gateways/                     # データ取得関数
+├── repositories/                 # React Query カスタムフック
+└── lib/                          # ライブラリ設定
 ```
 
-## 🔄 品質管理
+## アナリティクス
 
-- **コード品質**: Biomeによる自動フォーマットとリント
-- **型チェック**: TypeScriptによる静的型チェック
-- **Git Hooks**: コミット前の自動チェック
+GA4 でユーザー行動を収集し、Claude.ai ルーティンが毎日 9:00 (JST) に分析レポートを GitHub Issue に投稿します。
 
-## 📝 ライセンス
+```
+GA4 (収集) → /api/analytics (データ取得) → Claude.ai routine (分析・投稿) → GitHub Issue
+```
 
-MIT © Imaimai Portfolio
+## ライセンス
+
+MIT
 
 ---
 
 <div align="center">
-  <p>Made with 🐸 by Imaimai</p>
+  <p>Made with 🐸 by imaimai17468</p>
 </div>
