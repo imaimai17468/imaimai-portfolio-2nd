@@ -1,6 +1,6 @@
 # Project Instructions
 
-This project runs on **Next.js 14** (App Router) with Tailwind CSS and shadcn/ui.
+This project runs on **Next.js 15** (App Router) with Tailwind CSS and shadcn/ui.
 
 ## Workflow
 
