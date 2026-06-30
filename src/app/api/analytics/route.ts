@@ -1,103 +1,133 @@
-import {
-  isAnalyticsEvent,
-  type AnalyticsEvent,
-} from "@/entities/analytics/analyticsEvent";
+import crypto from "node:crypto";
 import { NextResponse } from "next/server";
 
-export async function POST(request: Request) {
-  const body: unknown = await request.json();
+async function getGoogleAccessToken(
+  clientEmail: string,
+  privateKey: string
+): Promise<string> {
+  const now = Math.floor(Date.now() / 1000);
 
-  if (typeof body !== "object" || body === null || !("events" in body)) {
-    return NextResponse.json({ error: "Events required" }, { status: 400 });
-  }
+  const header = Buffer.from(
+    JSON.stringify({ alg: "RS256", typ: "JWT" })
+  ).toString("base64url");
 
-  const rawEvents: unknown = body.events;
-  if (!Array.isArray(rawEvents)) {
-    return NextResponse.json({ error: "Events required" }, { status: 400 });
-  }
+  const payload = Buffer.from(
+    JSON.stringify({
+      iss: clientEmail,
+      scope: "https://www.googleapis.com/auth/analytics.readonly",
+      aud: "https://oauth2.googleapis.com/token",
+      exp: now + 3600,
+      iat: now,
+    })
+  ).toString("base64url");
 
-  const events = rawEvents.filter(isAnalyticsEvent);
+  const signInput = `${header}.${payload}`;
+  const signer = crypto.createSign("RSA-SHA256");
+  signer.update(signInput);
+  const signature = signer.sign(privateKey, "base64url");
 
-  if (events.length === 0) {
-    return NextResponse.json({ error: "No valid events" }, { status: 400 });
-  }
-
-  const token = process.env.GITHUB_TOKEN;
-  const repo = process.env.GITHUB_REPO || "imaimai17468/imaimai-portfolio-2nd";
-
-  if (!token) {
-    return NextResponse.json(
-      { error: "Server configuration error" },
-      { status: 500 }
-    );
-  }
-
-  const date = new Date().toISOString().slice(0, 10);
-  const rows = events
-    .map((e: AnalyticsEvent) =>
-      e.type === "dwell"
-        ? `| dwell | ${e.path} | ${e.dwell_seconds}s | |`
-        : `| transition | ${e.from} | | ${e.from} → ${e.to} |`
-    )
-    .join("\n");
-
-  const issueBody = `## Analytics Report — ${date}\n\n| Type | Path | Dwell | Transition |\n|------|------|-------|------------|\n${rows}\n\n---\n**Timestamp:** ${new Date().toISOString()}`;
-
-  const listRes = await fetch(
-    `https://api.github.com/repos/${repo}/issues?labels=analytics&state=open&per_page=1`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/vnd.github+json",
-      },
-    }
-  );
-
-  if (listRes.ok) {
-    const existing: unknown = await listRes.json();
-    if (
-      Array.isArray(existing) &&
-      existing.length > 0 &&
-      typeof existing[0] === "object" &&
-      existing[0] !== null &&
-      "number" in existing[0]
-    ) {
-      await fetch(
-        `https://api.github.com/repos/${repo}/issues/${String(existing[0].number)}/comments`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-            Accept: "application/vnd.github+json",
-          },
-          body: JSON.stringify({ body: issueBody }),
-        }
-      );
-      return NextResponse.json({ success: true, appended: true });
-    }
-  }
-
-  const res = await fetch(`https://api.github.com/repos/${repo}/issues`, {
+  const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-      Accept: "application/vnd.github+json",
-    },
-    body: JSON.stringify({
-      title: "[Analytics] User engagement data",
-      body: issueBody,
-      labels: ["analytics"],
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+      assertion: `${signInput}.${signature}`,
     }),
   });
 
-  if (!res.ok) {
+  const tokenData: unknown = await tokenRes.json();
+
+  if (
+    typeof tokenData !== "object" ||
+    tokenData === null ||
+    !("access_token" in tokenData) ||
+    typeof tokenData.access_token !== "string"
+  ) {
+    throw new Error("Failed to obtain Google access token");
+  }
+
+  return tokenData.access_token;
+}
+
+export async function GET() {
+  const saKeyBase64 = process.env.GOOGLE_SA_KEY;
+  const propertyId = process.env.GA4_PROPERTY_ID;
+
+  if (!saKeyBase64 || !propertyId) {
     return NextResponse.json(
-      { error: "Failed to submit analytics" },
+      { error: "Missing server configuration" },
       { status: 500 }
     );
   }
 
-  return NextResponse.json({ success: true });
+  let saKey: unknown;
+  try {
+    saKey = JSON.parse(Buffer.from(saKeyBase64, "base64").toString());
+  } catch {
+    return NextResponse.json(
+      { error: "Invalid credentials format" },
+      { status: 500 }
+    );
+  }
+
+  if (
+    typeof saKey !== "object" ||
+    saKey === null ||
+    !("client_email" in saKey) ||
+    !("private_key" in saKey) ||
+    typeof saKey.client_email !== "string" ||
+    typeof saKey.private_key !== "string"
+  ) {
+    return NextResponse.json({ error: "Invalid credentials" }, { status: 500 });
+  }
+
+  let accessToken: string;
+  try {
+    accessToken = await getGoogleAccessToken(
+      saKey.client_email,
+      saKey.private_key
+    );
+  } catch {
+    return NextResponse.json(
+      { error: "Google authentication failed" },
+      { status: 500 }
+    );
+  }
+
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+
+  const reportRes = await fetch(
+    `https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:runReport`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        dateRanges: [{ startDate: yesterday, endDate: yesterday }],
+        dimensions: [
+          { name: "pagePath" },
+          { name: "sessionDefaultChannelGroup" },
+        ],
+        metrics: [
+          { name: "screenPageViews" },
+          { name: "averageSessionDuration" },
+          { name: "totalUsers" },
+          { name: "bounceRate" },
+        ],
+        metricAggregations: ["TOTAL"],
+      }),
+    }
+  );
+
+  if (!reportRes.ok) {
+    return NextResponse.json(
+      { error: "Analytics data unavailable" },
+      { status: 502 }
+    );
+  }
+
+  const report: unknown = await reportRes.json();
+  return NextResponse.json({ date: yesterday, report });
 }
