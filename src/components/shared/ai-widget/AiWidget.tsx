@@ -90,7 +90,7 @@ export const AiWidget: React.FC = () => {
         </div>
         {showInfo && (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-background"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-backdrop"
             onClick={() => setShowInfo(false)}
             role="presentation"
           >

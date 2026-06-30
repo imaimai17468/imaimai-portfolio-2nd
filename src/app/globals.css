@@ -19,6 +19,7 @@
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
     --ring: 240 5.9% 10%;
+    --backdrop: 0 0% 100% / 0.8;
     --radius: 0;
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
@@ -42,6 +43,7 @@
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
+    --backdrop: 240 10% 3.9% / 0.8;
     --card: 240 10% 3.9%;
     --card-foreground: 0 0% 98%;
     --popover: 240 10% 3.9%;
@@ -63,6 +65,9 @@
 }
 
 @layer utilities {
+  .bg-backdrop {
+    background-color: hsl(var(--backdrop));
+  }
   .text-foreground-strong {
     color: hsl(var(--foreground) / 0.8);
   }
