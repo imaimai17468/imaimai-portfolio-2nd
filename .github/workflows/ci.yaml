@@ -29,6 +29,9 @@ jobs:
     - name: Install dependencies
       run: bun install --frozen-lockfile
 
+    - name: Audit dependencies
+      run: bun pm trust --list && bun audit || true
+
     - name: Run oxlint and oxfmt
       run: bun run check
 
