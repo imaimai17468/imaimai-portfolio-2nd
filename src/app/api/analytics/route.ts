@@ -95,39 +95,62 @@ export async function GET() {
   }
 
   const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const apiUrl = `https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:runReport`;
+  const headers = {
+    Authorization: `Bearer ${accessToken}`,
+    "Content-Type": "application/json",
+  };
+  const dateRanges = [{ startDate: yesterday, endDate: yesterday }];
 
-  const reportRes = await fetch(
-    `https://analyticsdata.googleapis.com/v1beta/properties/${propertyId}:runReport`,
-    {
+  const [pagesRes, audienceRes] = await Promise.all([
+    fetch(apiUrl, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({
-        dateRanges: [{ startDate: yesterday, endDate: yesterday }],
-        dimensions: [
-          { name: "pagePath" },
-          { name: "sessionDefaultChannelGroup" },
-        ],
+        dateRanges,
+        dimensions: [{ name: "pagePath" }],
         metrics: [
           { name: "screenPageViews" },
-          { name: "averageSessionDuration" },
           { name: "totalUsers" },
+          { name: "averageSessionDuration" },
+          { name: "bounceRate" },
+          { name: "engagementRate" },
+          { name: "userEngagementDuration" },
+        ],
+        metricAggregations: ["TOTAL"],
+        orderBys: [{ metric: { metricName: "screenPageViews" }, desc: true }],
+      }),
+    }),
+    fetch(apiUrl, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        dateRanges,
+        dimensions: [
+          { name: "deviceCategory" },
+          { name: "sessionDefaultChannelGroup" },
+          { name: "newVsReturning" },
+        ],
+        metrics: [
+          { name: "totalUsers" },
+          { name: "sessions" },
+          { name: "screenPageViews" },
+          { name: "averageSessionDuration" },
           { name: "bounceRate" },
         ],
         metricAggregations: ["TOTAL"],
       }),
-    }
-  );
+    }),
+  ]);
 
-  if (!reportRes.ok) {
+  if (!pagesRes.ok || !audienceRes.ok) {
     return NextResponse.json(
       { error: "Analytics data unavailable" },
       { status: 502 }
     );
   }
 
-  const report: unknown = await reportRes.json();
-  return NextResponse.json({ date: yesterday, report });
+  const pages: unknown = await pagesRes.json();
+  const audience: unknown = await audienceRes.json();
+  return NextResponse.json({ date: yesterday, pages, audience });
 }
