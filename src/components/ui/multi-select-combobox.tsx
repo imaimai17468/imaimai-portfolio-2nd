@@ -93,7 +93,7 @@ export function MultiSelectCombobox({
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-[var(--radix-popover-trigger-width)] p-0"
+          className="w-(--radix-popover-trigger-width) p-0"
           align="start"
         >
           <Command>
@@ -143,7 +143,7 @@ export function MultiSelectCombobox({
                             e.stopPropagation();
                             handleRemove(value);
                           }}
-                          className="ml-1 rounded-sm opacity-70 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                          className="ml-1 rounded-sm opacity-70 hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2"
                           aria-label={`Remove ${label}`}
                         >
                           <X className="h-3 w-3" />

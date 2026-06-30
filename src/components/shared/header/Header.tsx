@@ -32,7 +32,7 @@ export const Header: React.FC = () => {
           <Link
             key={item.href}
             href={item.href}
-            className={`text-sm transition-colors focus-visible:underline focus-visible:outline-none ${
+            className={`text-sm transition-colors focus-visible:underline focus-visible:outline-hidden ${
               pathname === item.href
                 ? "font-medium text-foreground"
                 : "text-muted-foreground hover:text-foreground"

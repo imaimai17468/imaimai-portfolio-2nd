@@ -10,7 +10,7 @@ export const HeroSection: React.FC = () => {
           alt="imaimai17468"
           width={48}
           height={48}
-          className="flex-shrink-0"
+          className="shrink-0"
         />
         <div className="flex flex-col gap-1">
           <h1 className="text-lg font-bold text-foreground">imaimai17468</h1>
@@ -22,7 +22,7 @@ export const HeroSection: React.FC = () => {
           href="https://x.com/imaimai17468"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs text-muted-foreground hover:text-foreground focus-visible:underline focus-visible:outline-none transition-colors"
+          className="text-xs text-muted-foreground hover:text-foreground focus-visible:underline focus-visible:outline-hidden transition-colors"
         >
           X
         </Link>
@@ -30,7 +30,7 @@ export const HeroSection: React.FC = () => {
           href="https://github.com/imaimai17468"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs text-muted-foreground hover:text-foreground focus-visible:underline focus-visible:outline-none transition-colors"
+          className="text-xs text-muted-foreground hover:text-foreground focus-visible:underline focus-visible:outline-hidden transition-colors"
         >
           GitHub
         </Link>
@@ -38,7 +38,7 @@ export const HeroSection: React.FC = () => {
           href="https://sizu.me/imaimai17468"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs text-muted-foreground hover:text-foreground focus-visible:underline focus-visible:outline-none transition-colors"
+          className="text-xs text-muted-foreground hover:text-foreground focus-visible:underline focus-visible:outline-hidden transition-colors"
         >
           Blog
         </Link>
@@ -46,7 +46,7 @@ export const HeroSection: React.FC = () => {
           href="https://zenn.dev/imaimai17468"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs text-muted-foreground hover:text-foreground focus-visible:underline focus-visible:outline-none transition-colors"
+          className="text-xs text-muted-foreground hover:text-foreground focus-visible:underline focus-visible:outline-hidden transition-colors"
         >
           Zenn
         </Link>

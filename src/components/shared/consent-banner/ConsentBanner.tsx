@@ -28,7 +28,7 @@ export const ConsentBanner: React.FC = () => {
         <button
           type="button"
           onClick={accept}
-          className="flex-shrink-0 min-h-11 min-w-11 px-3 py-1 text-xs border border-border bg-background text-foreground hover:bg-secondary focus-visible:ring-1 focus-visible:ring-foreground active:opacity-80 disabled:opacity-50 disabled:pointer-events-none transition-colors"
+          className="shrink-0 min-h-11 min-w-11 px-3 py-1 text-xs border border-border bg-background text-foreground hover:bg-secondary focus-visible:ring-1 focus-visible:ring-foreground active:opacity-80 disabled:opacity-50 disabled:pointer-events-none transition-colors"
         >
           OK
         </button>
