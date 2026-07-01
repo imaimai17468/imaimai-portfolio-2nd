@@ -32,7 +32,7 @@ export const ProjectsSection: React.FC = () => {
               href={project.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 py-1 text-sm text-foreground-strong hover:text-foreground focus-visible:underline focus-visible:outline-hidden transition-colors"
+              className="inline-flex items-center gap-1.5 py-1 text-sm text-accent hover:text-accent-hover focus-visible:underline focus-visible:outline-hidden transition-colors"
             >
               {project.title}
               <span className="text-muted-foreground text-xs">↗</span>
