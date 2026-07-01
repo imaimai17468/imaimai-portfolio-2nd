@@ -72,8 +72,8 @@ jobs:
               .metricValues[0].value + " | " +
               .metricValues[1].value + " | " +
               (.metricValues[2].value | tonumber | . * 10 | round / 10 | tostring) + " | " +
-              (.metricValues[3].value | tonumber | . * 100 | round / 100 | tostring) + "% | " +
-              (.metricValues[4].value | tonumber | . * 100 | round / 100 | tostring) + "% | " +
+              (.metricValues[3].value | tonumber | . * 10000 | round / 100 | tostring) + "% | " +
+              (.metricValues[4].value | tonumber | . * 10000 | round / 100 | tostring) + "% | " +
               .metricValues[5].value + " |"] |
             .[]' /tmp/ga4-data.json)
 
@@ -81,8 +81,8 @@ jobs:
             .pages.totals[0].metricValues |
             "| **合計** | " + .[0].value + " | " + .[1].value + " | " +
             (.[2].value | tonumber | . * 10 | round / 10 | tostring) + " | " +
-            (.[3].value | tonumber | . * 100 | round / 100 | tostring) + "% | " +
-            (.[4].value | tonumber | . * 100 | round / 100 | tostring) + "% | " +
+            (.[3].value | tonumber | . * 10000 | round / 100 | tostring) + "% | " +
+            (.[4].value | tonumber | . * 10000 | round / 100 | tostring) + "% | " +
             .[5].value + " |"' /tmp/ga4-data.json)
 
           AUDIENCE_TABLE=$(jq -r '
@@ -96,7 +96,7 @@ jobs:
               .metricValues[1].value + " | " +
               .metricValues[2].value + " | " +
               (.metricValues[3].value | tonumber | . * 10 | round / 10 | tostring) + " | " +
-              (.metricValues[4].value | tonumber | . * 100 | round / 100 | tostring) + "% |"] |
+              (.metricValues[4].value | tonumber | . * 10000 | round / 100 | tostring) + "% |"] |
             .[]' /tmp/ga4-data.json)
 
           QUOTA=$(jq -r '
