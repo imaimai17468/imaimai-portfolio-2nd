@@ -129,7 +129,7 @@ export const AiWidget: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowInfo(false)}
-                className="mt-4 px-3 py-1 text-xs border border-border bg-background text-foreground hover:bg-secondary focus-visible:ring-1 focus-visible:ring-foreground active:opacity-80 transition-colors"
+                className="mt-4 min-h-11 min-w-11 px-3 py-1 text-xs border border-border bg-background text-foreground hover:bg-secondary focus-visible:ring-1 focus-visible:ring-foreground active:opacity-80 transition-colors"
               >
                 閉じる
               </button>
@@ -162,7 +162,7 @@ export const AiWidget: React.FC = () => {
                 type="button"
                 onClick={handleSubmit}
                 disabled={status === "sending"}
-                className="shrink-0 px-4 py-1.5 text-xs border border-border bg-background text-muted-foreground hover:text-foreground hover:border-foreground focus-visible:ring-1 focus-visible:ring-foreground active:opacity-80 disabled:opacity-50 disabled:pointer-events-none transition-colors mb-0.5"
+                className="shrink-0 min-h-11 min-w-11 px-4 py-1.5 text-xs border border-border bg-background text-muted-foreground hover:text-foreground hover:border-foreground focus-visible:ring-1 focus-visible:ring-foreground active:opacity-80 disabled:opacity-50 disabled:pointer-events-none transition-colors"
               >
                 {status === "sending" ? "送信中..." : "送信"}
               </button>
