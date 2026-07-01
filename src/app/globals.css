@@ -40,8 +40,8 @@
   --accent-foreground: hsl(0 0% 98%);
   --destructive: hsl(0 62.8% 30.6%);
   --destructive-foreground: hsl(0 0% 98%);
-  --border: hsl(240 3.7% 15.9%);
-  --input: hsl(240 3.7% 15.9%);
+  --border: hsl(240 3.7% 38%);
+  --input: hsl(240 3.7% 38%);
   --ring: hsl(240 4.9% 83.9%);
   --backdrop: hsl(240 10% 3.9% / 0.8);
   --card: hsl(240 10% 3.9%);
@@ -145,5 +145,14 @@
     position: absolute;
     left: -0.75rem;
     color: var(--muted-foreground);
+  }
+}
+
+@utility tap-target-44 {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -0.625rem;
   }
 }
