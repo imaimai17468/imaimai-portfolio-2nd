@@ -99,16 +99,24 @@ src/
 
 ## アナリティクス
 
-GA4 でユーザー行動を収集し、Claude Code Remote のルーティン (cron) が毎朝 9:00 (JST) に `/api/analytics` 経由でデータを取得、分析レポートを PR として作成します。
+GA4 でユーザー行動を収集し、GitHub Actions + Claude Code ルーティンで毎朝自動分析・改善 PR を作成します。
 
 ```
 ユーザー → GA4 (収集)
                 ↓
-Claude Code Remote routine (毎朝 9:00 JST)
-  1. /api/analytics → GA4 Data API でページ別・オーディエンス指標を取得
-  2. レポート分析・要約
-  3. GitHub PR を作成
+GitHub Actions (毎朝 8:50 JST)
+  1. GA4 Data API → analytics-data Issue に投稿
+                ↓
+Claude Code ルーティン (毎朝 9:00 JST)
+  2. analytics-data Issue + feedback Issue を読み取り
+  3. 分析レポート → analytics-report Issue に投稿
+  4. 改善 PR を作成（複数可）
+                ↓
+Claude Code ルーティン (毎朝 9:30 JST)
+  5. PR レビュー → approve or request-changes
 ```
+
+詳細は [docs/analytics-routine.md](docs/analytics-routine.md) を参照。
 
 ## ライセンス
 
