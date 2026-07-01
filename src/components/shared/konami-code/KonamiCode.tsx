@@ -24,7 +24,13 @@ export const KonamiCode: React.FC = () => {
     const handler = (e: KeyboardEvent) => {
       const expected = SEQUENCE[progressRef.current];
       const matches = e.key.toLowerCase() === expected?.toLowerCase();
-      progressRef.current = matches ? progressRef.current + 1 : 0;
+      const restartsSequence =
+        e.key.toLowerCase() === SEQUENCE[0].toLowerCase();
+      progressRef.current = matches
+        ? progressRef.current + 1
+        : restartsSequence
+          ? 1
+          : 0;
       if (progressRef.current === SEQUENCE.length) {
         progressRef.current = 0;
         setFound(true);
