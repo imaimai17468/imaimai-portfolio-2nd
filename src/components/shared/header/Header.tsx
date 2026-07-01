@@ -45,7 +45,7 @@ export const Header: React.FC = () => {
       <button
         type="button"
         onClick={toggleTheme}
-        className="flex items-center justify-center w-8 h-8 border border-border bg-background text-sm text-muted-foreground hover:text-foreground hover:border-foreground focus-visible:ring-1 focus-visible:ring-foreground active:opacity-80 transition-colors"
+        className="tap-target-44 flex items-center justify-center w-8 h-8 border border-border bg-background text-sm text-muted-foreground hover:text-foreground hover:border-foreground focus-visible:ring-1 focus-visible:ring-foreground active:opacity-80 transition-colors"
         aria-label="Toggle theme"
       >
         {mounted ? (resolvedTheme === "dark" ? "☀" : "☾") : ""}
