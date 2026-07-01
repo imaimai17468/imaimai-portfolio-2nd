@@ -6,10 +6,7 @@
   "session_context": {
     "allowed_tools": [
       "preset:default", "Task", "Bash",
-      "Bash(git commit:*)", "Bash(git checkout:*)", "Bash(git push:*)",
-      "Bash(git add:*)", "Bash(git branch:*)",
-      "Bash(gh pr create:*)", "Bash(gh issue:*)", "Bash(gh issue close:*)",
-      "Bash(gh repo clone:*)",
+      "Bash(git:*)", "Bash(gh:*)",
       "Glob", "Grep", "Read", "Edit", "MultiEdit", "Write",
       "NotebookEdit", "WebFetch", "TodoWrite", "WebSearch",
       "BashOutput", "KillBash", "Skill", "Tmux", "Monitor",
