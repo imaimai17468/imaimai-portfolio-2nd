@@ -3,6 +3,7 @@ import "./globals.css";
 import { AiWidget } from "@/components/shared/ai-widget/AiWidget";
 import { ConsentBanner } from "@/components/shared/consent-banner/ConsentBanner";
 import { Header } from "@/components/shared/header/Header";
+import { KonamiCode } from "@/components/shared/konami-code/KonamiCode";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { ThemeProvider } from "next-themes";
 
@@ -69,6 +70,7 @@ export default function RootLayout({
             </footer>
           </div>
         </ThemeProvider>
+        <KonamiCode />
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID ?? ""} />
       </body>
     </html>
