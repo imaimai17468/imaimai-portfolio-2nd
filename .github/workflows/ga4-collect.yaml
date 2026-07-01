@@ -57,21 +57,85 @@ jobs:
             '{date: $date, pages: $pages, audience: $audience}' > /tmp/ga4-data.json
           echo "DATE=$YESTERDAY" >> "$GITHUB_ENV"
 
-      - name: Post to GitHub Issue
+      - name: Format and post to GitHub Issue
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           REPO="imaimai17468/imaimai-portfolio-2nd"
           LABEL="analytics-data"
-          ISSUE_NUM=$(gh issue list -R "$REPO" -l "$LABEL" --state open --json number -q '.[0].number' 2>/dev/null || echo "")
-          BODY="## GA4 Raw Data — ${DATE}
+
+          PAGES_TABLE=$(jq -r '
+            .pages.rows // [] | sort_by(-.metricValues[0].value | tonumber) |
+            ["| ページ | PV | ユーザー | 平均滞在(s) | 直帰率 | エンゲージメント率 | エンゲージメント時間(s) |",
+             "|---|---|---|---|---|---|---|"] +
+            [.[] | "| " + .dimensionValues[0].value + " | " +
+              .metricValues[0].value + " | " +
+              .metricValues[1].value + " | " +
+              (.metricValues[2].value | tonumber | . * 10 | round / 10 | tostring) + " | " +
+              (.metricValues[3].value | tonumber | . * 100 | round / 100 | tostring) + "% | " +
+              (.metricValues[4].value | tonumber | . * 100 | round / 100 | tostring) + "% | " +
+              .metricValues[5].value + " |"] |
+            .[]' /tmp/ga4-data.json)
+
+          TOTALS=$(jq -r '
+            .pages.totals[0].metricValues |
+            "| **合計** | " + .[0].value + " | " + .[1].value + " | " +
+            (.[2].value | tonumber | . * 10 | round / 10 | tostring) + " | " +
+            (.[3].value | tonumber | . * 100 | round / 100 | tostring) + "% | " +
+            (.[4].value | tonumber | . * 100 | round / 100 | tostring) + "% | " +
+            .[5].value + " |"' /tmp/ga4-data.json)
+
+          AUDIENCE_TABLE=$(jq -r '
+            .audience.rows // [] |
+            ["| デバイス | チャネル | 新規/再訪 | ユーザー | セッション | PV | 平均滞在(s) | 直帰率 |",
+             "|---|---|---|---|---|---|---|---|"] +
+            [.[] | "| " + .dimensionValues[0].value + " | " +
+              .dimensionValues[1].value + " | " +
+              .dimensionValues[2].value + " | " +
+              .metricValues[0].value + " | " +
+              .metricValues[1].value + " | " +
+              .metricValues[2].value + " | " +
+              (.metricValues[3].value | tonumber | . * 10 | round / 10 | tostring) + " | " +
+              (.metricValues[4].value | tonumber | . * 100 | round / 100 | tostring) + "% |"] |
+            .[]' /tmp/ga4-data.json)
+
+          QUOTA=$(jq -r '
+            .pages.propertyQuota |
+            "| トークン/日 | " + (.tokensPerDay.consumed | tostring) + " / " + ((.tokensPerDay.consumed + .tokensPerDay.remaining) | tostring) +
+            " | トークン/時 | " + (.tokensPerHour.consumed | tostring) + " / " + ((.tokensPerHour.consumed + .tokensPerHour.remaining) | tostring) + " |"' /tmp/ga4-data.json)
+
+          BODY=$(cat <<MARKDOWN
+          ## GA4 Analytics — ${DATE}
+
+          ### ページ別パフォーマンス
+
+          ${PAGES_TABLE}
+          ${TOTALS}
+
+          ### オーディエンス内訳
+
+          ${AUDIENCE_TABLE}
+
+          ### クォータ状況
+
+          | 項目 | 消費/上限 | 項目 | 消費/上限 |
+          |---|---|---|---|
+          ${QUOTA}
+
+          <details>
+          <summary>Raw JSON</summary>
 
           \`\`\`json
           $(cat /tmp/ga4-data.json)
           \`\`\`
 
-          _Updated by [ga4-collect workflow](https://github.com/${REPO}/actions/workflows/ga4-collect.yaml)_"
+          </details>
 
+          _Updated by [ga4-collect workflow](https://github.com/${REPO}/actions/workflows/ga4-collect.yaml)_
+          MARKDOWN
+          )
+
+          ISSUE_NUM=$(gh issue list -R "$REPO" -l "$LABEL" --state open --json number -q '.[0].number' 2>/dev/null || echo "")
           if [ -n "$ISSUE_NUM" ]; then
             gh issue comment "$ISSUE_NUM" -R "$REPO" --body "$BODY"
           else
