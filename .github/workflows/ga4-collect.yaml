@@ -1,0 +1,79 @@
+name: Collect GA4 Analytics Data
+
+on:
+  schedule:
+    - cron: "50 23 * * *" # 8:50 JST (10分後にルーチンが読む)
+  workflow_dispatch: {}
+
+permissions:
+  issues: write
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch GA4 data
+        env:
+          GOOGLE_SA_KEY: ${{ secrets.GOOGLE_SA_KEY }}
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+        run: |
+          SA_JSON=$(printf '%s' "$GOOGLE_SA_KEY" | base64 -d)
+          CLIENT_EMAIL=$(echo "$SA_JSON" | jq -r '.client_email')
+          PRIVATE_KEY=$(echo "$SA_JSON" | jq -r '.private_key')
+          NOW=$(date +%s)
+          EXP=$((NOW + 3600))
+          b64url() { openssl base64 -e -A | tr '+/' '-_' | tr -d '='; }
+          HEADER=$(printf '{"alg":"RS256","typ":"JWT"}' | b64url)
+          PAYLOAD=$(printf '{"iss":"%s","scope":"https://www.googleapis.com/auth/analytics.readonly","aud":"https://oauth2.googleapis.com/token","exp":%d,"iat":%d}' "$CLIENT_EMAIL" "$EXP" "$NOW" | b64url)
+          SIGN_INPUT="${HEADER}.${PAYLOAD}"
+          SIGNATURE=$(printf '%s' "$SIGN_INPUT" | openssl dgst -sha256 -sign <(printf '%s' "$PRIVATE_KEY") | b64url)
+          JWT="${SIGN_INPUT}.${SIGNATURE}"
+          ACCESS_TOKEN=$(curl -s -X POST https://oauth2.googleapis.com/token \
+            -H "Content-Type: application/x-www-form-urlencoded" \
+            -d "grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${JWT}" | jq -r '.access_token')
+          if [ -z "$ACCESS_TOKEN" ] || [ "$ACCESS_TOKEN" = "null" ]; then
+            echo "::error::Failed to obtain access token"
+            exit 1
+          fi
+          YESTERDAY=$(date -u -d "yesterday" +%Y-%m-%d)
+          API_URL="https://analyticsdata.googleapis.com/v1beta/properties/${GA4_PROPERTY_ID}:runReport"
+          AUTH="Authorization: Bearer ${ACCESS_TOKEN}"
+          PAGES=$(curl -s -X POST "$API_URL" -H "$AUTH" -H "Content-Type: application/json" -d '{
+            "dateRanges":[{"startDate":"'$YESTERDAY'","endDate":"'$YESTERDAY'"}],
+            "dimensions":[{"name":"pagePath"}],
+            "metrics":[{"name":"screenPageViews"},{"name":"totalUsers"},{"name":"averageSessionDuration"},{"name":"bounceRate"},{"name":"engagementRate"},{"name":"userEngagementDuration"}],
+            "metricAggregations":["TOTAL"],
+            "orderBys":[{"metric":{"metricName":"screenPageViews"},"desc":true}],
+            "returnPropertyQuota":true
+          }')
+          AUDIENCE=$(curl -s -X POST "$API_URL" -H "$AUTH" -H "Content-Type: application/json" -d '{
+            "dateRanges":[{"startDate":"'$YESTERDAY'","endDate":"'$YESTERDAY'"}],
+            "dimensions":[{"name":"deviceCategory"},{"name":"sessionDefaultChannelGroup"},{"name":"newVsReturning"}],
+            "metrics":[{"name":"totalUsers"},{"name":"sessions"},{"name":"screenPageViews"},{"name":"averageSessionDuration"},{"name":"bounceRate"}],
+            "metricAggregations":["TOTAL"],
+            "returnPropertyQuota":true
+          }')
+          jq -n --arg date "$YESTERDAY" --argjson pages "$PAGES" --argjson audience "$AUDIENCE" \
+            '{date: $date, pages: $pages, audience: $audience}' > /tmp/ga4-data.json
+          echo "DATE=$YESTERDAY" >> "$GITHUB_ENV"
+
+      - name: Post to GitHub Issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REPO="imaimai17468/imaimai-portfolio-2nd"
+          LABEL="analytics-data"
+          ISSUE_NUM=$(gh issue list -R "$REPO" -l "$LABEL" --state open --json number -q '.[0].number' 2>/dev/null || echo "")
+          BODY="## GA4 Raw Data — ${DATE}
+
+          \`\`\`json
+          $(cat /tmp/ga4-data.json)
+          \`\`\`
+
+          _Updated by [ga4-collect workflow](https://github.com/${REPO}/actions/workflows/ga4-collect.yaml)_"
+
+          if [ -n "$ISSUE_NUM" ]; then
+            gh issue comment "$ISSUE_NUM" -R "$REPO" --body "$BODY"
+          else
+            gh issue create -R "$REPO" --title "GA4 Analytics Data (auto-updated)" --label "$LABEL" --body "$BODY"
+          fi

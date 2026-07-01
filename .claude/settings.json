@@ -4,7 +4,6 @@
   },
   "permissions": {
     "allow": [
-      "mcp__*",
       "WebSearch",
       "WebFetch",
       "Bash(tree:*)",
@@ -97,14 +96,6 @@
       "Bash(cp:*)"
     ]
   },
-  "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [
-    "context7",
-    "serena",
-    "chrome-devtools",
-    "next-devtools",
-    "kiri"
-  ],
   "hooks": {
     "PostToolUse": [
       {
