@@ -1,6 +1,6 @@
 <div align="center">
   <h1>Imaimai Portfolio</h1>
-  <p><a href="https://imaimai.ai">imaimai.ai</a></p>
+  <p><a href="https://imaim.ai">imaim.ai</a></p>
 </div>
 
 <div align="center">

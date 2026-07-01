@@ -49,3 +49,4 @@ storybook-static
 .superpowers/
 .claude/scheduled_tasks.lock
 .claude/.review-stamp
+.env*.local
