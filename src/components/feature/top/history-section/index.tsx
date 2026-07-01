@@ -164,7 +164,7 @@ const HistoryItem: React.FC<{ entry: HistoryEntry }> = ({ entry }) => {
           </p>
           <button
             type="button"
-            className="flex items-center justify-center w-6 h-6 border border-border bg-background text-muted-foreground mt-2 focus-visible:ring-1 focus-visible:ring-foreground active:opacity-80"
+            className="tap-target-44 flex items-center justify-center w-6 h-6 border border-border bg-background text-muted-foreground mt-2 hover:text-foreground hover:border-foreground focus-visible:ring-1 focus-visible:ring-foreground active:opacity-80 transition-colors"
             onClick={toggle}
             aria-expanded={open}
             aria-label={open ? "Close details" : "Open details"}
