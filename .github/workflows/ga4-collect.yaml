@@ -65,7 +65,7 @@ jobs:
           LABEL="analytics-data"
 
           PAGES_TABLE=$(jq -r '
-            .pages.rows // [] | sort_by(-.metricValues[0].value | tonumber) |
+            .pages.rows // [] | sort_by(-(.metricValues[0].value | tonumber)) |
             ["| ページ | PV | ユーザー | 平均滞在(s) | 直帰率 | エンゲージメント率 | エンゲージメント時間(s) |",
              "|---|---|---|---|---|---|---|"] +
             [.[] | "| " + .dimensionValues[0].value + " | " +
