@@ -136,3 +136,12 @@
     color: var(--muted-foreground);
   }
 }
+
+@utility tap-target-44 {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -0.625rem;
+  }
+}
