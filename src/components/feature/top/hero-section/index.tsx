@@ -22,7 +22,7 @@ export const HeroSection: React.FC = () => {
           href="https://x.com/imaimai17468"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs text-muted-foreground hover:text-foreground focus-visible:underline focus-visible:outline-hidden transition-colors"
+          className="text-xs text-accent hover:text-accent-hover focus-visible:underline focus-visible:outline-hidden transition-colors"
         >
           X
         </Link>
@@ -30,7 +30,7 @@ export const HeroSection: React.FC = () => {
           href="https://github.com/imaimai17468"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs text-muted-foreground hover:text-foreground focus-visible:underline focus-visible:outline-hidden transition-colors"
+          className="text-xs text-accent hover:text-accent-hover focus-visible:underline focus-visible:outline-hidden transition-colors"
         >
           GitHub
         </Link>
@@ -38,7 +38,7 @@ export const HeroSection: React.FC = () => {
           href="https://sizu.me/imaimai17468"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs text-muted-foreground hover:text-foreground focus-visible:underline focus-visible:outline-hidden transition-colors"
+          className="text-xs text-accent hover:text-accent-hover focus-visible:underline focus-visible:outline-hidden transition-colors"
         >
           Blog
         </Link>
@@ -46,7 +46,7 @@ export const HeroSection: React.FC = () => {
           href="https://zenn.dev/imaimai17468"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs text-muted-foreground hover:text-foreground focus-visible:underline focus-visible:outline-hidden transition-colors"
+          className="text-xs text-accent hover:text-accent-hover focus-visible:underline focus-visible:outline-hidden transition-colors"
         >
           Zenn
         </Link>

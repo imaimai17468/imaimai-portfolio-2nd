@@ -120,7 +120,7 @@ export const AiWidget: React.FC = () => {
                     href="https://github.com/imaimai17468/imaimai-portfolio-2nd/blob/main/docs/analytics-routine.md"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="underline hover:text-foreground transition-colors"
+                    className="text-accent underline hover:text-accent-hover transition-colors"
                   >
                     仕組みの詳細
                   </a>
