@@ -44,7 +44,9 @@ claude.ai ルーチン環境は egress ポリシーでカスタムドメイン�
 ### Phase 1: データ収集
 
 1. `analytics-data` ラベルの Issue から最新の GA4 データ（JSON）を読み取る
-2. `gh issue list -l feedback --state open` でフィードバック Issue 確認
+2. `feedback` ラベルの open Issue を全件確認
+
+Issue の読み書きはすべてクラウドセッション組み込みの GitHub ツールで行う（`gh` CLI は未インストール。後述の「クラウドセッションの制約」参照）。
 
 ### Phase 1.5: Issue 整理
 
@@ -56,10 +58,23 @@ GitHub Issue (`analytics-report` ラベル) にレポートを投稿。
 
 ### Phase 3: 自動改善 PR 作成
 
-- 改善ごとに `fix/daily-improvement-YYYY-MM-DD-N` ブランチを作成
+- 改善ごとに `git checkout -b fix/daily-improvement-YYYY-MM-DD-N main` でブランチを新規作成（`-B` での上書きは禁止。同名衝突時は別名を使う）
 - 1 PR = 1 改善（複数あれば複数 PR を積極的に作成）
 - `bun run check` + `bun run typecheck` を通す
 - デザイン判断を伴う変更も、デザインシステム準拠であれば PR を出す
+- PR 作成は組み込みの GitHub / PR 作成機能で行い、使えない場合は push 済みブランチ名と PR 本文案を analytics-report Issue にコメントしてオーナーの手動作成に委ねる
+
+## クラウドセッションの制約（トラブルシュート履歴）
+
+無人実行（cron）は承認プロンプトに答えられないため、以下の制約を守らないと実行が停止する。2026-07-02〜03 の調査で確定したもの:
+
+| 制約 | 理由 | 対策 |
+|------|------|------|
+| committed `.claude/settings.json` に git/gh の `ask` ルールを置かない | 明示的な ask ルールは全 permission モードで適用され、クラウドセッション（クローンに settings.json が含まれる）でも承認待ちになる | git/gh の ask はローカル専用の `.claude/settings.local.json`（git 管理外）に置く。`deny` の破壊操作ガードは committed 側に残してよい |
+| `gh` CLI を前提にしない | クラウドセッションに `gh` は未インストールが仕様 | Issue/PR 操作は組み込み GitHub ツールを使う。どうしても gh が必要なら環境の setup script で `apt install -y gh` + 環境変数 `GH_TOKEN` |
+| `git fetch` / `git pull` をしない | クローンはセッション開始時点で最新。不要なうえ停止要因になる | ネットワーク git は自分のブランチの `git push` のみ |
+| 破壊的 git（`checkout -B` / `reset --hard` / `push --force` / `clean` / `branch -D`）を使わない | プラットフォームの安全分類器が承認対象にする（settings では回避不可） | ブランチは常に `-b` で新規名作成 |
+| 手動実行（run now）で無人動作を検証しない | 手動実行は cron 発火と環境・権限挙動が異なる場合がある | 検証は cron 実行の成果物（analytics-report Issue / PR）で行う |
 
 ## ルーティン B: PR Review
 
@@ -67,8 +82,13 @@ GitHub Issue (`analytics-report` ラベル) にレポートを投稿。
 |------|-----|
 | スケジュール | `30 0 * * *` (毎日 0:30 UTC / 9:30 JST) |
 | モード | 毎回新規セッション |
+| プロンプト | `.claude/routines/pr-review.json` に保存 |
 
 レビューのみ行い、マージは行わない。マージはオーナーが判断する。
+
+- open PR の一覧・diff 取得・レビュー投稿はすべて組み込み GitHub ツールで行う（gh CLI 未使用）
+- 周辺コードの文脈確認には sources でチェックアウトされた main を使う（PR ブランチの checkout はしない）
+- git の書き込み操作は一切行わない
 
 ## 必要なインフラ
 
