@@ -1,11 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { AiWidget } from "@/components/shared/ai-widget/AiWidget";
-import { ConsentBanner } from "@/components/shared/consent-banner/ConsentBanner";
-import { Header } from "@/components/shared/header/Header";
-import { KonamiCode } from "@/components/shared/konami-code/KonamiCode";
-import { GoogleAnalytics } from "@next/third-parties/google";
-import { ThemeProvider } from "next-themes";
+import { NextPageLink } from "@/components/shared/next-page-link/NextPageLink";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://imaim.ai"),
@@ -46,10 +41,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#000000" },
-  ],
+  themeColor: "#fafafa",
 };
 
 export default function RootLayout({
@@ -58,20 +50,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja" suppressHydrationWarning>
+    <html lang="ja">
       <body>
-        <ThemeProvider attribute="class" defaultTheme="dark">
-          <div className="min-h-screen flex flex-col max-w-2xl mx-auto">
-            <Header />
-            <main className="flex-1">{children}</main>
-            <footer>
-              <AiWidget />
-              <ConsentBanner />
-            </footer>
-          </div>
-        </ThemeProvider>
-        <KonamiCode />
-        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID ?? ""} />
+        <div className="min-h-screen max-w-2xl mx-auto flex flex-col">
+          <div className="flex-1">{children}</div>
+          <NextPageLink />
+        </div>
       </body>
     </html>
   );
