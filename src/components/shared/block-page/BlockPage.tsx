@@ -10,7 +10,7 @@ type BlockPageProps = {
 };
 
 const FADE_OUT_DURATION = 300;
-const ZOOM_OUT_DURATION = 600;
+const ZOOM_OUT_DURATION = 1200;
 
 function calcBlockScale(
   vw: number,
@@ -60,6 +60,14 @@ export const BlockPage: React.FC<BlockPageProps> = ({ blockKey, children }) => {
   }, []);
 
   useEffect(() => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.body.style.backgroundColor = "var(--background)";
+      });
+    });
+  }, []);
+
+  useEffect(() => {
     if (!block) return;
     const update = () => {
       const dvh = window.visualViewport?.height ?? window.innerHeight;
@@ -85,7 +93,7 @@ export const BlockPage: React.FC<BlockPageProps> = ({ blockKey, children }) => {
       const zoomStart = performance.now();
       const animateZoom = (now2: number) => {
         const t2 = Math.min((now2 - zoomStart) / ZOOM_OUT_DURATION, 1);
-        const eased = t2 * t2;
+        const eased = 1 - (1 - t2) * (1 - t2) * (1 - t2);
         setZoomOut(eased);
         if (t2 < 1) {
           requestAnimationFrame(animateZoom);

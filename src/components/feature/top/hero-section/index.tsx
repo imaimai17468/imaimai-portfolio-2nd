@@ -9,7 +9,7 @@ const BLACK_SCALE = 30;
 const FINAL_SCALE = 1;
 const INTRO_DELAY = 300;
 const INTRO_DURATION = 2000;
-const ZOOM_DURATION = 600;
+const ZOOM_DURATION = 1200;
 const SPACER_HEIGHT = 1800;
 const PADDING = 16;
 
@@ -43,7 +43,7 @@ function calcLayout(vw: number, vh: number): Layout {
   const sR = (vw - elLeft - cx - PADDING) / dR;
   const sT = (elTop + cy - PADDING) / dT;
   const sB = (vh - elTop - cy - PADDING) / dB;
-  const singleBlockScale = Math.min(sL, sR, sT, sB) * 1.3;
+  const singleBlockScale = Math.min(sL, sR, sT, sB) * 0.85;
   return { elSize, singleBlockScale };
 }
 
@@ -98,6 +98,7 @@ export const HeroSection: React.FC = () => {
 
   useEffect(() => {
     if (skipIntro) {
+      document.body.style.backgroundColor = "var(--background)";
       const max = document.documentElement.scrollHeight - window.innerHeight;
       window.scrollTo(0, max);
       return;
@@ -116,6 +117,7 @@ export const HeroSection: React.FC = () => {
         } else {
           phaseRef.current = "ready";
           setPhase("ready");
+          document.body.style.backgroundColor = "var(--background)";
         }
       };
       frame = requestAnimationFrame(animate);
@@ -154,11 +156,12 @@ export const HeroSection: React.FC = () => {
       const start = performance.now();
       const animate = (now: number) => {
         const t = Math.min((now - start) / ZOOM_DURATION, 1);
-        const eased = 1 - (1 - t) * (1 - t) * (1 - t);
+        const eased = t * t * t;
         setZoom({ block, progress: eased, targetScale });
         if (t < 1) {
           requestAnimationFrame(animate);
         } else {
+          document.body.style.backgroundColor = "#0A0A0A";
           router.push(block.href);
         }
       };
@@ -304,7 +307,10 @@ export const HeroSection: React.FC = () => {
               <p className="text-sm text-muted">Engineer</p>
             </div>
           </div>
-          <div className="flex items-center gap-4 pointer-events-auto">
+          <div
+            className="flex items-center gap-4"
+            style={{ pointerEvents: profileOpacity > 0 ? "auto" : "none" }}
+          >
             <a
               href="https://x.com/imaimai17468"
               target="_blank"
