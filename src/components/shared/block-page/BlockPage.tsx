@@ -133,11 +133,11 @@ export const BlockPage: React.FC<BlockPageProps> = ({ blockKey, children }) => {
             xmlns="http://www.w3.org/2000/svg"
             className="w-full h-full"
           >
-            <path d={block.path} fill="#0A0A0A" />
+            <path d={block.path} fill="var(--block-surface)" />
             {zoomOut > 0.3 && (
               <g style={{ opacity: Math.min(1, (zoomOut - 0.3) / 0.4) }}>
                 {BLOCKS.filter((b) => b.key !== block.key).map((b) => (
-                  <path key={b.key} d={b.path} fill="#0A0A0A" />
+                  <path key={b.key} d={b.path} fill="var(--block-surface)" />
                 ))}
               </g>
             )}
@@ -150,7 +150,7 @@ export const BlockPage: React.FC<BlockPageProps> = ({ blockKey, children }) => {
                     y={b.cy}
                     textAnchor="middle"
                     dominantBaseline="central"
-                    fill="#FAFAFA"
+                    fill="var(--background)"
                     fontSize="5"
                     fontWeight="300"
                   >
@@ -171,7 +171,7 @@ export const BlockPage: React.FC<BlockPageProps> = ({ blockKey, children }) => {
           <button
             type="button"
             onClick={handleBack}
-            className="text-sm text-muted hover:text-background transition-colors mb-6 px-6"
+            className="text-sm text-muted hover:text-background transition-colors mb-6 px-6 focus-visible:underline focus-visible:outline-hidden active:opacity-80"
           >
             ← Index
           </button>

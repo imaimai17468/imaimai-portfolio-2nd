@@ -161,7 +161,7 @@ export const HeroSection: React.FC = () => {
         if (t < 1) {
           requestAnimationFrame(animate);
         } else {
-          document.body.style.backgroundColor = "#0A0A0A";
+          document.body.style.backgroundColor = "var(--block-surface)";
           router.push(block.href);
         }
       };
@@ -240,19 +240,19 @@ export const HeroSection: React.FC = () => {
           >
             {zoom ? (
               <>
-                <path d={zoom.block.path} fill="#0A0A0A" />
+                <path d={zoom.block.path} fill="var(--block-surface)" />
                 <g style={{ opacity: otherBlocksOpacity }}>
                   {BLOCKS.filter((b) => b.key !== zoom.block.key).map((b) => (
-                    <path key={b.key} d={b.path} fill="#0A0A0A" />
+                    <path key={b.key} d={b.path} fill="var(--block-surface)" />
                   ))}
                 </g>
               </>
             ) : (
               <>
-                <path d={BLOCKS[0].path} fill="#0A0A0A" />
+                <path d={BLOCKS[0].path} fill="var(--block-surface)" />
                 <g style={{ opacity: otherBlocksOpacity }}>
                   {BLOCKS.slice(1).map((b) => (
-                    <path key={b.key} d={b.path} fill="#0A0A0A" />
+                    <path key={b.key} d={b.path} fill="var(--block-surface)" />
                   ))}
                 </g>
               </>
@@ -263,20 +263,27 @@ export const HeroSection: React.FC = () => {
                 className="pointer-events-auto"
               >
                 {BLOCKS.map((b) => (
-                  <text
+                  <a
                     key={b.key}
-                    x={b.cx}
-                    y={b.cy}
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                    fill="#FAFAFA"
-                    fontSize="5"
-                    fontWeight="300"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => navigateToBlock(b.key)}
+                    href={b.href}
+                    className="cursor-pointer outline-none focus-visible:underline focus-visible:outline-hidden"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigateToBlock(b.key);
+                    }}
                   >
-                    {b.label}
-                  </text>
+                    <text
+                      x={b.cx}
+                      y={b.cy}
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                      fill="var(--background)"
+                      fontSize="5"
+                      fontWeight="300"
+                    >
+                      {b.label}
+                    </text>
+                  </a>
                 ))}
               </g>
             )}
@@ -285,7 +292,7 @@ export const HeroSection: React.FC = () => {
       </div>
 
       <div
-        className="fixed inset-0 z-20 flex items-center justify-center pointer-events-none transition-opacity duration-700 ease-out"
+        className="fixed inset-0 z-20 flex items-center justify-center pointer-events-none"
         style={{
           opacity: profileOpacity,
           transform: `translate(${centroidDx}px, ${centroidDy}px) scale(${scale / layout.singleBlockScale})`,
@@ -315,7 +322,7 @@ export const HeroSection: React.FC = () => {
               href="https://x.com/imaimai17468"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-muted hover:text-background transition-colors"
+              className="text-xs text-muted hover:text-background transition-colors focus-visible:underline focus-visible:outline-hidden"
             >
               X
             </a>
@@ -323,13 +330,13 @@ export const HeroSection: React.FC = () => {
               href="https://github.com/imaimai17468"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-muted hover:text-background transition-colors"
+              className="text-xs text-muted hover:text-background transition-colors focus-visible:underline focus-visible:outline-hidden"
             >
               GitHub
             </a>
             <a
               href="mailto:contact@imaim.ai"
-              className="text-xs text-muted hover:text-background transition-colors"
+              className="text-xs text-muted hover:text-background transition-colors focus-visible:underline focus-visible:outline-hidden"
             >
               contact@imaim.ai
             </a>

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useExpandableList } from "@/components/feature/top/use-expandable-list";
 
 const PROJECTS = [
   {
@@ -72,45 +72,13 @@ const PROJECTS = [
 ];
 
 export const ProjectsSection: React.FC = () => {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [targetIndex, setTargetIndex] = useState<number | null>(null);
-  const [othersFading, setOthersFading] = useState(false);
-  const [othersCollapsed, setOthersCollapsed] = useState(false);
-  const [busy, setBusy] = useState(false);
-
-  const handleToggle = useCallback(
-    (index: number) => {
-      if (busy) return;
-      setBusy(true);
-
-      if (openIndex === null) {
-        setTargetIndex(index);
-        requestAnimationFrame(() => {
-          setOthersFading(true);
-          setTimeout(() => {
-            setOthersCollapsed(true);
-            requestAnimationFrame(() => {
-              setOpenIndex(index);
-              setBusy(false);
-            });
-          }, 300);
-        });
-      } else {
-        setOpenIndex(null);
-        setTimeout(() => {
-          setOthersCollapsed(false);
-          requestAnimationFrame(() => {
-            setOthersFading(false);
-            setTimeout(() => {
-              setTargetIndex(null);
-              setBusy(false);
-            }, 300);
-          });
-        }, 500);
-      }
-    },
-    [busy, openIndex]
-  );
+  const {
+    openIndex,
+    targetIndex,
+    othersFading,
+    othersCollapsed,
+    handleToggle,
+  } = useExpandableList();
 
   return (
     <section className="px-6 py-12">
@@ -133,8 +101,9 @@ export const ProjectsSection: React.FC = () => {
             >
               <button
                 type="button"
-                className="w-full text-left group"
+                className="w-full text-left group focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-background active:opacity-80"
                 onClick={() => handleToggle(i)}
+                aria-expanded={openIndex === i}
               >
                 <div className="flex items-center gap-2">
                   {openIndex === i ? (

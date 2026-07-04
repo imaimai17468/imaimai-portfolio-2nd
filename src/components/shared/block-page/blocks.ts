@@ -7,7 +7,6 @@ export const BLOCKS = [
     cx: 35.38,
     cy: 81.22,
     bounds: { minX: 0.5, maxX: 74.19, minY: 50.67, maxY: 99.5 },
-    scaleFactor: 1.3,
   },
   {
     key: "links",
@@ -17,7 +16,6 @@ export const BLOCKS = [
     cx: 81.22,
     cy: 64.62,
     bounds: { minX: 50.67, maxX: 99.5, minY: 25.81, maxY: 99.5 },
-    scaleFactor: 1.5,
   },
   {
     key: "projects",
@@ -27,7 +25,6 @@ export const BLOCKS = [
     cx: 18.78,
     cy: 35.38,
     bounds: { minX: 0.5, maxX: 49.33, minY: 0.5, maxY: 74.19 },
-    scaleFactor: 1.5,
   },
   {
     key: "skills",
@@ -37,7 +34,6 @@ export const BLOCKS = [
     cx: 64.62,
     cy: 18.78,
     bounds: { minX: 25.81, maxX: 99.5, minY: 0.5, maxY: 49.33 },
-    scaleFactor: 1.3,
   },
 ] as const;
 
