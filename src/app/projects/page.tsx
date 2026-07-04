@@ -1,11 +1,10 @@
 import { ProjectsSection } from "@/components/feature/top/projects-section";
-import { SubPageNav } from "@/components/shared/sub-page-nav/SubPageNav";
+import { BlockPage } from "@/components/shared/block-page/BlockPage";
 
 export default function Page() {
   return (
-    <>
-      <SubPageNav />
+    <BlockPage blockKey="projects">
       <ProjectsSection />
-    </>
+    </BlockPage>
   );
 }

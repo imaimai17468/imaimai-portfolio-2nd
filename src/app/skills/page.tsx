@@ -1,11 +1,10 @@
 import { SkillsSection } from "@/components/feature/top/skills-section";
-import { SubPageNav } from "@/components/shared/sub-page-nav/SubPageNav";
+import { BlockPage } from "@/components/shared/block-page/BlockPage";
 
 export default function Page() {
   return (
-    <>
-      <SubPageNav />
+    <BlockPage blockKey="skills">
       <SkillsSection />
-    </>
+    </BlockPage>
   );
 }

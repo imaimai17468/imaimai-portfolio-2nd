@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { NextPageLink } from "@/components/shared/next-page-link/NextPageLink";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://imaim.ai"),
@@ -51,12 +50,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body>
-        <div className="min-h-screen max-w-2xl mx-auto flex flex-col">
-          <div className="flex-1">{children}</div>
-          <NextPageLink />
-        </div>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

@@ -1,11 +1,10 @@
 import { HistorySection } from "@/components/feature/top/history-section";
-import { SubPageNav } from "@/components/shared/sub-page-nav/SubPageNav";
+import { BlockPage } from "@/components/shared/block-page/BlockPage";
 
 export default function Page() {
   return (
-    <>
-      <SubPageNav />
+    <BlockPage blockKey="history">
       <HistorySection />
-    </>
+    </BlockPage>
   );
 }

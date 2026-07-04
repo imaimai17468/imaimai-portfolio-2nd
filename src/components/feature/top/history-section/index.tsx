@@ -79,20 +79,6 @@ const HISTORY: HistoryEntry[] = [
       },
       { label: "Results", values: ["技育展 2023 企業賞"] },
     ],
-    freelance: [
-      {
-        client: "スタートアップA社",
-        projects: ["修理の受注/発注ができるLINEアプリの開発"],
-      },
-      {
-        client: "スタートアップB社",
-        projects: [
-          "建築関係のマッチングプラットフォームの開発",
-          "学会の抄録冊子の自動作成サービス",
-          "履歴書の自動PDF化・管理サービス",
-        ],
-      },
-    ],
   },
   {
     period: "2017.04 - 2022.03",
@@ -111,123 +97,173 @@ const HISTORY: HistoryEntry[] = [
       },
       { label: "Results", values: ["Paiza S", "AtCoder 緑"] },
     ],
-    freelance: [
-      {
-        client: "paiza Inc.",
-        projects: ["競技プログラミング問題集の作問"],
-      },
-    ],
   },
 ];
 
 export const HistorySection: React.FC = () => {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [targetIndex, setTargetIndex] = useState<number | null>(null);
+  const [othersFading, setOthersFading] = useState(false);
+  const [othersCollapsed, setOthersCollapsed] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  const handleToggle = useCallback(
+    (index: number) => {
+      if (busy) return;
+      setBusy(true);
+
+      if (openIndex === null) {
+        setTargetIndex(index);
+        requestAnimationFrame(() => {
+          setOthersFading(true);
+          setTimeout(() => {
+            setOthersCollapsed(true);
+            requestAnimationFrame(() => {
+              setOpenIndex(index);
+              setBusy(false);
+            });
+          }, 300);
+        });
+      } else {
+        setOpenIndex(null);
+        setTimeout(() => {
+          setOthersCollapsed(false);
+          requestAnimationFrame(() => {
+            setOthersFading(false);
+            setTimeout(() => {
+              setTargetIndex(null);
+              setBusy(false);
+            }, 300);
+          });
+        }, 500);
+      }
+    },
+    [busy, openIndex]
+  );
+
   return (
     <section className="px-6 py-12">
-      <h2 className="text-sm text-muted-foreground tracking-wider mb-8">
-        HISTORY
-      </h2>
-      <div className="space-y-6">
-        {HISTORY.map((entry) => (
-          <HistoryItem key={entry.period} entry={entry} />
-        ))}
+      <h2 className="text-sm text-muted tracking-wider mb-8">HISTORY</h2>
+      <div>
+        {HISTORY.map((entry, i) => {
+          const isTarget = i === targetIndex;
+          const isOther = targetIndex !== null && !isTarget;
+
+          return (
+            <div
+              key={entry.period}
+              style={{
+                opacity: isOther && othersFading ? 0 : 1,
+                height: isOther && othersCollapsed ? 0 : "auto",
+                marginBottom: isOther && othersCollapsed ? 0 : 16,
+                overflow: "hidden",
+                transition: "opacity 300ms ease-in-out",
+              }}
+            >
+              <HistoryItem
+                entry={entry}
+                open={openIndex === i}
+                onToggle={() => handleToggle(i)}
+              />
+            </div>
+          );
+        })}
       </div>
     </section>
   );
 };
 
-const HistoryItem: React.FC<{ entry: HistoryEntry }> = ({ entry }) => {
-  const [open, setOpen] = useState(false);
+type HistoryItemProps = {
+  entry: HistoryEntry;
+  open: boolean;
+  onToggle: () => void;
+};
 
-  const toggle = useCallback(() => {
-    setOpen((prev) => !prev);
-  }, []);
-
+const HistoryItem: React.FC<HistoryItemProps> = ({ entry, open, onToggle }) => {
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-3">
-        <span className="text-xs text-muted-foreground font-mono shrink-0 sm:w-40">
-          {entry.period}
-        </span>
-        <div className="min-w-0">
-          <div className="flex items-baseline gap-2">
-            <span className="text-sm font-medium text-foreground">
-              {entry.title}
+      <button
+        type="button"
+        className="w-full text-left group"
+        onClick={onToggle}
+        aria-expanded={open}
+      >
+        <div className="flex items-baseline gap-3">
+          {open ? (
+            <span className="text-xs text-muted hover:text-background transition-colors">
+              ← 一覧
             </span>
-            {entry.note && (
-              <span className="text-xs text-muted-foreground">
-                ({entry.note})
+          ) : (
+            <>
+              <span className="text-xs text-muted font-mono flex-shrink-0">
+                {entry.period}
               </span>
-            )}
-          </div>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {entry.subtitle}
-          </p>
-          <button
-            type="button"
-            className="tap-target-44 flex items-center justify-center w-6 h-6 border border-border bg-background text-muted-foreground mt-2.5 hover:text-foreground hover:border-foreground focus-visible:ring-1 focus-visible:ring-foreground active:opacity-80 transition-colors"
-            onClick={toggle}
-            aria-expanded={open}
-            aria-label={open ? "Close details" : "Open details"}
-          >
-            <span
-              className="text-xs leading-none"
-              style={{ transform: "translateY(-0.5px)" }}
-            >
-              {open ? "−" : "+"}
-            </span>
-          </button>
-          <div
-            className="overflow-hidden transition-all duration-300 ease-in-out"
-            style={{ maxHeight: open ? "200rem" : "0" }}
-          >
-            <div className="flex flex-col items-start">
-              <div className="w-px h-3 bg-border ml-3" />
-            </div>
-            <div className="border border-border bg-background p-4 space-y-4">
-              {entry.details.map((detail) => (
-                <div key={detail.label}>
-                  <h4 className="text-xs text-muted-foreground tracking-wider uppercase mb-1.5">
-                    {detail.label}
-                  </h4>
-                  <ul className="space-y-1 pl-3">
-                    {detail.values.map((value) => (
-                      <li
-                        key={value}
-                        className="text-sm text-foreground-strong list-dot"
-                      >
-                        {value}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-              {entry.freelance && entry.freelance.length > 0 && (
-                <div>
-                  <h4 className="text-xs text-muted-foreground tracking-wider uppercase mb-1.5">
-                    Freelance
-                  </h4>
-                  <div className="space-y-3 pl-3">
-                    {entry.freelance.map((item) => (
-                      <div key={item.client}>
-                        <p className="text-xs text-foreground-muted-alpha mb-1">
-                          {item.client}
-                        </p>
-                        <ul className="space-y-1">
-                          {item.projects.map((project) => (
-                            <li
-                              key={project}
-                              className="text-sm text-foreground-strong list-dot"
-                            >
-                              {project}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              <span className="text-sm text-background group-hover:text-muted transition-colors">
+                {entry.title}
+              </span>
+              <span className="text-xs text-muted">+</span>
+            </>
+          )}
+        </div>
+      </button>
+      <div
+        className="grid"
+        style={{
+          gridTemplateRows: open ? "1fr" : "0fr",
+          opacity: open ? 1 : 0,
+          transition:
+            "grid-template-rows 500ms ease-in-out, opacity 500ms ease-in-out",
+        }}
+      >
+        <div className="overflow-hidden">
+          <div className="mt-3 pl-3 space-y-3">
+            <div>
+              <p className="text-xs text-muted">{entry.subtitle}</p>
+              {entry.note && (
+                <p className="text-xs text-muted mt-0.5">({entry.note})</p>
               )}
             </div>
+            {entry.details.map((detail) => (
+              <div key={detail.label}>
+                <h4 className="text-xs text-muted tracking-wider uppercase mb-1.5">
+                  {detail.label}
+                </h4>
+                <ul className="space-y-1 pl-3">
+                  {detail.values.map((value) => (
+                    <li
+                      key={value}
+                      className="text-sm text-background list-dot"
+                    >
+                      {value}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+            {entry.freelance && entry.freelance.length > 0 && (
+              <div>
+                <h4 className="text-xs text-muted tracking-wider uppercase mb-1.5">
+                  Freelance
+                </h4>
+                <div className="space-y-3 pl-3">
+                  {entry.freelance.map((item) => (
+                    <div key={item.client}>
+                      <p className="text-xs text-muted mb-1">{item.client}</p>
+                      <ul className="space-y-1">
+                        {item.projects.map((project) => (
+                          <li
+                            key={project}
+                            className="text-sm text-background list-dot"
+                          >
+                            {project}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

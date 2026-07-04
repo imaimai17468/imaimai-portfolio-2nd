@@ -1,16 +1,19 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { BLOCKS, type BlockKey } from "@/components/shared/block-page/blocks";
 
 const BLACK_SCALE = 30;
 const FINAL_SCALE = 1;
 const INTRO_DELAY = 300;
 const INTRO_DURATION = 2000;
+const ZOOM_DURATION = 600;
 const SPACER_HEIGHT = 1800;
+const PADDING = 16;
 
-const CENTROID_X = 35.38;
-const CENTROID_Y = 81.22;
+const HOME_CENTROID = BLOCKS[0];
 
 type Phase = "black" | "intro" | "ready";
 
@@ -19,43 +22,86 @@ type Layout = {
   singleBlockScale: number;
 };
 
+type ZoomState = {
+  block: (typeof BLOCKS)[number];
+  progress: number;
+  targetScale: number;
+};
+
 function calcLayout(vw: number, vh: number): Layout {
   const elSize = Math.min(400, vw - 32);
-  const cx = (elSize * CENTROID_X) / 100;
-  const cy = (elSize * CENTROID_Y) / 100;
-  const dL = cx;
-  const dR = elSize * 0.74 - cx;
-  const dT = cy - elSize * 0.507;
-  const dB = elSize - cy;
+  const cx = (elSize * HOME_CENTROID.cx) / 100;
+  const cy = (elSize * HOME_CENTROID.cy) / 100;
+  const b = HOME_CENTROID.bounds;
+  const dL = cx - (elSize * b.minX) / 100;
+  const dR = (elSize * b.maxX) / 100 - cx;
+  const dT = cy - (elSize * b.minY) / 100;
+  const dB = (elSize * b.maxY) / 100 - cy;
   const elLeft = (vw - elSize) / 2;
   const elTop = (vh - elSize) / 2;
-  const sL = (elLeft + cx) / dL;
-  const sR = (vw - elLeft - cx) / dR;
-  const sT = (elTop + cy) / dT;
-  const sB = (vh - elTop - cy) / dB;
-  const singleBlockScale = Math.min(3, sL, sR, sT, sB) * 1.15;
+  const sL = (elLeft + cx - PADDING) / dL;
+  const sR = (vw - elLeft - cx - PADDING) / dR;
+  const sT = (elTop + cy - PADDING) / dT;
+  const sB = (vh - elTop - cy - PADDING) / dB;
+  const singleBlockScale = Math.min(sL, sR, sT, sB) * 1.3;
   return { elSize, singleBlockScale };
 }
 
+function calcBlockTargetScale(
+  vw: number,
+  vh: number,
+  elSize: number,
+  block: (typeof BLOCKS)[number]
+): number {
+  const originInEl = {
+    x: (elSize * block.cx) / 100,
+    y: (elSize * block.cy) / 100,
+  };
+  const elLeft = (vw - elSize) / 2;
+  const elTop = (vh - elSize) / 2;
+  const originVp = { x: elLeft + originInEl.x, y: elTop + originInEl.y };
+  const dL = originInEl.x - (elSize * block.bounds.minX) / 100;
+  const dR = (elSize * block.bounds.maxX) / 100 - originInEl.x;
+  const dT = originInEl.y - (elSize * block.bounds.minY) / 100;
+  const dB = (elSize * block.bounds.maxY) / 100 - originInEl.y;
+  const sL = dL > 0 ? originVp.x / dL : 1;
+  const sR = dR > 0 ? (vw - originVp.x) / dR : 1;
+  const sT = dT > 0 ? originVp.y / dT : 1;
+  const sB = dB > 0 ? (vh - originVp.y) / dB : 1;
+  return Math.max(sL, sR, sT, sB) * 3;
+}
+
 export const HeroSection: React.FC = () => {
-  const [phase, setPhase] = useState<Phase>("black");
-  const [introProgress, setIntroProgress] = useState(0);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const skipIntro = searchParams.get("blocks") !== null;
+
+  const [phase, setPhase] = useState<Phase>(skipIntro ? "ready" : "black");
+  const [introProgress, setIntroProgress] = useState(skipIntro ? 1 : 0);
+  const [scrollProgress, setScrollProgress] = useState(skipIntro ? 1 : 0);
   const [layout, setLayout] = useState<Layout>({
     elSize: 400,
     singleBlockScale: 3,
   });
-  const phaseRef = useRef<Phase>("black");
+  const [zoom, setZoom] = useState<ZoomState | null>(null);
+  const phaseRef = useRef<Phase>(skipIntro ? "ready" : "black");
 
   useEffect(() => {
-    const update = () =>
-      setLayout(calcLayout(window.innerWidth, window.innerHeight));
+    const update = () => {
+      const dvh = window.visualViewport?.height ?? window.innerHeight;
+      setLayout(calcLayout(window.innerWidth, dvh));
+    };
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
   }, []);
 
   useEffect(() => {
+    if (skipIntro) {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      window.scrollTo(0, max);
+      return;
+    }
     let frame: number;
     const timeout = window.setTimeout(() => {
       phaseRef.current = "intro";
@@ -78,7 +124,7 @@ export const HeroSection: React.FC = () => {
       clearTimeout(timeout);
       cancelAnimationFrame(frame);
     };
-  }, []);
+  }, [skipIntro]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -93,39 +139,84 @@ export const HeroSection: React.FC = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const navigateToBlock = useCallback(
+    (key: BlockKey) => {
+      const block = BLOCKS.find((b) => b.key === key);
+      if (!block || zoom) return;
+      const dvh = window.visualViewport?.height ?? window.innerHeight;
+      const targetScale = calcBlockTargetScale(
+        window.innerWidth,
+        dvh,
+        layout.elSize,
+        block
+      );
+      setZoom({ block, progress: 0, targetScale });
+      const start = performance.now();
+      const animate = (now: number) => {
+        const t = Math.min((now - start) / ZOOM_DURATION, 1);
+        const eased = 1 - (1 - t) * (1 - t) * (1 - t);
+        setZoom({ block, progress: eased, targetScale });
+        if (t < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          router.push(block.href);
+        }
+      };
+      requestAnimationFrame(animate);
+    },
+    [router, zoom, layout.elSize]
+  );
+
   let scale: number;
-  if (phase === "black") {
+  let ox: number;
+  let oy: number;
+
+  if (zoom) {
+    const zp = zoom.progress;
+    scale = FINAL_SCALE + (zoom.targetScale - FINAL_SCALE) * zp;
+    ox = 50 + (zoom.block.cx - 50) * zp;
+    oy = 50 + (zoom.block.cy - 50) * zp;
+  } else if (phase === "black") {
     scale = BLACK_SCALE;
+    ox = HOME_CENTROID.cx;
+    oy = HOME_CENTROID.cy;
   } else if (phase === "intro") {
     scale =
       BLACK_SCALE - (BLACK_SCALE - layout.singleBlockScale) * introProgress;
+    ox = HOME_CENTROID.cx;
+    oy = HOME_CENTROID.cy;
   } else {
     scale =
       layout.singleBlockScale -
       (layout.singleBlockScale - FINAL_SCALE) * scrollProgress;
+    ox = HOME_CENTROID.cx + (50 - HOME_CENTROID.cx) * scrollProgress;
+    oy = HOME_CENTROID.cy + (50 - HOME_CENTROID.cy) * scrollProgress;
   }
 
   const profileOpacity =
-    phase !== "ready" ? 0 : Math.max(0, 1 - scrollProgress / 0.2);
+    phase !== "ready" || zoom ? 0 : Math.max(0, 1 - scrollProgress / 0.2);
 
-  const otherBlocksOpacity =
-    phase !== "ready" || scrollProgress < 0.4
+  const otherBlocksOpacity = zoom
+    ? Math.max(0, 1 - zoom.progress / 0.6)
+    : phase !== "ready" || scrollProgress < 0.4
       ? 0
       : Math.min(1, (scrollProgress - 0.4) / 0.3);
 
-  const originT = phase === "ready" ? scrollProgress : 0;
-  const ox = CENTROID_X + (50 - CENTROID_X) * originT;
-  const oy = CENTROID_Y + (50 - CENTROID_Y) * originT;
+  const labelsOpacity = zoom
+    ? Math.max(0, 1 - zoom.progress / 0.3)
+    : phase === "ready" && scrollProgress > 0.7
+      ? Math.min(1, (scrollProgress - 0.7) / 0.2)
+      : 0;
 
-  const centroidDx = ((CENTROID_X - ox) / 100) * layout.elSize * scale;
-  const centroidDy = ((CENTROID_Y - oy) / 100) * layout.elSize * scale;
+  const centroidDx = ((HOME_CENTROID.cx - ox) / 100) * layout.elSize * scale;
+  const centroidDy = ((HOME_CENTROID.cy - oy) / 100) * layout.elSize * scale;
 
   const originPxX = (layout.elSize * ox) / 100;
   const originPxY = (layout.elSize * oy) / 100;
 
   return (
     <>
-      <div style={{ height: SPACER_HEIGHT }} aria-hidden="true" />
+      {!zoom && <div style={{ height: SPACER_HEIGHT }} aria-hidden="true" />}
 
       <div className="fixed inset-0 z-10 pointer-events-none overflow-hidden">
         <div
@@ -133,7 +224,7 @@ export const HeroSection: React.FC = () => {
           style={{
             width: layout.elSize,
             left: `calc(50vw - ${originPxX}px)`,
-            top: `calc(50vh - ${originPxY}px)`,
+            top: `calc(50dvh - ${originPxY}px)`,
             transform: `scale(${scale})`,
             transformOrigin: `${ox}% ${oy}%`,
           }}
@@ -144,24 +235,48 @@ export const HeroSection: React.FC = () => {
             xmlns="http://www.w3.org/2000/svg"
             className="block w-full h-full"
           >
-            <path
-              d="M74.1914 99.5H0.5V75.3086L49.7764 50.6709L74.1914 99.5Z"
-              fill="#0A0A0A"
-            />
-            <g style={{ opacity: otherBlocksOpacity }}>
-              <path
-                d="M99.5 99.5H75.3086L50.6709 50.2236L99.5 25.8086V99.5Z"
-                fill="#0A0A0A"
-              />
-              <path
-                d="M24.6914 0.5L49.3291 49.7764L0.5 74.1904V0.5H24.6914Z"
-                fill="#0A0A0A"
-              />
-              <path
-                d="M99.5 0.5V24.6904L50.2236 49.3291L25.8086 0.5H99.5Z"
-                fill="#0A0A0A"
-              />
-            </g>
+            {zoom ? (
+              <>
+                <path d={zoom.block.path} fill="#0A0A0A" />
+                <g style={{ opacity: otherBlocksOpacity }}>
+                  {BLOCKS.filter((b) => b.key !== zoom.block.key).map((b) => (
+                    <path key={b.key} d={b.path} fill="#0A0A0A" />
+                  ))}
+                </g>
+              </>
+            ) : (
+              <>
+                <path d={BLOCKS[0].path} fill="#0A0A0A" />
+                <g style={{ opacity: otherBlocksOpacity }}>
+                  {BLOCKS.slice(1).map((b) => (
+                    <path key={b.key} d={b.path} fill="#0A0A0A" />
+                  ))}
+                </g>
+              </>
+            )}
+            {labelsOpacity > 0 && (
+              <g
+                style={{ opacity: labelsOpacity }}
+                className="pointer-events-auto"
+              >
+                {BLOCKS.map((b) => (
+                  <text
+                    key={b.key}
+                    x={b.cx}
+                    y={b.cy}
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fill="#FAFAFA"
+                    fontSize="5"
+                    fontWeight="300"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => navigateToBlock(b.key)}
+                  >
+                    {b.label}
+                  </text>
+                ))}
+              </g>
+            )}
           </svg>
         </div>
       </div>
@@ -213,6 +328,19 @@ export const HeroSection: React.FC = () => {
               contact@imaim.ai
             </a>
           </div>
+        </div>
+      </div>
+
+      <div
+        className="fixed left-1/2 -translate-x-1/2 z-20 pointer-events-none"
+        style={{
+          bottom: "max(2rem, env(safe-area-inset-bottom, 0px) + 1rem)",
+          opacity: profileOpacity,
+        }}
+      >
+        <div className="flex flex-col items-center gap-1 animate-bounce">
+          <span className="text-xs text-foreground">scroll</span>
+          <span className="text-foreground">↓</span>
         </div>
       </div>
     </>
