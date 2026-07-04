@@ -138,9 +138,23 @@ export const ProjectsSection: React.FC = () => {
               >
                 <div className="flex items-center gap-2">
                   {openIndex === i ? (
-                    <span className="text-xs text-muted hover:text-background transition-colors">
-                      ← 一覧
-                    </span>
+                    <>
+                      <span className="text-xs text-muted hover:text-background transition-colors">
+                        ← 一覧
+                      </span>
+                      {project.favicon && (
+                        <Image
+                          src={project.favicon}
+                          alt=""
+                          width={16}
+                          height={16}
+                          className="shrink-0"
+                        />
+                      )}
+                      <span className="text-sm text-background">
+                        {project.title}
+                      </span>
+                    </>
                   ) : (
                     <>
                       {project.favicon && (

@@ -190,9 +190,15 @@ const HistoryItem: React.FC<HistoryItemProps> = ({ entry, open, onToggle }) => {
       >
         <div className="flex items-baseline gap-3">
           {open ? (
-            <span className="text-xs text-muted hover:text-background transition-colors">
-              ← 一覧
-            </span>
+            <>
+              <span className="text-xs text-muted hover:text-background transition-colors">
+                ← 一覧
+              </span>
+              <span className="text-xs text-muted font-mono flex-shrink-0">
+                {entry.period}
+              </span>
+              <span className="text-sm text-background">{entry.title}</span>
+            </>
           ) : (
             <>
               <span className="text-xs text-muted font-mono flex-shrink-0">
