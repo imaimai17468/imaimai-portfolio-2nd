@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://imaim.ai"),
-  title: "imaimai17468's Portfolio",
+  title: "imaimai17468",
   description:
     "imaimai17468のポートフォリオサイト | クリエイティブなWeb開発者として、技術とデザインで新しい体験を創造します",
   keywords: [
@@ -19,17 +19,17 @@ export const metadata: Metadata = {
   publisher: "imaimai17468",
   robots: "index, follow",
   openGraph: {
-    title: "imaimai17468's Portfolio",
+    title: "imaimai17468",
     description:
       "imaimai17468のポートフォリオサイト | フロントエンドエンジニアとして、常に自分を示し続けます",
     url: "https://imaim.ai",
-    siteName: "imaimai17468's Portfolio",
+    siteName: "imaimai17468",
     locale: "ja_JP",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "imaimai17468's Portfolio",
+    title: "imaimai17468",
     description:
       "imaimai17468のポートフォリオサイト | フロントエンドエンジニアとして、常に自分を示し続けます",
     creator: "@imaimai17468",
