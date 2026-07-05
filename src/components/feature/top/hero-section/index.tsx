@@ -15,6 +15,18 @@ const PADDING = 16;
 
 const HOME_CENTROID = BLOCKS[0];
 
+// Content-safe rectangle centered on the home block anchor point (HOME_CENTROID),
+// in viewBox units. The history triangle narrows around that point, so the
+// profile must stay inside this box to avoid spilling onto the light background.
+const PROFILE_CONTENT_BOX = { width: 48, height: 17 };
+// Footprint of the profile overlay at scale 1, in CSS px, measured from the
+// markup rendered below. Keep this in sync if the profile layout changes. The
+// home block must render large enough that this fits inside PROFILE_CONTENT_BOX.
+const PROFILE_DESIGN_SIZE = { width: 198, height: 82 };
+// Extra breathing room around the profile, absorbing font-rendering variance so
+// the block stays large enough at every viewport width, not just the tested ones.
+const PROFILE_SAFETY_MARGIN = 1.15;
+
 type Phase = "black" | "intro" | "ready";
 
 type Layout = {
@@ -43,7 +55,18 @@ function calcLayout(vw: number, vh: number): Layout {
   const sR = (vw - elLeft - cx - PADDING) / dR;
   const sT = (elTop + cy - PADDING) / dT;
   const sB = (vh - elTop - cy - PADDING) / dB;
-  const singleBlockScale = Math.min(sL, sR, sT, sB) * 0.85;
+  const containScale = Math.min(sL, sR, sT, sB) * 0.85;
+  // On narrow viewports the contain scale is small, leaving the block too tiny
+  // for the fixed-size profile. Enforce a floor so the block always grows large
+  // enough to hold the profile inside PROFILE_CONTENT_BOX (block edges may
+  // extend past the viewport at rest, which is fine while zoomed in).
+  const requiredPxPerUnit =
+    Math.max(
+      PROFILE_DESIGN_SIZE.width / PROFILE_CONTENT_BOX.width,
+      PROFILE_DESIGN_SIZE.height / PROFILE_CONTENT_BOX.height
+    ) * PROFILE_SAFETY_MARGIN;
+  const profileFitScale = (requiredPxPerUnit * 100) / elSize;
+  const singleBlockScale = Math.max(containScale, profileFitScale);
   return { elSize, singleBlockScale };
 }
 
