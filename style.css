@@ -54,6 +54,7 @@ li + li {
   column-gap: 1rem;
   padding-left: 0;
   list-style: none;
+  font-variant-numeric: tabular-nums;
 }
 
 .timeline li {
