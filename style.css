@@ -1,7 +1,16 @@
 :root {
-  color-scheme: light;
-  --background: #fff;
-  --foreground: #000;
+  color-scheme: light dark;
+  --ankoku: #16160e;
+  --hakuji: #f8fbf8;
+  --background: var(--hakuji);
+  --foreground: var(--ankoku);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: var(--ankoku);
+    --foreground: var(--hakuji);
+  }
 }
 
 body {
