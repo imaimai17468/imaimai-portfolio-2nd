@@ -1,6 +1,6 @@
 ---
 name: launch-checklist
-description: Pre-launch checklist for web services. Comprehensively audits security, SEO, OGP, performance, accessibility, and more, then generates a report.
+description: Pre-launch checklist for web services. Audits security, SEO, OGP, performance, accessibility, and more, then writes a report.
 when_to_use: When the user asks for a launch checklist, pre-launch audit, release readiness check, or wants to verify the app is ready for production.
 argument-hint: "[category (optional): security, seo, ogp, performance, a11y, email, payment, env, all]"
 arguments: category
@@ -8,7 +8,7 @@ arguments: category
 
 # Pre-Launch Web Service Checklist
 
-Comprehensively audit a pre-launch service and write a report to `docs/launch-checklist/YYYY-MM-DD.md`.
+Audit a pre-launch service and write a report to `docs/launch-checklist/YYYY-MM-DD.md`.
 
 Reference: https://zenn.dev/catnose99/articles/547cbf57e5ad28
 
@@ -26,13 +26,13 @@ Valid categories: `security`, `seo`, `ogp`, `performance`, `a11y`, `email`, `pay
 
 ### 2. Run checklist audit
 
-For each category in scope, inspect the codebase, configuration, and running application against the checklist below. Use grep, file reads, and chrome-devtools MCP tools as needed.
+For each category in scope, inspect the codebase, configuration, and running application against the checklist below. Use grep, file reads, and this session's browser as needed.
 
 ---
 
 ## Checklist
 
-### Security — Cookie
+### Security: Cookie
 
 | # | Item | How to verify |
 |---|------|---------------|
@@ -41,7 +41,7 @@ For each category in scope, inspect the codebase, configuration, and running app
 | 3 | Auth cookies have the `Secure` attribute set | Same as above |
 | 4 | Auth cookies have an appropriate `Domain` attribute | Check the risk of cookie leakage to subdomains. Using the `__Host-` prefix is recommended |
 
-### Security — Input Validation
+### Security: Input Validation
 
 | # | Item | How to verify |
 |---|------|---------------|
@@ -51,7 +51,7 @@ For each category in scope, inspect the codebase, configuration, and running app
 | 8 | SQL injection is prevented | Check usages of raw SQL queries. Confirm the ORM's parameter binding is used |
 | 9 | Usernames are checked for path conflicts and reserved words | Check the username validation logic. Confirm a reserved-word list (`admin`, `contact`, etc.) exists |
 
-### Security — Response Headers
+### Security: Response Headers
 
 | # | Item | How to verify |
 |---|------|---------------|
@@ -59,7 +59,7 @@ For each category in scope, inspect the codebase, configuration, and running app
 | 11 | `X-Frame-Options` or CSP `frame-ancestors` is set | Check response headers. Recommended: `DENY` or `SAMEORIGIN` |
 | 12 | `X-Content-Type-Options: nosniff` is set | Check response headers |
 
-### Security — Other
+### Security: Other
 
 | # | Item | How to verify |
 |---|------|---------------|
@@ -72,11 +72,11 @@ For each category in scope, inspect the codebase, configuration, and running app
 | 19 | User input is not injected into response headers | Check where headers are set |
 | 20 | Server error details are not exposed to the client | Check error handling |
 | 21 | File uploads validate format, size, and filename | Check the upload handling |
-| 22 | Periodic DB backups are enabled | Check Cloudflare D1 / infrastructure settings |
+| 22 | Periodic DB backups are enabled | Check the database / infrastructure settings |
 | 23 | Two-factor authentication is enabled on cloud accounts | Manual check (note in the report) |
 | 24 | A Content Security Policy (CSP) is configured | Check response headers |
 
-### Security — Login
+### Security: Login
 
 | # | Item | How to verify |
 |---|------|---------------|
@@ -100,12 +100,12 @@ For each category in scope, inspect the codebase, configuration, and running app
 
 | # | Item | How to verify |
 |---|------|---------------|
-| 35 | Every page has an appropriate `<title>` tag | Check the router config and each page's head settings |
+| 35 | Every page has an appropriate `<title>` tag | Run a Lighthouse SEO audit (use the `page-audit` skill) |
 | 36 | Canonical URLs are set | Check `<link rel="canonical">`. Normalize URLs with query parameters |
 | 37 | Error pages return an appropriate status code (40x / 50x), or have `noindex` set | Check error handling and response codes |
 | 38 | Search result pages have `noindex` or a canonical URL set | Check the meta tags on search pages |
 | 39 | `noindex` is removed in production | Check the `robots` meta tag and `robots.txt` |
-| 40 | Key pages (top page, etc.) have a meta description | Check the head settings |
+| 40 | Key pages (top page, etc.) have a meta description | Run a Lighthouse SEO audit (use the `page-audit` skill) |
 | 41 | An XML sitemap is generated and registered | Check the `/sitemap.xml` route and its contents |
 
 ### OGP
@@ -136,9 +136,9 @@ For each category in scope, inspect the codebase, configuration, and running app
 
 | # | Item | How to verify |
 |---|------|---------------|
-| 56 | Images have appropriate `alt` attributes | Grep `<img>` tags and check the presence and content of `alt` |
-| 57 | Icon-only buttons / links have an `aria-label` | Check SVG icon buttons. Pattern: `<a aria-label="..."><svg aria-hidden="true"></svg></a>` |
-| 58 | Element roles are recognizable by screen readers | Run a Lighthouse a11y audit (use the `/lighthouse-audit` skill) |
+| 56 | Images have appropriate `alt` attributes | Run a Lighthouse a11y audit (use the `page-audit` skill) |
+| 57 | Icon-only buttons / links have an `aria-label` | Same as above. A passing icon link reads `<a aria-label="..."><svg aria-hidden="true"></svg></a>` |
+| 58 | Element roles are recognizable by screen readers | Same as above |
 
 ### Performance
 
@@ -150,14 +150,17 @@ For each category in scope, inspect the codebase, configuration, and running app
 | 62 | Image sizes are optimized | Check there are no images far larger than their display size |
 | 63 | The DB has appropriate indexes | Check the indexes in the schema definition |
 
+Items 59–63 are static heuristics, and passing them is not a Core Web Vitals
+measurement. For real LCP / CLS / INP traces run the `page-audit` skill.
+
 ### Multi-Environment
 
 | # | Item | How to verify |
 |---|------|---------------|
-| 64 | The UI does not break at phone / tablet sizes | Check responsiveness with chrome-devtools |
+| 64 | The UI does not break at phone / tablet sizes | Check phone and tablet widths with Chrome DevTools MCP `emulate` |
 | 65 | Verified in browsers other than Chrome (Safari, Firefox) | Manual check (note in the report) |
 | 66 | No layout jitter from the scrollbar on Windows | Check the `scrollbar-gutter` setting |
-| 67 | The UI does not break when user input is long | Check rendering with long usernames, etc. |
+| 67 | The UI does not break when user input is long | Check that long text wraps inside its container at phone width instead of overflowing it |
 
 ### Other
 
@@ -165,7 +168,7 @@ For each category in scope, inspect the codebase, configuration, and running app
 |---|------|---------------|
 | 68 | No problem if local storage / cookies are cleared after 7 days under iOS Safari ITP | Check the auth persistence mechanism |
 | 69 | No dependency on third-party cookies | Check cookie settings and external service integrations |
-| 70 | `<html lang="...">` is set | Check the root HTML template |
+| 70 | `<html lang="...">` is set | Run a Lighthouse a11y audit (use the `page-audit` skill) |
 | 71 | A server-error detection / alerting mechanism exists | Check the error monitoring configuration |
 | 72 | 404 / 50x error pages have a link back to the top page | Check the error page components |
 | 73 | A favicon is set | Check `<link rel="icon">` |
@@ -179,19 +182,28 @@ For each category in scope, inspect the codebase, configuration, and running app
 Create `docs/launch-checklist/YYYY-MM-DD.md`:
 
 ```markdown
-# Launch Checklist Report — YYYY-MM-DD
+# Launch Checklist Report: YYYY-MM-DD
 
-Commit: `{short hash}` {commit message}
+Commit: `{short hash}` {subject}
+
+## Action Items
+
+FAIL items in severity order, each with the fix. Where nothing failed, this
+section says so in one line.
+
+1. **[Critical]** {item}: {fix suggestion}
+2. **[Important]** {item}: {fix suggestion}
+3. **[Minor]** {item}: {fix suggestion}
 
 ## Summary
 
 | Category | Pass | Fail | N/A | Score |
 |----------|------|------|-----|-------|
-| Security — Cookie | x | x | x | x/x |
-| Security — Input Validation | x | x | x | x/x |
-| Security — Response Headers | x | x | x | x/x |
-| Security — Other | x | x | x | x/x |
-| Security — Login | x | x | x | x/x |
+| Security: Cookie | x | x | x | x/x |
+| Security: Input Validation | x | x | x | x/x |
+| Security: Response Headers | x | x | x | x/x |
+| Security: Other | x | x | x | x/x |
+| Security: Login | x | x | x | x/x |
 | Email | x | x | x | x/x |
 | SEO | x | x | x | x/x |
 | OGP | x | x | x | x/x |
@@ -206,30 +218,23 @@ Commit: `{short hash}` {commit message}
 
 ### {Category}
 
+Pass: {the item numbers that passed, e.g. 1, 2, 4-6}
+
 | # | Item | Status | Notes |
 |---|------|--------|-------|
-| {n} | {item} | PASS / FAIL / N/A | {evidence or fix suggestion} |
+| {n} | {item} | FAIL / N/A | {the evidence, and the fix for a FAIL} |
 
-(Repeat for each category in scope)
-
-## Action Items
-
-Priority fixes (FAIL items ordered by severity):
-
-1. **[Critical]** {item} — {fix suggestion}
-2. **[Important]** {item} — {fix suggestion}
-3. **[Minor]** {item} — {fix suggestion}
+(Repeat for each category in scope. A passing item takes its number on the
+`Pass:` line and no table row, so step 4 can still compare it against the
+previous report, and a category that failed nothing is that line alone.)
 ```
 
-### 4. Compare with previous
+### 4. Compare with the previous report
 
-If a previous report exists in `docs/launch-checklist/`, compare results. Note newly passing or regressed items under `## Changes from previous audit`.
+Where `docs/launch-checklist/` already holds an earlier file, compare against the
+newest one and list newly passing and newly failing items under `## Changes`.
 
 ### 5. Fix issues (if requested)
 
-If the user asks to fix issues after the report, address them in priority order:
-1. Critical security issues
-2. SEO / OGP issues affecting discoverability
-3. Performance issues
-4. Accessibility issues
-5. Other items
+If the user asks to fix issues after the report, work through the report's
+`## Action Items` in the order that section lists them.
