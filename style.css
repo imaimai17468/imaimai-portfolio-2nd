@@ -1,7 +1,16 @@
 :root {
-  color-scheme: light;
-  --background: #fff;
-  --foreground: #000;
+  color-scheme: light dark;
+  --shikkoku: #0d0015;
+  --unohana: #f7fcfe;
+  --background: var(--unohana);
+  --foreground: var(--shikkoku);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: var(--shikkoku);
+    --foreground: var(--unohana);
+  }
 }
 
 body {

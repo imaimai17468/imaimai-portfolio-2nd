@@ -5,7 +5,7 @@ This repository is a static site: `index.html`, `style.css`, and `icon.png` (the
 ## Site Constraints
 
 - **One HTML file, one stylesheet, one image.** Content goes into `index.html`, styling into `style.css`, and `icon.png` is both the favicon and the avatar beside the name. The one external resource is the Roboto web font from Google Fonts, linked in `index.html`. Adding a second page, a script, another image, another web font, or a third-party embed is a design change the user decides, never a side effect of another task.
-- **White background, text only.** The page is black text on white, with the avatar as its one image. Keep colors as custom properties on `:root` in `style.css`.
+- **Two colors, text only.** The page uses the wairo 漆黒 (`--shikkoku`) and 卯の花色 (`--unohana`): 漆黒 text on 卯の花色 in light mode, swapped under `prefers-color-scheme: dark`. The avatar is its one image. Keep colors as custom properties on `:root` in `style.css`.
 - **Everything at the repository root is public.** Vercel serves the whole root, so never commit a secret, a private address, or a note meant only for the owner.
 
 ## Knowledge Currency
