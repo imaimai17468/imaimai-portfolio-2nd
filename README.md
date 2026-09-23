@@ -2,7 +2,7 @@
 
 [imaim.ai](https://imaim.ai)
 
-imaimai17468 のポートフォリオサイト。`index.html` と `style.css`、ファビコンの `icon.png` だけで構成された静的サイト。
+imaimai17468 のポートフォリオサイト。`index.html` と `style.css`、アイコンの `icon.png` だけで構成された静的サイト。
 
 ## 構成
 
@@ -10,7 +10,7 @@ imaimai17468 のポートフォリオサイト。`index.html` と `style.css`、
 |---------|------|
 | `index.html` | 全コンテンツ（Skills / Projects / History / Links） |
 | `style.css` | スタイル |
-| `icon.png` | ファビコン |
+| `icon.png` | ファビコン兼、名前の横のアイコン |
 
 ## ローカル確認
 
