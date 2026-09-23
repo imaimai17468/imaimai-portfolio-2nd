@@ -1,10 +1,10 @@
 # Project Instructions
 
-This repository is a static site: `index.html` and `style.css` at the repository root, and nothing else the browser loads. There is no package manager, build step, framework, JavaScript, test suite, linter, or CI. Vercel serves the repository root with the "Other" framework preset, and a merge to `main` deploys it.
+This repository is a static site: `index.html`, `style.css`, and the favicon `icon.png` at the repository root, and nothing else the browser loads. There is no package manager, build step, framework, JavaScript, test suite, linter, or CI. Vercel serves the repository root with the "Other" framework preset, and a merge to `main` deploys it.
 
 ## Site Constraints
 
-- **One HTML file and one stylesheet.** Content goes into `index.html`, styling into `style.css`. Adding a second page, a script, an image, a web font, or a third-party embed is a design change the user decides, never a side effect of another task.
+- **One HTML file, one stylesheet, one favicon.** Content goes into `index.html`, styling into `style.css`, and `icon.png` is the favicon. Adding a second page, a script, an image on the page, a web font, or a third-party embed is a design change the user decides, never a side effect of another task.
 - **White background, text only.** The page is black text on white. Keep colors as custom properties on `:root` in `style.css`.
 - **Everything at the repository root is public.** Vercel serves the whole root, so never commit a secret, a private address, or a note meant only for the owner.
 
