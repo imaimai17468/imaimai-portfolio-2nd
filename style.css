@@ -10,7 +10,14 @@ body {
   padding: 3rem 1rem;
   background: var(--background);
   color: var(--foreground);
-  font-family: system-ui, sans-serif;
+  font-family:
+    Roboto,
+    "游ゴシック体",
+    YuGothic,
+    "游ゴシック Medium",
+    "Yu Gothic Medium",
+    "Yu Gothic",
+    sans-serif;
   line-height: 1.7;
 }
 
