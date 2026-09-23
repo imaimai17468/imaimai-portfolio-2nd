@@ -34,12 +34,10 @@
       "Bash(gh pr diff:*)",
       "Bash(gh api:*)",
       "Bash(gh run view:*)",
-      "Bash(bun run:*)",
-      "Bash(bun add -E:*)",
-      "Bash(bun remove:*)",
-      "Bash(bun pm:*)",
-      "Bash(bun install:*)",
-      "Bash(bunx:*)"
+      "mcp__plugin_context7_context7__*",
+      "mcp__plugin_chrome-devtools-mcp_chrome-devtools__*",
+      "Bash(git fetch *)",
+      "Bash(gh pr checks *)"
     ],
     "deny": [
       "Bash(rm -rf:*)",
@@ -74,7 +72,6 @@
       "Edit(./.env.production)"
     ],
     "ask": [
-      "Bash(bun add:*)",
       "Bash(xargs kill -9)",
       "Bash(rm:*)",
       "Bash(mv:*)",
@@ -82,15 +79,27 @@
     ]
   },
   "hooks": {
-    "PostToolUse": [
+    "Stop": [
       {
-        "matcher": "Edit|Write|MultiEdit",
         "hooks": [
           {
             "type": "command",
-            "command": "F=$(jq -r '.tool_input.file_path // \"\"'); case \"$F\" in *.ts|*.tsx|*.js|*.jsx|*.mjs|*.cjs) ;; *) exit 0 ;; esac; cd $CLAUDE_PROJECT_DIR && OUT=$(bun run lint 2>&1 && bun run typecheck 2>&1); RC=$?; if [ $RC -ne 0 ]; then printf '%s' \"$OUT\" | jq -Rs --arg file \"$F\" '{systemMessage:(\"\\u26d4 PostToolUse block: lint/typecheck \\u5931\\u6557 \\u2014 \" + $file), decision:\"block\", reason:(\"PostToolUse: \\u7de8\\u96c6\\u5f8c\\u306e lint / typecheck \\u304c\\u5931\\u6557\\u3057\\u307e\\u3057\\u305f\\u3002\\u6b21\\u306e\\u30c4\\u30fc\\u30eb\\u547c\\u3073\\u51fa\\u3057\\u524d\\u306b\\u76f4\\u3057\\u3066\\u304f\\u3060\\u3055\\u3044\\u3002\\n\\n\" + .)}'; fi; exit 0",
-            "timeout": 60,
-            "statusMessage": "Per-edit check: oxlint + tsgo..."
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/reply-open-gate.sh",
+            "timeout": 15,
+            "statusMessage": "Reply gate: the first line is what the reader runs..."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Shell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/pre-bash-guard.sh",
+            "timeout": 30,
+            "statusMessage": "Bash guard: env-file protection + find gate + unnamed-changes gate..."
           }
         ]
       }
@@ -99,7 +108,6 @@
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
     "chrome-devtools-mcp@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true,
     "context7@claude-plugins-official": true
   },
   "plansDirectory": "./.claude/plans"
