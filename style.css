@@ -1,15 +1,15 @@
 :root {
   color-scheme: light dark;
-  --shikkoku: #16160e;
-  --unohana: #f8fbf8;
-  --background: var(--unohana);
-  --foreground: var(--shikkoku);
+  --ankoku: #16160e;
+  --hakuji: #f8fbf8;
+  --background: var(--hakuji);
+  --foreground: var(--ankoku);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: var(--shikkoku);
-    --foreground: var(--unohana);
+    --background: var(--ankoku);
+    --foreground: var(--hakuji);
   }
 }
 
