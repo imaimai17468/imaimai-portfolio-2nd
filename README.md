@@ -8,7 +8,7 @@ imaimai17468 のポートフォリオサイト。`index.html` と `style.css`、
 
 | ファイル | 役割 |
 |---------|------|
-| `index.html` | 全コンテンツ（Skills / Projects / History / Links） |
+| `index.html` | 全コンテンツ（Links / Projects / History / Speaker） |
 | `style.css` | スタイル |
 | `icon.png` | ファビコン兼、名前の横のアイコン |
 
