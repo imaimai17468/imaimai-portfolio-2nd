@@ -1,7 +1,7 @@
 :root {
   color-scheme: light dark;
-  --shikkoku: #0d0015;
-  --unohana: #f7fcfe;
+  --shikkoku: #16160e;
+  --unohana: #f8fbf8;
   --background: var(--unohana);
   --foreground: var(--shikkoku);
 }
