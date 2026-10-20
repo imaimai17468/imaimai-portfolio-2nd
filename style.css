@@ -1,15 +1,15 @@
 :root {
   color-scheme: light dark;
-  --ankoku: #16160e;
-  --hakuji: #f8fbf8;
-  --background: var(--hakuji);
-  --foreground: var(--ankoku);
+  --nyuhaku: #f3f3f3;
+  --kuro: #2b2b2b;
+  --background: var(--nyuhaku);
+  --foreground: var(--kuro);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: var(--ankoku);
-    --foreground: var(--hakuji);
+    --background: var(--kuro);
+    --foreground: var(--nyuhaku);
   }
 }
 
