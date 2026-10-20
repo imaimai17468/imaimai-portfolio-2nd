@@ -4,6 +4,7 @@
   --kuro: #2b2b2b;
   --background: var(--nyuhaku);
   --foreground: var(--kuro);
+  --muted: color-mix(in srgb, var(--foreground) 65%, var(--background));
 }
 
 @media (prefers-color-scheme: dark) {
@@ -32,13 +33,22 @@ body {
 
 header {
   display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
+  align-items: center;
+  gap: 1rem;
+}
+
+header img {
+  border-radius: 50%;
+}
+
+header p {
+  color: var(--muted);
 }
 
 h1 {
   margin: 0;
   font-size: 1.5rem;
+  line-height: 1.3;
 }
 
 h2 {
@@ -64,6 +74,59 @@ li + li {
   margin-top: 0.5rem;
 }
 
+a {
+  color: inherit;
+}
+
+.icon {
+  flex: none;
+  width: 1em;
+  height: 1em;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  padding-left: 0;
+  list-style: none;
+}
+
+.links li + li {
+  margin-top: 0;
+}
+
+.links a,
+.mail {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mail {
+  color: var(--muted);
+}
+
+.projects {
+  padding-left: 0;
+  list-style: none;
+}
+
+.projects li + li {
+  margin-top: 1rem;
+}
+
+.projects a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 700;
+}
+
+.projects p {
+  color: var(--muted);
+}
+
 .timeline {
   display: grid;
   grid-template-columns: max-content 1fr;
@@ -77,8 +140,4 @@ li + li {
   display: grid;
   grid-column: 1 / -1;
   grid-template-columns: subgrid;
-}
-
-a {
-  color: inherit;
 }
