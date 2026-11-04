@@ -179,6 +179,12 @@ a {
   font-size: 0.875rem;
 }
 
+.timeline small {
+  margin-left: 0.25rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
 .timeline ul {
   margin-top: 0.25rem;
   color: var(--muted);
