@@ -10,3 +10,6 @@
 # claude code runtime artifacts
 .superpowers/
 .claude/scheduled_tasks.lock
+
+# generator build output
+generator/target/
