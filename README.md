@@ -2,20 +2,33 @@
 
 [imaim.ai](https://imaim.ai)
 
-imaimai17468 のポートフォリオサイト。`index.html` と `style.css`、アイコンの `icon.png`、シェア画像の `og.png` だけで構成された静的サイト。
+imaimai17468 のポートフォリオサイト。Rust 製の Web フレームワーク [hypersig](https://github.com/imaimai17468/hypersig) で HTML を生成し、生成したファイルをそのまま配信する静的サイト。
 
 ## 構成
 
 | ファイル | 役割 |
 |---------|------|
-| `index.html` | 全コンテンツ（Links / Projects / History / Speaker） |
-| `style.css` | スタイル |
-| `icon.png` | ファビコン兼、名前の横のアイコン |
+| `generator/` | ページを生成する Rust のプログラム。内容とスタイルはすべて `generator/src/main.rs` にある |
+| `index.html` | トップページ（生成物）。Zenn と sizu の記事を新しい順に並べる |
+| `about/index.html` | About ページ（生成物） |
+| `hypersig.js` | hypersig のランタイム（生成物） |
+| `fonts/` | Zen Kurenaido をページの文字だけに絞った WOFF2 と、その元のフォントとライセンス |
+| `scripts/` | 生成とフォントの絞り込みを行うスクリプト |
+| `frog.svg` / `pencil.svg` / `paper.svg` / `avatar.png` | ヘッダーのカエル、トップの筆文字、紙の質感の背景、About のアイコン |
+| `icon.png` | ファビコン |
 | `og.png` | OG / Twitter Card 用のシェア画像（1200×630） |
 
-## ローカル確認
+## 生成
 
-ビルドは不要。`index.html` をブラウザで直接開くか、任意の静的サーバーで配信する。
+`cargo` と `uv` が必要。記事一覧は Zenn と sizu の RSS から取得するので、ネットワークにもつながっている必要がある。
+
+```bash
+scripts/build.sh
+```
+
+記事一覧はこのコマンドを実行して生成物をコミットしたときだけ更新される。
+
+## ローカル確認
 
 ```bash
 python3 -m http.server

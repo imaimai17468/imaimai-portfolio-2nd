@@ -1,11 +1,12 @@
 # Project Instructions
 
-This repository is a static site: `index.html`, `style.css`, `icon.png` (the favicon and the header avatar), and `og.png` (the 1200×630 share image for OG and Twitter Card) at the repository root, and nothing else the browser loads. There is no package manager, build step, framework, JavaScript, test suite, linter, or CI. Vercel serves the repository root with the "Other" framework preset, and a merge to `main` deploys it.
+This repository is a static site whose pages are generated. `generator/` is a Rust program that builds them with [hypersig](https://github.com/imaimai17468/hypersig) and writes the top page `index.html`, the about page `about/index.html`, and the hypersig runtime `hypersig.js` to the repository root. `scripts/subset_fonts.py` writes `fonts/zen-kurenaido.woff2` from the font source and its OFL license in `fonts/src/`. The rest of the root holds the files the page loads (`frog.svg`, `pencil.svg`, `paper.svg` for the background texture, `avatar.png` for the profile on the about page, `icon.png` for the favicon) and `og.png`, the 1200×630 share image for OG and Twitter Card. The generated files are committed, and Vercel serves the repository root with the "Other" framework preset and no build command, so a merge to `main` deploys whatever was committed. `scripts/build.sh` runs both, and needs `cargo`, `uv`, and the network: the generator fetches the RSS feeds of Zenn and sizu (`generator/src/feed.rs`) and lists their articles newest first, so the list changes only when the build runs and its output is committed. There is no package manager for the browser side, test suite, linter, or CI.
 
 ## Site Constraints
 
-- **One HTML file, one stylesheet, one image.** Content goes into `index.html`, styling into `style.css`, and `icon.png` is both the favicon and the avatar beside the name. Text uses the Yu Gothic system font, so the page loads nothing from another origin. Adding a second page, a script, another image, a web font, or a third-party embed is a design change the user decides, never a side effect of another task.
-- **Two colors, monochrome icons.** The page uses the achromatic wairo 黒 (`--kuro`, `#2b2b2b`) and 乳白色 (`--nyuhaku`, `#f3f3f3`): 黒 text on 乳白色 in light mode, swapped under `prefers-color-scheme: dark`. Lighter shades, such as the muted text and the timeline line, mix those two with `color-mix()` instead of adding a third color. Icons are inline SVG in `index.html` drawn in `currentColor` (brand marks from Simple Icons, the rest from Lucide). The avatar is the one image file on the page; `og.png` appears only in link previews. Keep colors as custom properties on `:root` in `style.css`.
+- **Edit the generator, never the HTML.** Each page's content, the `<head>` and header they share (`layout`), and the styles live in `generator/src/main.rs`. Links between pages come from the routes in its `routes!` block. Styles are written with `hypersig::style` (hypersig_style) and go into `<style>` elements in `<head>`, so there is no stylesheet file. Run `scripts/build.sh` after each change and commit the regenerated `index.html`, `about/index.html`, `hypersig.js`, and `fonts/zen-kurenaido.woff2` with the source change that produced them. The font keeps only the kana and the characters in the pages' text, so a character added to a page shows in Yu Gothic until the build runs.
+- **No outside resources.** Every text on the site, Latin and Japanese, headings included, is set in Zen Kurenaido, which has one weight, so a bold heading is drawn bolder by the browser. It is served from `fonts/`, so the page loads nothing from another origin. Its digits differ in width, so a column of dates takes a fixed width. Adding another page, a script beyond the hypersig runtime, another image, another font, or a third-party embed is a design change the user decides, never a side effect of another task.
+- **Two colors.** The page uses `#f9fafb` and `#1d1d1d` (`WHITE` and `BLACK` in the `look` module of `generator/src/main.rs`). The `background` and `foreground` tokens hold them: dark text on light in light mode, swapped by the `Theme` under `prefers-color-scheme: dark`. Add a lighter shade by mixing those two with `Color::mix` instead of adding a third color.
 - **Everything at the repository root is public.** Vercel serves the whole root, so never commit a secret, a private address, or a note meant only for the owner.
 
 ## Knowledge Currency
@@ -14,9 +15,9 @@ Your training data goes stale. Before stating a specific version, flag, configur
 
 ## Verification
 
-With no build or linter, verification is by hand. Before reporting a change done:
+With no linter or test suite, verification is by hand. Before reporting a change done:
 
-- Confirm `index.html` closes every element it opens.
+- Run `scripts/build.sh` and confirm it writes the pages and the font without a compile error or a panic.
 - Serve the root with `python3 -m http.server` and look at the page in a browser, at desktop and at phone width.
 - Report any step you could not run as "not run", never as "passed".
 
