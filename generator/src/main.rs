@@ -140,6 +140,12 @@ fn home(articles: &[Article]) -> Page<Doc> {
                     img()
                         .src(SafeUrl::new("/pencil.svg"))
                         .attr(attr::ALT, "「筆先の黒は乾かすな」という文字のSVGイラスト")
+                        // The SVG's own size, so the browser reserves the
+                        // image's height before the file arrives.
+                        .attr(attr::WIDTH, "816")
+                        .attr(attr::HEIGHT, "144")
+                        // The largest element on the top page's first screen.
+                        .attr(attr::FETCHPRIORITY, "high")
                         .css(look::pencil()),
                 ),
             )
