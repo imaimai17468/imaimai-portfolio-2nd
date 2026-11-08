@@ -69,6 +69,17 @@ impl Section {
     }
 }
 
+/// The band along `edge` of the window that blurs the page scrolling under it.
+fn edge_blur(edge: look::Edge) -> El<Doc> {
+    div()
+        .attr(attr::ARIA_HIDDEN, "true")
+        .css(look::edge_blur(edge))
+        .children(
+            (0..look::BLUR_LAYERS).map(move |layer| span().css(look::blur_layer(edge, layer))),
+        )
+        .child(span().css(look::blur_tint(edge)))
+}
+
 /// The `<head>`, the styles, and the header every page shares, around `main`.
 fn layout(title: &str, current: Section, main: El<Doc>) -> Page<Doc> {
     Page::new(title, Doc {})
@@ -84,13 +95,8 @@ fn layout(title: &str, current: Section, main: El<Doc>) -> Page<Doc> {
                 .locale(OpenGraphLocale::new("ja_JP"))
                 .image(ORIGIN, "/og.png", "カエルのアイコンと imaimai17468 の文字"),
         )
-        .child(
-            div()
-                .attr(attr::ARIA_HIDDEN, "true")
-                .css(look::header_blur())
-                .children((0..look::BLUR_LAYERS).map(|layer| span().css(look::blur_layer(layer))))
-                .child(span().css(look::blur_tint())),
-        )
+        .child(edge_blur(look::Edge::Top))
+        .child(edge_blur(look::Edge::Bottom))
         .child(
             header()
                 .css(look::header())
@@ -386,7 +392,8 @@ mod look {
                     .max_width(rem(40))
                     .margin_block(px(0))
                     .margin_inline(MarginInline::Auto)
-                    .padding_block_end(rem(3))
+                    // Room for the last line to scroll clear of the bottom `edge_blur`.
+                    .padding_block_end(rem(6))
                     .padding_inline(rem(1))
                     .background_color(background().var())
                     // A noise tile that `paper.svg` draws in the foreground
@@ -399,39 +406,71 @@ mod look {
             )
     }
 
-    /// How many blurred bands `header_blur` stacks.
+    /// How many blurred bands `edge_blur` stacks.
     pub(crate) const BLUR_LAYERS: u8 = 8;
 
-    /// On a phone, a band across the top of the window that blurs the page
-    /// scrolling under the header, strongest at the top edge and gone at the
-    /// band's bottom. It is drawn as `BLUR_LAYERS` bands, from `blur_layer`,
-    /// whose blur halves from one to the next, under `blur_tint`. From the
-    /// `sm` breakpoint the header sits beside the page's column instead of
-    /// over its text, so the band is hidden.
-    pub(crate) fn header_blur() -> Style {
-        Style::new()
+    /// The edge of the window a blurred band sits along.
+    #[derive(Clone, Copy)]
+    pub(crate) enum Edge {
+        /// Under the header, blurred by up to 20px.
+        Top,
+        /// At the bottom of the window, blurred by up to 8px.
+        Bottom,
+    }
+
+    impl Edge {
+        /// The direction of the gradients, from the edge inward.
+        fn inward(self) -> &'static str {
+            match self {
+                Edge::Top => "to bottom",
+                Edge::Bottom => "to top",
+            }
+        }
+
+        /// The blur of the band nearest the edge, in px.
+        fn strongest_blur(self) -> f64 {
+            match self {
+                Edge::Top => 20.0,
+                Edge::Bottom => 8.0,
+            }
+        }
+    }
+
+    /// A band 6rem tall along `edge` of the window, over the page, that
+    /// blurs the page scrolling under it: strongest at the edge and gone at
+    /// the band's inner side. It is drawn as `BLUR_LAYERS` bands, from
+    /// `blur_layer`, whose blur halves from one to the next, under
+    /// `blur_tint`.
+    pub(crate) fn edge_blur(edge: Edge) -> Style {
+        let band = Style::new()
             .position(Position::Fixed)
-            .top(px(0))
             .left(px(0))
             .right(px(0))
             .height(rem(6))
             .pointer_events(PointerEvents::None)
-            .z_index(ZIndex::Integer(1))
-            .on(Media::Sm, Style::new().display(Display::None))
+            .z_index(ZIndex::Integer(1));
+        match edge {
+            Edge::Top => band.top(px(0)),
+            Edge::Bottom => band.bottom(px(0)),
+        }
     }
 
-    /// Band `layer`, counted from the top: blurred by 20px halved `layer`
-    /// times, and shown only over its eighth of the height and the eighths
-    /// on either side, where it fades in and out.
-    pub(crate) fn blur_layer(layer: u8) -> Style {
+    /// Band `layer`, counted from `edge`: blurred by the edge's strongest
+    /// blur halved `layer` times, and shown only over its eighth of the
+    /// height and the eighths on either side, where it fades in and out.
+    pub(crate) fn blur_layer(edge: Edge, layer: u8) -> Style {
         let eighth = |step: i32| format!("{}%", f64::from(step) * 12.5);
         let at = i32::from(layer);
         Style::new()
             .position(Position::Absolute)
             .inset(px(0))
-            .backdrop_filter(raw(format!("blur({}px)", 20.0 / f64::from(1_u16 << layer))))
+            .backdrop_filter(raw(format!(
+                "blur({}px)",
+                edge.strongest_blur() / f64::from(1_u16 << layer)
+            )))
             .mask_image(raw(format!(
-                "linear-gradient(to bottom, transparent {}, #000 {}, #000 {}, transparent {})",
+                "linear-gradient({}, transparent {}, #000 {}, #000 {}, transparent {})",
+                edge.inward(),
                 eighth(at - 2),
                 eighth(at - 1),
                 eighth(at),
@@ -439,15 +478,16 @@ mod look {
             )))
     }
 
-    /// The background color over the blur, nearly opaque at the top edge
-    /// and gone by 70 percent of the band's height.
-    pub(crate) fn blur_tint() -> Style {
+    /// The background color over the blur, nearly opaque at `edge` and gone
+    /// by 70 percent of the band's height.
+    pub(crate) fn blur_tint(edge: Edge) -> Style {
         let background = background().var();
         Style::new()
             .position(Position::Absolute)
             .inset(px(0))
             .background_image(raw(format!(
-                "linear-gradient(to bottom, {} 18px, {} 42%, transparent 70%)",
+                "linear-gradient({}, {} 18px, {} 42%, transparent 70%)",
+                edge.inward(),
                 background.opacity(95),
                 background.opacity(48),
             )))
