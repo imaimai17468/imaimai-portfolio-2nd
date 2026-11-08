@@ -193,6 +193,13 @@ const MOTTO: [&str; 3] = [
     "\"わかってんじゃん、アンタ\"って思ってもらえる人に、私はここにいるって伝えなくちゃいけないんだ。",
 ];
 
+/// The owner's GitHub Sponsors page, which the button in the about page's
+/// Support section opens.
+const SPONSORS: &str = "https://github.com/sponsors/imaimai17468";
+
+/// The text above the Sponsor button.
+const SUPPORT: &str = "hypersig や個人開発のサービスを気に入っていただけたら、GitHub Sponsors から応援してもらえると嬉しいです。";
+
 struct Project {
     name: &'static str,
     href: &'static str,
@@ -295,6 +302,16 @@ fn about() -> Page<Doc> {
                     ul().css(look::projects())
                         .children(PROJECTS.iter().map(project)),
                 ),
+            )
+            .child(
+                section()
+                    .child(h2().text("Support"))
+                    .child(p().text(SUPPORT))
+                    .child(
+                        a().href(SafeUrl::new(SPONSORS))
+                            .css(look::sponsor())
+                            .text("Sponsor"),
+                    ),
             ),
     )
 }
@@ -334,7 +351,9 @@ mod look {
         OverscrollBehavior, PointerEvents, Position, TextDecorationLine, ZIndex, pct, px, quoted,
         raw, rem, url,
     };
-    use hypersig::style::{Element, FontFace, Global, Media, Selector, Style, Theme, Token};
+    use hypersig::style::{
+        Element, FontFace, Global, Media, PseudoClass, Selector, Style, Theme, Token,
+    };
 
     const WHITE: u32 = 0xf9fafb;
     const BLACK: u32 = 0x1d1d1d;
@@ -637,6 +656,24 @@ mod look {
 
     pub(crate) fn projects() -> Style {
         stack(rem(1)).list_style(ListStyle::None).padding(px(0))
+    }
+
+    /// A pill outlined in the foreground color, filled with it on hover.
+    pub(crate) fn sponsor() -> Style {
+        Style::new()
+            .display(Display::InlineBlock)
+            .padding_block(rem(0.5))
+            .padding_inline(rem(1.5))
+            .border(raw(format!("1px solid {}", foreground().var())))
+            .border_radius(px(9999))
+            .color(foreground().var())
+            .text_decoration_line(TextDecorationLine::None)
+            .on(
+                PseudoClass::Hover,
+                Style::new()
+                    .background_color(foreground().var())
+                    .color(background().var()),
+            )
     }
 
     pub(crate) fn project_summary() -> Style {
