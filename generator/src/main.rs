@@ -140,6 +140,12 @@ fn home(articles: &[Article]) -> Page<Doc> {
                     img()
                         .src(SafeUrl::new("/pencil.svg"))
                         .attr(attr::ALT, "「筆先の黒は乾かすな」という文字のSVGイラスト")
+                        // The SVG's own size, so the browser reserves the
+                        // image's height before the file arrives.
+                        .attr(attr::WIDTH, "816")
+                        .attr(attr::HEIGHT, "144")
+                        // The largest element on the top page's first screen.
+                        .attr(attr::FETCHPRIORITY, "high")
                         .css(look::pencil()),
                 ),
             )
@@ -176,7 +182,7 @@ const CONTACTS: [Contact; 3] = [
 const BIO: [&str; 4] = [
     "千葉の田舎でぬくぬくしているエンジニアです。木更津高専、長岡技術科学大学を経て、2024年株式会社ゆめみに入社し、現在は買収によりアクセンチュアでエンジニアとして働きながら、採用活動、DevEx改善に取り組んでいます。",
     "ものづくりが好きで、C言語に始まり、競技プログラミング、ゲーム（Unity）、ビジュアル表現（Processing）、IoT、AI、そしてWebなど興味本位で多くのものに手を出しています。",
-    "人材育成・組織運営に興味があり、サポーターズ主催の技育祭ではスポンサー登壇を勤めています。また、複数のハッカソンで審査員を務めたり、学生の制作物に対してフィードバックを行う活動も行なっています。",
+    "人材育成・組織運営に興味があり、サポーターズ主催の技育祭ではスポンサー登壇を勤めています。また、複数のハッカソンで審査員を務め、学生の制作物に対してフィードバックを行う活動も行なっています。",
     "開発物では、Rust製Webフレームワーク、個人開発向けテンプレートをはじめ、個人で困った時に作ったサービスがぽこぽこあります。",
 ];
 
