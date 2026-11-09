@@ -15,7 +15,7 @@ use std::path::Path;
 
 use feed::Article;
 use hypersig::html::{
-    self, El, a, attr, div, h1, h2, header, img, li, nav, p, section, span, time, ul,
+    self, El, a, attr, div, h1, h2, h3, header, img, li, nav, p, section, span, time, ul,
 };
 use hypersig::{
     Asset, LanguageTag, OpenGraph, OpenGraphLocale, Origin, Page, PageResponse, Route, SafeUrl,
@@ -249,6 +249,51 @@ const PROJECTS: [Project; 8] = [
     },
 ];
 
+/// The events of one year in the Speaker or Judge section, as the old site
+/// listed them.
+struct Year {
+    year: &'static str,
+    events: &'static [&'static str],
+}
+
+/// The events the owner spoke at.
+const SPEAKER: [Year; 3] = [
+    Year {
+        year: "2026",
+        events: &[
+            "技育祭 2026 春",
+            "技育祭 2026 東海",
+            "技育祭 2026 九州",
+            "技育祭 2026 関西",
+            "技育祭 2026 秋",
+        ],
+    },
+    Year {
+        year: "2025",
+        events: &["TSKaigi 2025"],
+    },
+    Year {
+        year: "2024",
+        events: &["フロントエンドカンファレンス北海道 2024"],
+    },
+];
+
+/// The events the owner judged.
+const JUDGE: [Year; 2] = [
+    Year {
+        year: "2026",
+        events: &[
+            "技育博 2025 Vol.6",
+            "Gemini 3 ハッカソン 東京（予選審査）",
+            "技育博 2026 Vol.1",
+        ],
+    },
+    Year {
+        year: "2025",
+        events: &["技育博 2025 Vol.1", "技育博 2025 Vol.2"],
+    },
+];
+
 fn about() -> Page<Doc> {
     layout(
         "About | imaimai17468",
@@ -303,6 +348,8 @@ fn about() -> Page<Doc> {
                         .children(PROJECTS.iter().map(project)),
                 ),
             )
+            .child(events("Speaker", &SPEAKER))
+            .child(events("Judge", &JUDGE))
             .child(
                 section()
                     .child(h2().text("Support"))
@@ -314,6 +361,19 @@ fn about() -> Page<Doc> {
                     ),
             ),
     )
+}
+
+fn events(title: &str, years: &[Year]) -> El<Doc> {
+    section()
+        .child(h2().text(title))
+        .children(years.iter().map(|year| {
+            div()
+                .child(h3().css(look::event_year()).text(year.year))
+                .child(
+                    ul().css(look::events())
+                        .children(year.events.iter().map(|event| li().text(*event))),
+                )
+        }))
 }
 
 fn project(project: &Project) -> El<Doc> {
@@ -656,6 +716,21 @@ mod look {
 
     pub(crate) fn projects() -> Style {
         stack(rem(1)).list_style(ListStyle::None).padding(px(0))
+    }
+
+    /// A year heading in the Speaker or Judge section, in the muted color.
+    pub(crate) fn event_year() -> Style {
+        Style::new()
+            .color(muted())
+            .font_size(rem(0.875))
+            .margin_block_end(rem(0.5))
+    }
+
+    pub(crate) fn events() -> Style {
+        stack(rem(0.25))
+            .list_style(ListStyle::None)
+            .padding(px(0))
+            .margin_block(px(0))
     }
 
     /// A pill outlined in the foreground color, filled with it on hover.
