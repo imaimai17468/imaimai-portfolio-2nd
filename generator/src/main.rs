@@ -758,12 +758,14 @@ mod look {
             .margin(px(0))
     }
 
-    /// 20rem wide, shrinking to the page on a narrower screen.
+    /// 14rem wide on a phone and 20rem from the `sm` breakpoint, shrinking
+    /// to the page on a narrower screen.
     pub(crate) fn pencil() -> Style {
         Style::new()
-            .width(rem(20))
+            .width(rem(14))
             .max_width(pct(100))
             .height(Height::Auto)
+            .on(Media::Sm, Style::new().width(rem(20)))
     }
 }
 
