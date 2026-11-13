@@ -310,6 +310,43 @@ html:has(.menu) {
   margin: 0 0 var(--space-2);
 }
 
+.menu-detail-section {
+  margin-top: var(--space-4);
+}
+
+.menu-detail-section h3 {
+  margin: 0 0 var(--space-2);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+}
+
+.menu-detail-section ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.menu-detail-section li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--space-2);
+  padding-block: var(--space-1);
+  line-height: 1.6;
+}
+
+.menu-detail-section a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25em;
+}
+
+.menu-detail-meta {
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+
 .menu-detail-actions {
   display: flex;
   gap: var(--space-2);

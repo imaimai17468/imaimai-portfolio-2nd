@@ -307,6 +307,25 @@ export default function MenuScreen() {
           {detailSub?.action.paragraphs.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
+          {detailSub?.action.sections?.map((section) => (
+            <section key={section.heading} className="menu-detail-section">
+              <h3>{section.heading}</h3>
+              <ul>
+                {section.entries.map((entry) => (
+                  <li key={entry.label}>
+                    {entry.href ? (
+                      <a href={entry.href} target="_blank" rel="noreferrer">
+                        {entry.label}
+                      </a>
+                    ) : (
+                      entry.label
+                    )}
+                    {entry.meta && <span className="menu-detail-meta">{entry.meta}</span>}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
         </div>
         <div className="menu-detail-actions" style={{ "--n": 2 }}>
           <button type="button" className="menu-detail-back" ref={backButtonRef} onClick={closeDetail}>
