@@ -253,8 +253,8 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
   }
 
   function handleWheel(event: WheelEvent) {
-    event.preventDefault();
     if (!isInputEnabled) return;
+    event.preventDefault();
     const scale = event.deltaMode === 0 ? 1 : LINE_HEIGHT_PX;
     const deltaX = (event.deltaX || (event.shiftKey ? event.deltaY : 0)) * scale;
     const deltaY = (event.shiftKey ? 0 : event.deltaY) * scale;
