@@ -7,20 +7,29 @@ export interface PianoVoice {
 
 export interface PianoPlayer {
   play(sound: PianoSound, volume?: number): PianoVoice;
+  unlock(): void;
 }
 
 type FetchAudio = (url: string) => Promise<Response>;
 
-// Browsers start an AudioContext suspended unless a user gesture creates it,
-// so the context is created on the first play() rather than at import.
+// Browsers keep an AudioContext suspended until a user gesture resumes it, and
+// a scroll is not such a gesture, so unlock() runs from a tap or a key press.
 export function createPianoPlayer(fetchAudio: FetchAudio): PianoPlayer {
   let context: AudioContext | undefined;
   let decoded: Promise<AudioBuffer> | undefined;
 
+  function getContext(): AudioContext {
+    context ??= new AudioContext();
+    return context;
+  }
+
   return {
+    unlock() {
+      const audioContext = getContext();
+      if (audioContext.state === "suspended") void audioContext.resume();
+    },
     play(sound, volume = 1) {
-      context ??= new AudioContext();
-      const audioContext = context;
+      const audioContext = getContext();
       decoded ??= fetchAudio(audioUrl)
         .then((response) => response.arrayBuffer())
         .then((data) => audioContext.decodeAudioData(data));
