@@ -267,6 +267,17 @@ export default function MenuScreen() {
     }
   }
 
+  // Enter on a focused button clicks that button, so focus follows the arrow
+  // keys onto the item they select; otherwise Enter opens the item left behind.
+  function moveFocusWithSelection(axis: MenuAxis, index: number) {
+    const active = document.activeElement;
+    const stage = stageRef.current;
+    if (!stage || !(active instanceof HTMLElement) || !stage.contains(active)) return;
+    const selector =
+      axis === "main" ? `[data-row="${index}"] .menu-main-item` : `[data-row="${mainIndex}"] [data-sub="${index}"]`;
+    stage.querySelector<HTMLElement>(selector)?.focus({ preventScroll: true });
+  }
+
   const onKeyPressed = useEffectEvent((event: KeyboardEvent) => {
     if (isDetailOpen) {
       if (event.key === "Escape") closeDetail();
@@ -282,10 +293,16 @@ export default function MenuScreen() {
     if (move) {
       event.preventDefault();
       goTo(...move);
+      moveFocusWithSelection(...move);
       return;
     }
     const sub = subs[subIndex];
-    if (event.key === "Enter" && sub && sub.action.kind !== "link" && event.target === document.body) {
+    // Enter on the page, or on the selected row's own main item, opens the sub
+    // item that row has selected; on a sub item the button's own click does it.
+    const isOnSelectedMain =
+      event.target instanceof Element && event.target.closest('.menu-main-item[aria-current="true"]') !== null;
+    const isOnPage = event.target === document.body || isOnSelectedMain;
+    if (event.key === "Enter" && sub && sub.action.kind !== "link" && isOnPage) {
       event.preventDefault();
       activateSub(sub, subIndex);
     }
