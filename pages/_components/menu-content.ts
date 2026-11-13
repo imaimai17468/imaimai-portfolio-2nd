@@ -109,7 +109,6 @@ export const MENU: readonly MainItem[] = [
             "今はフロントエンドとハードウェアに熱が入っています。",
           ],
           sections: [
-            { heading: "スキル", entries: entries(["フロントエンド開発", "UI/UX デザイン", "React / Next.js", "TypeScript"]) },
             { heading: "プライベート", entries: entries(["HIPHOP", "Cyberpunk 2077"]) },
           ],
         },
@@ -140,7 +139,7 @@ export const MENU: readonly MainItem[] = [
             },
             { heading: "つくったもの", entries: entries(["文化祭での自作ゲーム展示", "研究室の鍵のカードキーシステム化", "学校の単位数計算サイト"]) },
             { heading: "成果", entries: entries(["Paiza S", "AtCoder 緑"]) },
-            { heading: "業務委託", entries: entries(["paiza Inc. — 競技プログラミング問題集の作問"]) },
+            { heading: "業務委託", entries: [{ label: "競技プログラミング問題集の作問", meta: "paiza Inc." }] },
             {
               heading: "記事",
               entries: [
@@ -187,10 +186,12 @@ export const MENU: readonly MainItem[] = [
             { heading: "成果", entries: entries(["第一回技育博に NUTMEG の代表として参加", "技育展 2023 企業賞"]) },
             {
               heading: "業務委託",
-              entries: entries([
-                "スタートアップ A 社 — 修理の受注 / 発注ができる LINE アプリの開発",
-                "スタートアップ B 社 — 建築関係のマッチングプラットフォーム / 学会の抄録冊子の自動作成サービス / 履歴書の自動 PDF 化・管理サービス",
-              ]),
+              entries: [
+                { label: "修理の受注・発注ができる LINE アプリの開発", meta: "スタートアップ A 社" },
+                { label: "建築関係のマッチングプラットフォーム", meta: "スタートアップ B 社" },
+                { label: "学会の抄録冊子の自動作成サービス", meta: "スタートアップ B 社" },
+                { label: "履歴書の自動 PDF 化・管理サービス", meta: "スタートアップ B 社" },
+              ],
             },
             {
               heading: "記事",
