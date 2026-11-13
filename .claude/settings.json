@@ -37,12 +37,24 @@
       "mcp__plugin_context7_context7__*",
       "mcp__plugin_chrome-devtools-mcp_chrome-devtools__*",
       "Bash(git fetch *)",
-      "Bash(gh pr checks *)"
+      "Bash(gh pr checks *)",
+      "mcp__claude-in-chrome__*",
+      "Bash(pnpm install)",
+      "Bash(pnpm run dev)",
+      "Bash(pnpm run build)",
+      "Bash(pnpm run preview)",
+      "Bash(pnpm exec vp check *)",
+      "Bash(npx -y modern-web-guidance@latest *)"
     ],
     "deny": [
-      "Bash(rm -rf:*)",
-      "Bash(rm -fr:*)",
-      "Bash(rm -r:*)",
+      "Bash(rm -rf /)",
+      "Bash(rm -rf ~)",
+      "Bash(rm -rf .)",
+      "Bash(rm -rf .git)",
+      "Bash(rm -fr /)",
+      "Bash(rm -fr ~)",
+      "Bash(rm -fr .)",
+      "Bash(rm -fr .git)",
       "Bash(git push --force:*)",
       "Bash(git push -f:*)",
       "Bash(git push --force-with-lease:*)",
@@ -71,12 +83,7 @@
       "Edit(./.env.development)",
       "Edit(./.env.production)"
     ],
-    "ask": [
-      "Bash(xargs kill -9)",
-      "Bash(rm:*)",
-      "Bash(mv:*)",
-      "Bash(cp:*)"
-    ]
+    "ask": []
   },
   "hooks": {
     "Stop": [
