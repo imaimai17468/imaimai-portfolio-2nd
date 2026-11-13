@@ -11,6 +11,7 @@ import {
   measureFocus,
   measureHeroMove,
   pickTapSound,
+  projectRestingCenter,
   type Exit,
   type MenuAxis,
 } from "./menu-motion";
@@ -21,8 +22,8 @@ type DetailSub = SubItem & { readonly action: Extract<SubItem["action"], { kind:
 
 const SOUND_VOLUME = 0.6;
 const HERO_SCALE = 1.25;
-const HERO_LEFT_PX = 24;
-const HERO_TOP_PX = 72;
+const HERO_TARGET = { x: 24, y: 72 };
+const SELECTED_ICON_SCALE = 1.2;
 
 function countItems(axis: MenuAxis, mainIndex: number): number {
   return axis === "main" ? MENU.length : (MENU[mainIndex]?.subs.length ?? 0);
@@ -42,12 +43,14 @@ export default function MenuScreen() {
   const [isSoundOn, setIsSoundOn] = useState(true);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [detailSub, setDetailSub] = useState<DetailSub | null>(null);
+  const [heroSubIndex, setHeroSubIndex] = useState(0);
   const stageRef = useRef<HTMLElement>(null);
   const backButtonRef = useRef<HTMLButtonElement>(null);
   const scrollerRef = useRef<MenuScroller | null>(null);
   const tapCount = useRef(0);
 
   const subs = MENU[mainIndex]?.subs ?? [];
+  const anchorSubIndex = isDetailOpen ? heroSubIndex : subIndex;
 
   function cue(sound: PianoSound) {
     if (isSoundOn) piano.play(sound, SOUND_VOLUME);
@@ -122,16 +125,32 @@ export default function MenuScreen() {
 
   function openDetail(sub: DetailSub, index: number) {
     const stage = stageRef.current;
-    const subElement = stage?.querySelector<HTMLElement>(`[data-row="${mainIndex}"] [data-sub="${index}"]`);
+    const row = stage?.querySelector<HTMLElement>(`[data-row="${mainIndex}"]`);
+    const subElement = row?.querySelector<HTMLElement>(`[data-sub="${index}"]`);
     const icon = subElement?.querySelector<HTMLElement>(".menu-sub-icon");
-    if (!stage || !subElement || !icon) return;
-    const { dx, dy } = measureHeroMove(icon.getBoundingClientRect(), HERO_SCALE, HERO_LEFT_PX, HERO_TOP_PX);
+    if (!stage || !row || !subElement || !icon) return;
+    const readNumber = (element: HTMLElement, name: string) =>
+      Number.parseFloat(getComputedStyle(element).getPropertyValue(name)) || 0;
+    const rect = icon.getBoundingClientRect();
+    const center = projectRestingCenter(
+      { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 },
+      {
+        shift: readNumber(row, "--shift"),
+        subIndex: index,
+        subWidth: readNumber(stage, "--sub-width"),
+        main: readNumber(stage, "--main-pos"),
+        mainIndex,
+        rowHeight: readNumber(stage, "--row"),
+      },
+    );
+    const { dx, dy } = measureHeroMove(center, icon.offsetWidth * SELECTED_ICON_SCALE * HERO_SCALE, HERO_TARGET);
     subElement.style.setProperty("--hero-dx", `${dx}px`);
     subElement.style.setProperty("--hero-dy", `${dy}px`);
     const band = stage.querySelector<HTMLElement>(".menu-band");
     stage.style.setProperty("--band-scale", String((stage.clientHeight / (band?.offsetHeight ?? 1)) * 1.05));
     flushSync(() => {
       setDetailSub(sub);
+      setHeroSubIndex(index);
       setIsDetailOpen(true);
     });
     scrollerRef.current?.setInputEnabled(false);
@@ -202,13 +221,13 @@ export default function MenuScreen() {
   }, []);
 
   function renderSub(sub: SubItem, index: number, isCurrentRow: boolean) {
-    const exit = isCurrentRow ? findSubExit(index, subIndex) : null;
+    const exit = isCurrentRow ? findSubExit(index, anchorSubIndex) : null;
     const shared = {
       className: "menu-sub-item",
       style: placeStyle(index, exit),
       "data-sub": index,
       "data-exit": exit?.direction,
-      "data-hero": (isCurrentRow && index === subIndex) || undefined,
+      "data-hero": (isCurrentRow && index === anchorSubIndex) || undefined,
       "data-current": (isCurrentRow && index === subIndex) || undefined,
       onFocus: () => goTo("sub", index),
       onClick: () => activateSub(sub, index),
@@ -244,7 +263,7 @@ export default function MenuScreen() {
     }
   }
 
-  const leadExit = findLeadExit(subIndex);
+  const leadExit = findLeadExit(anchorSubIndex);
 
   return (
     <main className="menu" ref={stageRef} onClick={handleStageClick} data-detail={isDetailOpen ? "open" : undefined}>

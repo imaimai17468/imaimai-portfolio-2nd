@@ -79,18 +79,27 @@ export function findLeadExit(selectedSub: number): Exit {
   return { direction: "left", distance: Math.min(selectedSub + 1, FARTHEST_EXIT) };
 }
 
-export interface Rect {
-  readonly left: number;
-  readonly top: number;
-  readonly width: number;
-  readonly height: number;
+export interface Point {
+  readonly x: number;
+  readonly y: number;
 }
 
-// The translation that, combined with `scale` about the element's centre,
-// puts the element's top-left corner at the target point.
-export function measureHeroMove(rect: Rect, scale: number, targetLeft: number, targetTop: number) {
+// The translation that moves an element whose centre will rest at `center`,
+// and whose final size is `size`, so its top-left corner lands on the target.
+// Scaling happens about the centre, so only the centre and the final size count.
+export function measureHeroMove(center: Point, size: number, target: Point) {
+  return { dx: target.x + size / 2 - center.x, dy: target.y + size / 2 - center.y };
+}
+
+// Where an element's centre will be once the menu stops moving: the rows are
+// translated by the main position and the selected row by its shift, so the
+// distance left to travel on each axis is added to where it is now.
+export function projectRestingCenter(
+  current: Point,
+  motion: { readonly shift: number; readonly subIndex: number; readonly subWidth: number; readonly main: number; readonly mainIndex: number; readonly rowHeight: number },
+): Point {
   return {
-    dx: targetLeft + (rect.width * scale) / 2 - (rect.left + rect.width / 2),
-    dy: targetTop + (rect.height * scale) / 2 - (rect.top + rect.height / 2),
+    x: current.x + (motion.shift - motion.subIndex) * motion.subWidth,
+    y: current.y + (motion.main - motion.mainIndex) * motion.rowHeight,
   };
 }
