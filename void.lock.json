@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "source": {
+    "routes": [
+      {
+        "pattern": "imaim.ai",
+        "custom_domain": true
+      }
+    ]
+  },
+  "resolved": {
+    "account_id": "71dd5ac6d6f667426e2026f8c43dcef0",
+    "name": "imaimai-portfolio",
+    "routes": [
+      {
+        "pattern": "imaim.ai",
+        "custom_domain": true
+      }
+    ]
+  },
+  "text": "{\n  \"account_id\": \"71dd5ac6d6f667426e2026f8c43dcef0\",\n  \"name\": \"imaimai-portfolio\",\n  \"routes\": [\n    {\n      \"pattern\": \"imaim.ai\",\n      \"custom_domain\": true\n    }\n  ]\n}\n"
+}

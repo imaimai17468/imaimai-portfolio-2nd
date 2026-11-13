@@ -8,6 +8,9 @@ export default defineConfig({
   "worker": {
     "compatibility_date": "2026-02-24"
   },
+  "cloudflare": {
+    "routes": [{ "pattern": "imaim.ai", "custom_domain": true }]
+  },
   "head": {
     "title": "imaimai17468",
     "htmlAttrs": { "lang": "ja" },
