@@ -1,31 +1,49 @@
 import { ArrowLeft, ExternalLink, VolumeOff } from "lucide-react";
 import { useEffect, useEffectEvent, useRef, useState, type CSSProperties, type MouseEvent } from "react";
+import { flushSync } from "react-dom";
 import { piano } from "../../src/lib/piano/player";
 import type { PianoSound } from "../../src/lib/piano/sprite";
 import { MENU, type SubItem } from "./menu-content";
-import { measureFocus, pickTapSound, type MenuAxis } from "./menu-motion";
+import {
+  findLeadExit,
+  findRowExit,
+  findSubExit,
+  measureFocus,
+  measureHeroMove,
+  pickTapSound,
+  type Exit,
+  type MenuAxis,
+} from "./menu-motion";
 import { createMenuScroller, type MenuScroller } from "./menu-scroller";
 import "./menu.css";
 
 type DetailSub = SubItem & { readonly action: Extract<SubItem["action"], { kind: "detail" }> };
 
 const SOUND_VOLUME = 0.6;
+const HERO_SCALE = 1.25;
+const HERO_LEFT_PX = 24;
+const HERO_TOP_PX = 72;
 
 function countItems(axis: MenuAxis, mainIndex: number): number {
   return axis === "main" ? MENU.length : (MENU[mainIndex]?.subs.length ?? 0);
 }
 
-function indexStyle(index: number): CSSProperties {
-  return { "--i": index };
+function placeStyle(index: number, exit: Exit | null = null): CSSProperties {
+  return exit ? { "--i": index, "--k": exit.distance } : { "--i": index };
+}
+
+function exitStyle(exit: Exit): CSSProperties {
+  return { "--k": exit.distance };
 }
 
 export default function MenuScreen() {
   const [mainIndex, setMainIndex] = useState(0);
   const [subIndex, setSubIndex] = useState(0);
   const [isSoundOn, setIsSoundOn] = useState(true);
-  const [openedSub, setOpenedSub] = useState<DetailSub | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [detailSub, setDetailSub] = useState<DetailSub | null>(null);
   const stageRef = useRef<HTMLElement>(null);
-  const dialogRef = useRef<HTMLDialogElement>(null);
+  const backButtonRef = useRef<HTMLButtonElement>(null);
   const scrollerRef = useRef<MenuScroller | null>(null);
   const tapCount = useRef(0);
 
@@ -96,9 +114,38 @@ export default function MenuScreen() {
   }
 
   function handleStageClick(event: MouseEvent<HTMLElement>) {
-    if (event.target instanceof Element && event.target.closest("button, a, dialog")) return;
+    if (isDetailOpen) return;
+    if (event.target instanceof Element && event.target.closest("button, a")) return;
     cue(pickTapSound(tapCount.current));
     tapCount.current += 1;
+  }
+
+  function openDetail(sub: DetailSub, index: number) {
+    const stage = stageRef.current;
+    const subElement = stage?.querySelector<HTMLElement>(`[data-row="${mainIndex}"] [data-sub="${index}"]`);
+    const icon = subElement?.querySelector<HTMLElement>(".menu-sub-icon");
+    if (!stage || !subElement || !icon) return;
+    const { dx, dy } = measureHeroMove(icon.getBoundingClientRect(), HERO_SCALE, HERO_LEFT_PX, HERO_TOP_PX);
+    subElement.style.setProperty("--hero-dx", `${dx}px`);
+    subElement.style.setProperty("--hero-dy", `${dy}px`);
+    const band = stage.querySelector<HTMLElement>(".menu-band");
+    stage.style.setProperty("--band-scale", String((stage.clientHeight / (band?.offsetHeight ?? 1)) * 1.05));
+    flushSync(() => {
+      setDetailSub(sub);
+      setIsDetailOpen(true);
+    });
+    scrollerRef.current?.setInputEnabled(false);
+    backButtonRef.current?.focus({ preventScroll: true });
+    cue("transition_up");
+  }
+
+  function closeDetail() {
+    flushSync(() => setIsDetailOpen(false));
+    scrollerRef.current?.setInputEnabled(true);
+    stageRef.current?.querySelector<HTMLElement>(`[data-row="${mainIndex}"] [data-sub="${subIndex}"]`)?.focus({
+      preventScroll: true,
+    });
+    cue("transition_down");
   }
 
   function activateSub(sub: SubItem, index: number) {
@@ -117,15 +164,16 @@ export default function MenuScreen() {
         cue("button");
         return;
       case "detail":
-        setOpenedSub({ ...sub, action: sub.action });
-        dialogRef.current?.showModal();
-        cue("transition_up");
+        openDetail({ ...sub, action: sub.action }, index);
         return;
     }
   }
 
   const onKeyPressed = useEffectEvent((event: KeyboardEvent) => {
-    if (dialogRef.current?.open) return;
+    if (isDetailOpen) {
+      if (event.key === "Escape") closeDetail();
+      return;
+    }
     const moves: Record<string, readonly [MenuAxis, number]> = {
       ArrowDown: ["main", mainIndex + 1],
       ArrowUp: ["main", mainIndex - 1],
@@ -154,10 +202,13 @@ export default function MenuScreen() {
   }, []);
 
   function renderSub(sub: SubItem, index: number, isCurrentRow: boolean) {
+    const exit = isCurrentRow ? findSubExit(index, subIndex) : null;
     const shared = {
       className: "menu-sub-item",
-      style: indexStyle(index),
+      style: placeStyle(index, exit),
       "data-sub": index,
+      "data-exit": exit?.direction,
+      "data-hero": (isCurrentRow && index === subIndex) || undefined,
       "data-current": (isCurrentRow && index === subIndex) || undefined,
       onFocus: () => goTo("sub", index),
       onClick: () => activateSub(sub, index),
@@ -193,29 +244,40 @@ export default function MenuScreen() {
     }
   }
 
+  const leadExit = findLeadExit(subIndex);
+
   return (
-    <main className="menu" ref={stageRef} onClick={handleStageClick}>
+    <main className="menu" ref={stageRef} onClick={handleStageClick} data-detail={isDetailOpen ? "open" : undefined}>
       <div className="menu-band" aria-hidden="true" />
 
-      <nav className="menu-rows" aria-label="メインメニュー">
+      <nav className="menu-rows" aria-label="メインメニュー" inert={isDetailOpen}>
         {MENU.map((item, index) => {
           const isSelected = index === mainIndex;
+          const rowExit = findRowExit(index, mainIndex);
           const Icon = item.id === "sound" && !isSoundOn ? VolumeOff : item.icon;
           return (
             <div
               key={item.id}
               className="menu-row"
-              style={indexStyle(index)}
+              style={placeStyle(index, rowExit)}
               data-row={index}
+              data-exit={rowExit?.direction}
               data-selected={isSelected || undefined}
             >
-              <span className="menu-main-title" aria-hidden="true">
+              <span
+                className="menu-main-title"
+                aria-hidden="true"
+                data-exit={isSelected ? leadExit.direction : undefined}
+                style={isSelected ? exitStyle(leadExit) : undefined}
+              >
                 {item.label}
               </span>
               <button
                 type="button"
                 className="menu-main-item"
                 aria-current={isSelected ? "true" : undefined}
+                data-exit={isSelected ? leadExit.direction : undefined}
+                style={isSelected ? exitStyle(leadExit) : undefined}
                 onClick={() => goTo("main", index)}
                 onFocus={() => goTo("main", index)}
               >
@@ -232,34 +294,33 @@ export default function MenuScreen() {
         })}
       </nav>
 
-      <dialog
-        ref={dialogRef}
+      <section
         className="menu-detail"
         aria-labelledby="menu-detail-title"
-        onClose={() => {
-          setOpenedSub(null);
-          cue("transition_down");
-        }}
+        aria-hidden={!isDetailOpen}
+        inert={!isDetailOpen}
       >
-        {openedSub && (
-          <>
-            <button type="button" className="menu-detail-back" onClick={() => dialogRef.current?.close()}>
-              <ArrowLeft aria-hidden="true" />
-              戻る
-            </button>
-            <h2 id="menu-detail-title">{openedSub.label}</h2>
-            {openedSub.action.paragraphs.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
-            {openedSub.action.href && (
-              <a className="menu-detail-link" href={openedSub.action.href} target="_blank" rel="noreferrer">
-                開く
-                <ExternalLink aria-hidden="true" />
-              </a>
-            )}
-          </>
-        )}
-      </dialog>
+        <h2 id="menu-detail-title" style={{ "--n": 0 }}>
+          {detailSub?.label}
+        </h2>
+        <div className="menu-detail-body" style={{ "--n": 1 }}>
+          {detailSub?.action.paragraphs.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
+        </div>
+        <div className="menu-detail-actions" style={{ "--n": 2 }}>
+          <button type="button" className="menu-detail-back" ref={backButtonRef} onClick={closeDetail}>
+            <ArrowLeft aria-hidden="true" />
+            戻る
+          </button>
+          {detailSub?.action.href && (
+            <a className="menu-detail-link" href={detailSub.action.href} target="_blank" rel="noreferrer">
+              開く
+              <ExternalLink aria-hidden="true" />
+            </a>
+          )}
+        </div>
+      </section>
     </main>
   );
 }

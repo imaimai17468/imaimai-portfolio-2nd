@@ -24,6 +24,7 @@ export interface MenuScrollerOptions {
 
 export interface MenuScroller {
   goTo(axis: MenuAxis, index: number): void;
+  setInputEnabled(isEnabled: boolean): void;
   repaint(): void;
   destroy(): void;
 }
@@ -75,6 +76,7 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
   let wheel: Gesture | null = null;
   let wheelTimer = 0;
   let shouldSuppressClick = false;
+  let isInputEnabled = true;
 
   function countOf(axis: MenuAxis): number {
     return options.countOf(axis, axes.main.lastIndex);
@@ -194,7 +196,7 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
   }
 
   function handlePointerDown(event: PointerEvent) {
-    if (!event.isPrimary || event.button !== 0) return;
+    if (!isInputEnabled || !event.isPrimary || event.button !== 0) return;
     for (const state of Object.values(axes)) {
       if (state.target === null) continue;
       state.target = null;
@@ -243,6 +245,7 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
 
   function handleWheel(event: WheelEvent) {
     event.preventDefault();
+    if (!isInputEnabled) return;
     const scale = event.deltaMode === 0 ? 1 : LINE_HEIGHT_PX;
     const deltaX = (event.deltaX || (event.shiftKey ? event.deltaY : 0)) * scale;
     const deltaY = (event.shiftKey ? 0 : event.deltaY) * scale;
@@ -275,6 +278,10 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
   return {
     goTo(axis, index) {
       settle(axis, clampIndex(index, countOf(axis)), axes[axis].velocity);
+    },
+    setInputEnabled(isEnabled) {
+      isInputEnabled = isEnabled;
+      if (!isEnabled) drag = null;
     },
     repaint: paint,
     destroy() {

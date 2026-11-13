@@ -49,3 +49,48 @@ export function isSettled(state: SpringState, target: number): boolean {
 export function measureFocus(distance: number): number {
   return Math.max(0, 1 - Math.abs(distance));
 }
+
+export type ExitDirection = "up" | "down" | "left" | "right";
+
+export interface Exit {
+  readonly direction: ExitDirection;
+  readonly distance: number;
+}
+
+const FARTHEST_EXIT = 3;
+
+// Everything on screen leaves away from the opened item: rows above go up,
+// rows below go down, and in its own row what lies left goes left and what
+// lies right goes right. The distance orders the exits, farthest first.
+export function findRowExit(row: number, selectedRow: number): Exit | null {
+  if (row === selectedRow) return null;
+  return {
+    direction: row < selectedRow ? "up" : "down",
+    distance: Math.min(Math.abs(row - selectedRow) + 1, FARTHEST_EXIT),
+  };
+}
+
+export function findSubExit(sub: number, selectedSub: number): Exit | null {
+  if (sub === selectedSub) return null;
+  return { direction: sub < selectedSub ? "left" : "right", distance: Math.min(Math.abs(sub - selectedSub), FARTHEST_EXIT) };
+}
+
+export function findLeadExit(selectedSub: number): Exit {
+  return { direction: "left", distance: Math.min(selectedSub + 1, FARTHEST_EXIT) };
+}
+
+export interface Rect {
+  readonly left: number;
+  readonly top: number;
+  readonly width: number;
+  readonly height: number;
+}
+
+// The translation that, combined with `scale` about the element's centre,
+// puts the element's top-left corner at the target point.
+export function measureHeroMove(rect: Rect, scale: number, targetLeft: number, targetTop: number) {
+  return {
+    dx: targetLeft + (rect.width * scale) / 2 - (rect.left + rect.width / 2),
+    dy: targetTop + (rect.height * scale) / 2 - (rect.top + rect.height / 2),
+  };
+}
