@@ -195,8 +195,32 @@ html:has(.menu) {
   .menu-switch-thumb {
     transition:
       transform 200ms var(--ease-out),
+      scale 160ms var(--ease-out),
       background-color 200ms ease;
   }
+}
+
+/* Rows that leave the band drop back: their sub row softens as the
+   selection changes, a discrete step rather than a per-frame filter. */
+.menu-row:not([data-selected]) .menu-sub {
+  filter: blur(2px);
+}
+
+.menu-sub {
+  transition: filter 200ms ease;
+}
+
+/* Press feedback answers the touch itself, before the release decides
+   whether it was a tap or the start of a drag. */
+.menu-main-icon svg,
+.menu-sub-icon svg {
+  transition: scale 160ms var(--ease-out);
+}
+
+.menu-main-item:active .menu-main-icon svg,
+.menu-sub-item:active .menu-sub-icon svg,
+.menu-sub-item:active .menu-switch {
+  scale: 0.97;
 }
 
 /* Opening a detail: everything else leaves away from the opened item,
@@ -205,7 +229,6 @@ html:has(.menu) {
 
 .menu {
   --exit-step: 90ms;
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 .menu-band {
@@ -220,10 +243,14 @@ html:has(.menu) {
 }
 
 [data-exit] {
-  transition: translate 520ms var(--ease-out) calc(1100ms + (var(--k) - 1) * var(--exit-step));
+  transition-property: translate, filter;
+  transition-duration: 520ms;
+  transition-timing-function: var(--ease-out);
+  transition-delay: calc(1100ms + (var(--k) - 1) * var(--exit-step));
 }
 
 .menu[data-detail="open"] [data-exit] {
+  filter: blur(8px);
   transition-timing-function: var(--ease-in-out);
   transition-delay: calc((3 - var(--k)) * var(--exit-step));
 }
@@ -287,14 +314,17 @@ html:has(.menu) {
   max-width: 560px;
   opacity: 0;
   transform: translateY(8px);
+  filter: blur(5px);
   transition:
     opacity 250ms ease,
-    transform 250ms ease;
+    transform 250ms ease,
+    filter 250ms ease;
 }
 
 .menu[data-detail="open"] .menu-detail > * {
   opacity: 1;
   transform: none;
+  filter: none;
   transition-duration: 450ms;
   transition-timing-function: var(--ease-out);
   transition-delay: calc(1600ms + var(--n) * 80ms);
@@ -376,6 +406,14 @@ html:has(.menu) {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .menu[data-detail="open"] .menu-band {
+    transform: none;
+  }
+
+  .menu[data-detail="open"] [data-exit] {
+    filter: none;
+  }
+
   .menu-band,
   [data-exit],
   .menu-sub-item[data-hero] .menu-sub-icon {

@@ -26,6 +26,7 @@
   --space-5: 40px;
 
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 
   font-family: var(--font-sans);
   font-weight: var(--font-weight-body);
