@@ -28,14 +28,13 @@ import {
   TrainFront,
   UserRound,
   Volume2,
-  VolumeOff,
   type LucideIcon,
 } from "lucide-react";
 
 export type SubAction =
   | { readonly kind: "detail"; readonly paragraphs: readonly string[]; readonly href?: string }
   | { readonly kind: "link"; readonly href: string }
-  | { readonly kind: "sound"; readonly isOn: boolean };
+  | { readonly kind: "soundSwitch" };
 
 export interface SubItem {
   readonly id: string;
@@ -58,10 +57,7 @@ export const MENU: readonly MainItem[] = [
     id: "sound",
     label: "サウンド",
     icon: Volume2,
-    subs: [
-      { id: "on", label: "オン", icon: Volume2, action: { kind: "sound", isOn: true } },
-      { id: "off", label: "オフ", icon: VolumeOff, action: { kind: "sound", isOn: false } },
-    ],
+    subs: [{ id: "switch", label: "サウンド", icon: Volume2, action: { kind: "soundSwitch" } }],
   },
   {
     id: "profile",
