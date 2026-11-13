@@ -5,14 +5,22 @@ import {
   projectTarget,
   stepSpring,
   type MenuAxis,
+  type SpringState,
 } from "./menu-motion";
+
+export interface MenuFrame {
+  readonly main: number;
+  readonly sub: number;
+  readonly subOwner: number;
+  readonly leftover: { readonly owner: number; readonly shift: number } | null;
+}
 
 export interface MenuScrollerOptions {
   countOf(axis: MenuAxis, mainIndex: number): number;
   sizeOf(axis: MenuAxis): number;
   onStep(axis: MenuAxis, index: number): void;
   onEdge(): void;
-  paint(main: number, sub: number): void;
+  paint(frame: MenuFrame): void;
 }
 
 export interface MenuScroller {
@@ -26,7 +34,6 @@ interface AxisState {
   velocity: number;
   target: number | null;
   lastIndex: number;
-  isSilent: boolean;
 }
 
 interface Sample {
@@ -34,11 +41,13 @@ interface Sample {
   readonly raw: number;
 }
 
+const AXES = ["main", "sub"] as const;
 const SPRING_PERIOD_S = 0.42;
 const WHEEL_IDLE_MS = 140;
-const AXIS_LOCK_PX = 8;
+const DRAG_START_PX = 8;
 const VELOCITY_WINDOW_MS = 100;
 const LINE_HEIGHT_PX = 16;
+const EDGE_CUE_OVERSHOOT = 0.15;
 
 function estimateVelocity(samples: readonly Sample[]): number {
   const last = samples.at(-1);
@@ -47,29 +56,80 @@ function estimateVelocity(samples: readonly Sample[]): number {
   return ((last.raw - first.raw) / (last.time - first.time)) * 1000;
 }
 
+function isPastEdge(raw: number, count: number): boolean {
+  return raw < -EDGE_CUE_OVERSHOOT || raw > count - 1 + EDGE_CUE_OVERSHOOT;
+}
+
+interface Gesture {
+  raw: Record<MenuAxis, number>;
+  samples: Record<MenuAxis, Sample[]>;
+  hasCuedEdge: boolean;
+}
+
+function startGesture(origin: Record<MenuAxis, number>): Gesture {
+  return { raw: { ...origin }, samples: { main: [], sub: [] }, hasCuedEdge: false };
+}
+
 export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOptions): MenuScroller {
   const axes: Record<MenuAxis, AxisState> = {
-    main: { position: 0, velocity: 0, target: null, lastIndex: 0, isSilent: false },
-    sub: { position: 0, velocity: 0, target: null, lastIndex: 0, isSilent: false },
+    main: { position: 0, velocity: 0, target: null, lastIndex: 0 },
+    sub: { position: 0, velocity: 0, target: null, lastIndex: 0 },
   };
+  let leftover: { owner: number; spring: SpringState } | null = null;
   let frame = 0;
   let lastFrameTime = 0;
+  let drag: (Gesture & { pointerId: number; lastX: number; lastY: number; isDragging: boolean }) | null = null;
+  let wheel: Gesture | null = null;
+  let wheelTimer = 0;
+  let shouldSuppressClick = false;
 
   function countOf(axis: MenuAxis): number {
     return options.countOf(axis, axes.main.lastIndex);
   }
 
   function paint() {
-    options.paint(axes.main.position, axes.sub.position);
+    options.paint({
+      main: axes.main.position,
+      sub: axes.sub.position,
+      subOwner: axes.main.lastIndex,
+      leftover: leftover && { owner: leftover.owner, shift: leftover.spring.position },
+    });
+  }
+
+  // The sub row belongs to the selected main item. When the selection moves,
+  // the shift it had springs back on the item it left, and the new row starts
+  // from its first item, with any gesture in progress counting from there.
+  function handOverSubRow(previousMain: number) {
+    const sub = axes.sub;
+    if (Math.abs(sub.position) > 0.001) {
+      leftover = { owner: previousMain, spring: { position: sub.position, velocity: sub.velocity } };
+    }
+    sub.position = 0;
+    sub.velocity = 0;
+    sub.target = null;
+    sub.lastIndex = 0;
+    for (const gesture of [drag, wheel]) {
+      if (!gesture) continue;
+      gesture.raw.sub = 0;
+      gesture.samples.sub = [];
+    }
+    animate();
   }
 
   function emitSteps() {
-    for (const axis of ["main", "sub"] as const) {
-      const state = axes[axis];
-      const index = clampIndex(state.position, countOf(axis));
-      if (index === state.lastIndex) continue;
-      state.lastIndex = index;
-      if (!state.isSilent) options.onStep(axis, index);
+    const main = axes.main;
+    const mainIndex = clampIndex(main.position, countOf("main"));
+    if (mainIndex !== main.lastIndex) {
+      const previousMain = main.lastIndex;
+      main.lastIndex = mainIndex;
+      handOverSubRow(previousMain);
+      options.onStep("main", mainIndex);
+    }
+    const sub = axes.sub;
+    const subIndex = clampIndex(sub.position, countOf("sub"));
+    if (subIndex !== sub.lastIndex) {
+      sub.lastIndex = subIndex;
+      options.onStep("sub", subIndex);
     }
   }
 
@@ -79,7 +139,7 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
     let isMoving = false;
     for (const state of Object.values(axes)) {
       if (state.target === null) continue;
-      let next = { position: state.position, velocity: state.velocity };
+      let next: SpringState = state;
       for (let step = 0; step < 4; step += 1) next = stepSpring(next, state.target, dt / 4, SPRING_PERIOD_S);
       state.position = next.position;
       state.velocity = next.velocity;
@@ -87,10 +147,15 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
         state.position = state.target;
         state.velocity = 0;
         state.target = null;
-        state.isSilent = false;
       } else {
         isMoving = true;
       }
+    }
+    if (leftover) {
+      let next = leftover.spring;
+      for (let step = 0; step < 4; step += 1) next = stepSpring(next, 0, dt / 4, SPRING_PERIOD_S);
+      leftover = isSettled(next, 0) ? null : { owner: leftover.owner, spring: next };
+      isMoving ||= leftover !== null;
     }
     emitSteps();
     paint();
@@ -110,83 +175,74 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
     animate();
   }
 
-  function returnSubToStart() {
-    const sub = axes.sub;
-    if (sub.position === 0 && sub.target === null) return;
-    sub.isSilent = true;
-    settle("sub", 0, sub.velocity);
-  }
-
-  function follow(axis: MenuAxis, raw: number, hasCuedEdge: boolean): boolean {
-    const state = axes[axis];
-    const count = countOf(axis);
-    state.target = null;
-    state.position = applyRubberBand(raw, count);
+  function follow(gesture: Gesture, time: number) {
+    let isOverEdge = false;
+    for (const axis of AXES) {
+      const state = axes[axis];
+      const count = countOf(axis);
+      const raw = gesture.raw[axis];
+      state.target = null;
+      state.position = applyRubberBand(raw, count);
+      const samples = gesture.samples[axis];
+      samples.push({ time, raw });
+      if (samples.length > 20) samples.shift();
+      isOverEdge ||= isPastEdge(raw, count);
+    }
     emitSteps();
     paint();
-    const isPastEdge = raw < 0 || raw > count - 1;
-    if (isPastEdge && !hasCuedEdge) options.onEdge();
-    return hasCuedEdge || isPastEdge;
+    if (isOverEdge && !gesture.hasCuedEdge) options.onEdge();
+    gesture.hasCuedEdge = isOverEdge;
   }
 
-  // Drag
-  let drag: {
-    pointerId: number;
-    startX: number;
-    startY: number;
-    origin: Record<MenuAxis, number>;
-    axis: MenuAxis | null;
-    samples: Sample[];
-    hasCuedEdge: boolean;
-  } | null = null;
-  let shouldSuppressClick = false;
+  function release(gesture: Gesture, shouldProject: boolean) {
+    for (const axis of AXES) {
+      const state = axes[axis];
+      const count = countOf(axis);
+      const velocity = shouldProject ? estimateVelocity(gesture.samples[axis]) : 0;
+      const isInside = state.position >= 0 && state.position <= count - 1;
+      settle(axis, projectTarget(state.position, velocity, count), isInside ? velocity : 0);
+    }
+  }
 
   function handlePointerDown(event: PointerEvent) {
     if (!event.isPrimary || event.button !== 0) return;
     for (const state of Object.values(axes)) {
-      if (state.target === null || state.isSilent) continue;
+      if (state.target === null) continue;
       state.target = null;
       state.velocity = 0;
     }
     drag = {
+      ...startGesture({ main: axes.main.position, sub: axes.sub.position }),
       pointerId: event.pointerId,
-      startX: event.clientX,
-      startY: event.clientY,
-      origin: { main: axes.main.position, sub: axes.sub.position },
-      axis: null,
-      samples: [],
-      hasCuedEdge: false,
+      lastX: event.clientX,
+      lastY: event.clientY,
+      isDragging: false,
     };
   }
 
   function handlePointerMove(event: PointerEvent) {
     if (!drag || event.pointerId !== drag.pointerId) return;
-    const dx = event.clientX - drag.startX;
-    const dy = event.clientY - drag.startY;
-    if (drag.axis === null) {
-      if (Math.hypot(dx, dy) < AXIS_LOCK_PX) return;
-      drag.axis = Math.abs(dx) > Math.abs(dy) ? "sub" : "main";
+    const dx = event.clientX - drag.lastX;
+    const dy = event.clientY - drag.lastY;
+    if (!drag.isDragging) {
+      if (Math.hypot(dx, dy) < DRAG_START_PX) return;
+      drag.isDragging = true;
       stage.setPointerCapture(event.pointerId);
-      if (drag.axis === "main") returnSubToStart();
     }
-    const delta = drag.axis === "main" ? dy : dx;
-    const raw = drag.origin[drag.axis] - delta / options.sizeOf(drag.axis);
-    drag.samples.push({ time: event.timeStamp, raw });
-    if (drag.samples.length > 20) drag.samples.shift();
-    drag.hasCuedEdge = follow(drag.axis, raw, drag.hasCuedEdge);
+    drag.lastX = event.clientX;
+    drag.lastY = event.clientY;
+    drag.raw.main -= dy / options.sizeOf("main");
+    drag.raw.sub -= dx / options.sizeOf("sub");
+    follow(drag, event.timeStamp);
   }
 
   function handlePointerUp(event: PointerEvent) {
     if (!drag || event.pointerId !== drag.pointerId) return;
-    const { axis, samples } = drag;
+    const gesture = drag;
     drag = null;
-    if (axis === null) return;
+    if (!gesture.isDragging) return;
     shouldSuppressClick = true;
-    const state = axes[axis];
-    const count = countOf(axis);
-    const velocity = estimateVelocity(samples);
-    const isInside = state.position >= 0 && state.position <= count - 1;
-    settle(axis, projectTarget(state.position, velocity, count), isInside ? velocity : 0);
+    release(gesture, true);
   }
 
   function handleClickCapture(event: MouseEvent) {
@@ -196,30 +252,21 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
     event.stopPropagation();
   }
 
-  // Wheel and trackpad
-  let wheel: { axis: MenuAxis; raw: number; samples: Sample[]; hasCuedEdge: boolean } | null = null;
-  let wheelTimer = 0;
-
   function handleWheel(event: WheelEvent) {
     event.preventDefault();
     const scale = event.deltaMode === 0 ? 1 : LINE_HEIGHT_PX;
     const deltaX = (event.deltaX || (event.shiftKey ? event.deltaY : 0)) * scale;
     const deltaY = (event.shiftKey ? 0 : event.deltaY) * scale;
-    if (wheel === null) {
-      const axis: MenuAxis = Math.abs(deltaX) > Math.abs(deltaY) ? "sub" : "main";
-      if (axis === "main") returnSubToStart();
-      wheel = { axis, raw: axes[axis].position, samples: [], hasCuedEdge: false };
-    }
-    const delta = wheel.axis === "main" ? deltaY : deltaX;
-    wheel.raw += delta / options.sizeOf(wheel.axis);
-    wheel.samples.push({ time: event.timeStamp, raw: wheel.raw });
-    wheel.hasCuedEdge = follow(wheel.axis, wheel.raw, wheel.hasCuedEdge);
+    wheel ??= startGesture({ main: axes.main.position, sub: axes.sub.position });
+    wheel.raw.main += deltaY / options.sizeOf("main");
+    wheel.raw.sub += deltaX / options.sizeOf("sub");
+    follow(wheel, event.timeStamp);
     window.clearTimeout(wheelTimer);
     wheelTimer = window.setTimeout(() => {
       if (!wheel) return;
-      const { axis } = wheel;
+      const gesture = wheel;
       wheel = null;
-      settle(axis, clampIndex(axes[axis].position, countOf(axis)), 0);
+      release(gesture, false);
     }, WHEEL_IDLE_MS);
   }
 
@@ -238,7 +285,6 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
 
   return {
     goTo(axis, index) {
-      if (axis === "main" && index !== axes.main.lastIndex) returnSubToStart();
       settle(axis, clampIndex(index, countOf(axis)), axes[axis].velocity);
     },
     repaint: paint,

@@ -38,10 +38,7 @@ html:has(.menu) {
 }
 
 .menu-main {
-  transform: translate(
-    calc(var(--sub-pos) * var(--sub-width) * -1),
-    calc(var(--main-pos) * var(--row) * -1)
-  );
+  transform: translateY(calc(var(--main-pos) * var(--row) * -1));
 }
 
 .menu-sub {
@@ -70,7 +67,9 @@ html:has(.menu) {
 }
 
 .menu-main-item {
+  --shift: 0;
   top: calc(var(--band-top) + var(--i) * var(--row));
+  transform: translateX(calc(var(--shift) * var(--sub-width) * -1));
   left: 0;
   display: grid;
   grid-template-rows: var(--title-height) auto auto;

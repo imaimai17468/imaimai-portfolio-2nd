@@ -56,12 +56,18 @@ export default function MenuScreen() {
       sizeOf: (axis) => readSize(axis === "main" ? "--row" : "--sub-width"),
       onStep: (axis, index) => onStepped(axis, index),
       onEdge: () => onPushedPastEdge(),
-      paint(mainPosition, subPosition) {
+      paint({ main: mainPosition, sub: subPosition, subOwner, leftover }) {
         stage.style.setProperty("--main-pos", String(mainPosition));
         stage.style.setProperty("--sub-pos", String(subPosition));
         for (const item of stage.querySelectorAll<HTMLElement>("[data-axis]")) {
-          const position = item.dataset.axis === "main" ? mainPosition : subPosition;
-          item.style.setProperty("--focus", String(measureFocus(Number(item.dataset.index) - position)));
+          const index = Number(item.dataset.index);
+          if (item.dataset.axis === "sub") {
+            item.style.setProperty("--focus", String(measureFocus(index - subPosition)));
+            continue;
+          }
+          const shift = (index === subOwner ? subPosition : 0) + (index === leftover?.owner ? leftover.shift : 0);
+          item.style.setProperty("--focus", String(measureFocus(index - mainPosition)));
+          item.style.setProperty("--shift", String(shift));
         }
       },
     });
