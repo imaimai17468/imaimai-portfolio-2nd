@@ -22,7 +22,7 @@ type DetailSub = SubItem & { readonly action: Extract<SubItem["action"], { kind:
 
 const SOUND_VOLUME = 0.6;
 const HERO_SCALE = 1.25;
-const HERO_TARGET = { x: 24, y: 72 };
+const HERO_TOP_PX = 72;
 const SELECTED_ICON_SCALE = 1.2;
 // The hero icon's way back takes 150ms of delay and 550ms of travel, and the
 // detail text has faded by 250ms, so these clear the scroll once both are done.
@@ -160,7 +160,13 @@ export default function MenuScreen() {
         rowHeight: readSize("--row"),
       },
     );
-    const { dx, dy } = measureHeroMove(center, icon.offsetWidth * SELECTED_ICON_SCALE * HERO_SCALE, HERO_TARGET);
+    // The heading's left edge follows the detail's padding, which grows past the
+    // notch in landscape, so the icon lands where the text starts.
+    const textLeft = detailRef.current ? Number.parseFloat(getComputedStyle(detailRef.current).paddingLeft) : 0;
+    const { dx, dy } = measureHeroMove(center, icon.offsetWidth * SELECTED_ICON_SCALE * HERO_SCALE, {
+      x: textLeft,
+      y: HERO_TOP_PX,
+    });
     subElement.style.setProperty("--hero-dx", `${dx}px`);
     subElement.style.setProperty("--hero-dy", `${dy}px`);
     for (const timer of closeTimers.current) window.clearTimeout(timer);

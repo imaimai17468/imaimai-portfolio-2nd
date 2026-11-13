@@ -13,7 +13,8 @@ export default defineConfig({
     "htmlAttrs": { "lang": "ja" },
     "meta": [
       { "name": "viewport", "content": "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { "name": "description", "content": "imaimai17468のポートフォリオサイト" }
+      { "name": "description", "content": "imaimai17468のポートフォリオサイト" },
+      { "name": "color-scheme", "content": "light dark" }
     ],
     "link": [{ "rel": "icon", "href": "/icon.png" }]
   }

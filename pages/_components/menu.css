@@ -1,7 +1,8 @@
 .menu {
   --row: 176px;
   --row-padding: var(--space-4);
-  --main-width: 152px;
+  --inset-left: max(var(--space-4), env(safe-area-inset-left, 0px));
+  --main-width: calc(128px + var(--inset-left));
   --title-height: 40px;
   --title-size: 26px;
   --main-icon: 64px;
@@ -21,7 +22,7 @@
 @media (min-width: 768px) {
   .menu {
     --row: 208px;
-    --main-width: 184px;
+    --main-width: calc(160px + var(--inset-left));
     --title-height: 48px;
     --title-size: 32px;
     --main-icon: 76px;
@@ -59,7 +60,7 @@ html:has(.menu) {
   left: 0;
   right: 0;
   height: var(--row);
-  padding: var(--row-padding) var(--space-4) 0;
+  padding: var(--row-padding) var(--space-4) 0 var(--inset-left);
   pointer-events: none;
 }
 
@@ -89,7 +90,8 @@ html:has(.menu) {
   text-decoration: none;
   cursor: pointer;
   pointer-events: auto;
-  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
 }
 
 .menu-main-item {
@@ -313,8 +315,11 @@ html:has(.menu) {
   position: absolute;
   inset: 0;
   padding: var(--detail-top) max(var(--space-4), env(safe-area-inset-right))
-    calc(var(--space-5) + env(safe-area-inset-bottom)) max(var(--space-4), env(safe-area-inset-left));
+    calc(var(--space-5) + env(safe-area-inset-bottom)) var(--inset-left);
   overflow-y: auto;
+  overscroll-behavior: contain;
+  user-select: text;
+  -webkit-user-select: text;
   touch-action: pan-y;
   pointer-events: none;
 }
@@ -416,6 +421,10 @@ html:has(.menu) {
   background: var(--background);
   text-decoration: none;
   cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .menu-detail-back svg,
