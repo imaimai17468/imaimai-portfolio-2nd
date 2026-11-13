@@ -360,12 +360,23 @@ export default function MenuScreen() {
   }
 
   const leadExit = findLeadExit(anchorSubIndex);
+  const frogExit = findRowExit(-1, mainIndex) ?? { direction: "up", distance: 1 };
 
   return (
     <main className="menu" ref={stageRef} onClick={handleStageClick} data-detail={isDetailOpen ? "open" : undefined}>
       <div className="menu-band" aria-hidden="true" />
 
       <nav className="menu-rows" aria-label="メインメニュー" inert={isDetailOpen}>
+        <img
+          className="menu-mark"
+          src="/frog.svg"
+          alt="helloと挨拶しているいまいまいのカエルのイラスト"
+          width={70}
+          height={48}
+          data-exit="up"
+          style={exitStyle(frogExit)}
+          draggable={false}
+        />
         {MENU.map((item, index) => {
           const isSelected = index === mainIndex;
           const rowExit = findRowExit(index, mainIndex);

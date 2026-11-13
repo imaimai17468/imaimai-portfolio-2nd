@@ -51,6 +51,19 @@ html:has(.menu) {
   will-change: transform;
 }
 
+/* The frog sits one row above the first item, where that row's icon would be,
+   and scrolls with the list. */
+.menu-mark {
+  position: absolute;
+  top: calc(var(--band-top) - var(--row) + var(--row-padding) + var(--title-height));
+  left: calc(var(--inset-left) - 6px);
+  width: calc(var(--main-icon) * 1.4);
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 .menu-row {
   --focus: 0;
   --shift: 0;
