@@ -8,13 +8,13 @@ import {
   findLeadExit,
   findRowExit,
   findSubExit,
-  measureFocus,
   measureHeroMove,
   pickTapSound,
   projectRestingCenter,
   type Exit,
   type MenuAxis,
 } from "./menu-motion";
+import { collectRowElements, paintRow } from "./menu-paint";
 import { createMenuScroller, type MenuScroller } from "./menu-scroller";
 import "./menu.css";
 
@@ -68,30 +68,39 @@ export default function MenuScreen() {
 
   useEffect(() => {
     const stage = stageRef.current;
-    if (!stage) return;
+    const rowsElement = stage?.querySelector<HTMLElement>(".menu-rows");
+    if (!stage || !rowsElement) return;
     const readSize = (name: string) => Number.parseFloat(getComputedStyle(stage).getPropertyValue(name)) || 1;
+    let sizes = { row: readSize("--row"), sub: readSize("--sub-width") };
+    function handleResize() {
+      sizes = { row: readSize("--row"), sub: readSize("--sub-width") };
+    }
+    window.addEventListener("resize", handleResize);
+    const rows = collectRowElements(stage);
     const scroller = createMenuScroller(stage, {
       countOf: countItems,
-      sizeOf: (axis) => readSize(axis === "main" ? "--row" : "--sub-width"),
+      sizeOf: (axis) => (axis === "main" ? sizes.row : sizes.sub),
       onStep: (axis, index) => onStepped(axis, index),
-      paint({ main: mainPosition, sub: subPosition, subOwner, leftover }) {
-        stage.style.setProperty("--main-pos", String(mainPosition));
-        for (const row of stage.querySelectorAll<HTMLElement>("[data-row]")) {
-          const index = Number(row.dataset.row);
-          const shift = (index === subOwner ? subPosition : 0) + (index === leftover?.owner ? leftover.shift : 0);
-          row.style.setProperty("--focus", String(measureFocus(index - mainPosition)));
-          row.style.setProperty("--shift", String(shift));
-          for (const item of row.querySelectorAll<HTMLElement>("[data-sub]")) {
-            item.style.setProperty("--focus", String(measureFocus(Number(item.dataset.sub) - shift)));
-          }
-        }
+      paint(frame) {
+        rowsElement.style.transform = `translate3d(0, ${-frame.main * sizes.row}px, 0)`;
+        for (const row of rows) paintRow(row, frame, sizes.sub);
       },
     });
     scrollerRef.current = scroller;
     return () => {
+      window.removeEventListener("resize", handleResize);
       scroller.destroy();
       scrollerRef.current = null;
     };
+  }, []);
+
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    // iOS Safari applies :active only where a touchstart listener exists.
+    function noop() {}
+    stage.addEventListener("touchstart", noop, { passive: true });
+    return () => stage.removeEventListener("touchstart", noop);
   }, []);
 
   useEffect(() => {
@@ -125,22 +134,22 @@ export default function MenuScreen() {
 
   function openDetail(sub: DetailSub, index: number) {
     const stage = stageRef.current;
-    const row = stage?.querySelector<HTMLElement>(`[data-row="${mainIndex}"]`);
-    const subElement = row?.querySelector<HTMLElement>(`[data-sub="${index}"]`);
+    const subElement = stage?.querySelector<HTMLElement>(`[data-row="${mainIndex}"] [data-sub="${index}"]`);
     const icon = subElement?.querySelector<HTMLElement>(".menu-sub-icon");
-    if (!stage || !row || !subElement || !icon) return;
-    const readNumber = (element: HTMLElement, name: string) =>
-      Number.parseFloat(getComputedStyle(element).getPropertyValue(name)) || 0;
+    if (!stage || !subElement || !icon) return;
+    const frame = scrollerRef.current?.readFrame();
+    if (!frame) return;
+    const readSize = (name: string) => Number.parseFloat(getComputedStyle(stage).getPropertyValue(name)) || 0;
     const rect = icon.getBoundingClientRect();
     const center = projectRestingCenter(
       { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 },
       {
-        shift: readNumber(row, "--shift"),
+        shift: frame.subOwner === mainIndex ? frame.sub : 0,
         subIndex: index,
-        subWidth: readNumber(stage, "--sub-width"),
-        main: readNumber(stage, "--main-pos"),
+        subWidth: readSize("--sub-width"),
+        main: frame.main,
         mainIndex,
-        rowHeight: readNumber(stage, "--row"),
+        rowHeight: readSize("--row"),
       },
     );
     const { dx, dy } = measureHeroMove(center, icon.offsetWidth * SELECTED_ICON_SCALE * HERO_SCALE, HERO_TARGET);

@@ -25,6 +25,7 @@ export interface MenuScrollerOptions {
 
 export interface MenuScroller {
   goTo(axis: MenuAxis, index: number): void;
+  readFrame(): MenuFrame;
   setInputEnabled(isEnabled: boolean): void;
   repaint(): void;
   destroy(): void;
@@ -84,13 +85,17 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
     return options.countOf(axis, axes.main.lastIndex);
   }
 
-  function paint() {
-    options.paint({
+  function readFrame(): MenuFrame {
+    return {
       main: axes.main.position,
       sub: axes.sub.position,
       subOwner: axes.main.lastIndex,
       leftover: leftover && { owner: leftover.owner, shift: leftover.spring.position },
-    });
+    };
+  }
+
+  function paint() {
+    options.paint(readFrame());
   }
 
   // The sub row belongs to the selected main item. When the selection moves,
@@ -287,6 +292,7 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
       isInputEnabled = isEnabled;
       if (!isEnabled) drag = null;
     },
+    readFrame,
     repaint: paint,
     destroy() {
       cancelAnimationFrame(frame);
