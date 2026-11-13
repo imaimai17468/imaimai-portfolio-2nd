@@ -7,6 +7,7 @@ import {
   useState,
   type CSSProperties,
   type MouseEvent,
+  type TransitionEvent,
   type ReactNode,
 } from "react";
 import { flushSync } from "react-dom";
@@ -31,7 +32,6 @@ type DetailSub = SubItem & { readonly action: Extract<SubItem["action"], { kind:
 
 const SOUND_VOLUME = 0.6;
 const HERO_SCALE = 1.25;
-const HERO_TOP_PX = 72;
 const SELECTED_ICON_SCALE = 1.2;
 // The hero icon's way back takes 150ms of delay and 550ms of travel, and the
 // detail text has faded by 250ms, so these clear the scroll once both are done.
@@ -70,6 +70,7 @@ export default function MenuScreen() {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [detailSub, setDetailSub] = useState<DetailSub | null>(null);
   const [heroSubIndex, setHeroSubIndex] = useState(0);
+  const [isHeroLanded, setIsHeroLanded] = useState(false);
   const stageRef = useRef<HTMLElement>(null);
   const backButtonRef = useRef<HTMLButtonElement>(null);
   const detailRef = useRef<HTMLElement>(null);
@@ -186,7 +187,7 @@ export default function MenuScreen() {
     const textLeft = detailRef.current ? Number.parseFloat(getComputedStyle(detailRef.current).paddingLeft) : 0;
     const { dx, dy } = measureHeroMove(center, icon.offsetWidth * SELECTED_ICON_SCALE * HERO_SCALE, {
       x: textLeft,
-      y: HERO_TOP_PX,
+      y: readSize("--hero-top"),
     });
     subElement.style.setProperty("--hero-dx", `${dx}px`);
     subElement.style.setProperty("--hero-dy", `${dy}px`);
@@ -200,29 +201,37 @@ export default function MenuScreen() {
     if (detailRef.current) detailRef.current.scrollTop = 0;
     const band = stage.querySelector<HTMLElement>(".menu-band");
     stage.style.setProperty("--band-scale", String((stage.clientHeight / (band?.offsetHeight ?? 1)) * 1.05));
+    // Without motion the icon jumps to the heading, so no transition end arrives
+    // to report the landing.
+    const isMotionReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     flushSync(() => {
       setDetailSub(sub);
       setHeroSubIndex(index);
       setIsDetailOpen(true);
+      setIsHeroLanded(isMotionReduced);
     });
     scrollerRef.current?.setInputEnabled(false);
     backButtonRef.current?.focus({ preventScroll: true });
     cue("transition_up");
   }
 
-  // The hero icon sits in the menu layer while the text scrolls in its own
-  // panel, so the icon follows the scroll to stay above the heading.
-  function handleDetailScroll() {
-    const hero = heroItemRef.current;
-    const detail = detailRef.current;
-    if (!hero || !detail || !isDetailOpen) return;
-    hero.style.transform = `translate3d(0, ${-detail.scrollTop}px, 0)`;
+  // Once the flying icon reaches the heading, the copy inside the detail takes
+  // its place and scrolls with the text, so the panel scrolls only from then on.
+  function handleTransitionEnd(event: TransitionEvent<HTMLElement>) {
+    if (!isDetailOpen || event.propertyName !== "translate") return;
+    if (event.target !== heroItemRef.current?.querySelector(".menu-sub-icon")) return;
+    setIsHeroLanded(true);
   }
 
   function returnHeroFromScroll() {
     const hero = heroItemRef.current;
     const detail = detailRef.current;
     if (!hero || !detail) return;
+    // The flying icon takes over from the copy where the scroll has carried it.
+    // Measuring commits that start before the transition is set; a bare read of
+    // offsetWidth would be dropped by the React Compiler as an unused value.
+    hero.style.transform = `translate3d(0, ${-detail.scrollTop}px, 0)`;
+    hero.getBoundingClientRect();
     hero.style.transition = HERO_RETURN_TRANSITION;
     hero.style.transform = "translate3d(0, 0, 0)";
     closeTimers.current = [
@@ -238,7 +247,10 @@ export default function MenuScreen() {
 
   function closeDetail() {
     returnHeroFromScroll();
-    flushSync(() => setIsDetailOpen(false));
+    flushSync(() => {
+      setIsDetailOpen(false);
+      setIsHeroLanded(false);
+    });
     scrollerRef.current?.setInputEnabled(true);
     stageRef.current?.querySelector<HTMLElement>(`[data-row="${mainIndex}"] [data-sub="${subIndex}"]`)?.focus({
       preventScroll: true,
@@ -363,7 +375,14 @@ export default function MenuScreen() {
   const frogExit = findRowExit(-1, mainIndex) ?? { direction: "up", distance: 1 };
 
   return (
-    <main className="menu" ref={stageRef} onClick={handleStageClick} data-detail={isDetailOpen ? "open" : undefined}>
+    <main
+      className="menu"
+      ref={stageRef}
+      onClick={handleStageClick}
+      onTransitionEnd={handleTransitionEnd}
+      data-detail={isDetailOpen ? "open" : undefined}
+      data-hero-landed={isHeroLanded || undefined}
+    >
       <div className="menu-band" aria-hidden="true" />
 
       <nav className="menu-rows" aria-label="メインメニュー" inert={isDetailOpen}>
@@ -423,11 +442,15 @@ export default function MenuScreen() {
       <section
         ref={detailRef}
         className="menu-detail"
-        onScroll={handleDetailScroll}
         aria-labelledby="menu-detail-title"
         aria-hidden={!isDetailOpen}
         inert={!isDetailOpen}
       >
+        {detailSub && (
+          <span className="menu-detail-icon" aria-hidden="true">
+            <detailSub.icon />
+          </span>
+        )}
         <h2 id="menu-detail-title" style={{ "--n": 0 }}>
           {detailSub?.label}
         </h2>

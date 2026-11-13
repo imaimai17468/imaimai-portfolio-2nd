@@ -8,6 +8,7 @@
   --main-icon: 64px;
   --sub-width: 112px;
   --detail-top: 200px;
+  --hero-top: 72px;
   --band-top: calc(50% - var(--row) / 2);
   --main-pos: 0;
 
@@ -310,6 +311,12 @@ html:has(.menu) {
   transition: opacity 300ms ease 300ms;
 }
 
+/* The copy inside the detail scrolls with the text, so the flying icon hides
+   once it has landed on the copy. */
+.menu[data-hero-landed] .menu-sub-item[data-hero] .menu-sub-icon {
+  opacity: 0;
+}
+
 .menu[data-detail="open"] .menu-sub-item[data-hero] .menu-sub-label {
   opacity: 0;
   transition-delay: 1100ms;
@@ -320,7 +327,7 @@ html:has(.menu) {
   inset: 0;
   padding: var(--detail-top) max(var(--space-4), env(safe-area-inset-right))
     calc(var(--space-5) + env(safe-area-inset-bottom)) var(--inset-left);
-  overflow-y: auto;
+  overflow-y: hidden;
   overscroll-behavior: contain;
   user-select: text;
   -webkit-user-select: text;
@@ -336,7 +343,35 @@ html:has(.menu) {
   pointer-events: auto;
 }
 
-.menu-detail > * {
+/* Scrolling waits for the icon to land, because until then the icon flies in
+   the menu layer and would be left behind by the text. */
+.menu[data-hero-landed] .menu-detail {
+  overflow-y: auto;
+}
+
+/* Sized as the flying icon lands: the selected icon's 1.2 times 1.25. */
+.menu-detail-icon {
+  position: absolute;
+  top: var(--hero-top);
+  left: var(--inset-left);
+  display: grid;
+  place-items: center;
+  width: calc(var(--main-icon) * 1.5);
+  height: calc(var(--main-icon) * 1.5);
+  opacity: 0;
+}
+
+.menu[data-hero-landed] .menu-detail-icon {
+  opacity: 1;
+}
+
+.menu-detail-icon svg {
+  width: calc(var(--main-icon) * 0.47 * 1.5);
+  height: calc(var(--main-icon) * 0.47 * 1.5);
+  stroke-width: 2.25;
+}
+
+.menu-detail > :not(.menu-detail-icon) {
   max-width: 560px;
   opacity: 0;
   transform: translateY(8px);
@@ -347,7 +382,7 @@ html:has(.menu) {
     filter 250ms ease;
 }
 
-.menu[data-detail="open"] .menu-detail > * {
+.menu[data-detail="open"] .menu-detail > :not(.menu-detail-icon) {
   opacity: 1;
   transform: none;
   filter: none;
@@ -468,8 +503,8 @@ html:has(.menu) {
     opacity: 0;
   }
 
-  .menu-detail > *,
-  .menu[data-detail="open"] .menu-detail > * {
+  .menu-detail > :not(.menu-detail-icon),
+  .menu[data-detail="open"] .menu-detail > :not(.menu-detail-icon) {
     transform: none;
     transition: opacity 200ms ease;
   }
