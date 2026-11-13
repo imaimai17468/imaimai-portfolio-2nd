@@ -1,0 +1,674 @@
+---
+name: motion-craft
+description: "How motion in this app should feel and be built, with this repository's duration, easing, and reduced-motion defaults and a glossary that names effects. Use when adding, changing, or reviewing an animation, a transition, hover or press feedback, an enter or exit effect, a drag or swipe gesture, a spring, or an easing curve, when the user asks for something to feel smoother, snappier, or less janky, or when they describe an effect and ask what it is called."
+---
+
+# Motion Craft
+
+Read Part 1 when deciding how a motion should feel, Part 2 when writing the
+value, Part 3 before calling animation work done, and Part 4 when the user
+describes an effect without naming it.
+
+---
+
+# Part 1 — Design Philosophy
+
+How Apple builds interfaces that feel like an extension of you, translated for
+the web. From Apple's WWDC design talks — chiefly *Designing Fluid Interfaces*
+(WWDC 2018).
+
+The through-line: **an interface feels alive when motion starts from the current
+on-screen value, inherits the user's velocity, projects momentum forward, and
+can be grabbed and reversed at any instant.** Springs make this natural because
+they are inherently interruptible and velocity-aware.
+
+## 1. Response — kill latency
+
+The moment lag appears, the feeling of directness "falls off a cliff."
+
+- **Respond on pointer-down, not on release.** Highlight a button the instant
+  it's pressed. Waiting for `click`/touch-up to show feedback feels dead.
+- **Be vigilant about every latency.** Audit debounces, artificial timers,
+  transition waits, and the ~300ms tap delay.
+- **Feedback must be continuous *during* the interaction, not just at the end.**
+  For a drag, slider, or drawer, update the UI 1:1 with the pointer the whole
+  way through.
+
+## 2. Direct manipulation — 1:1 tracking
+
+> "Touch and content should move together."
+
+When the user drags something, it must stay glued to the finger — and respect
+the offset from *where they grabbed it*. Snapping to the element's center on
+grab breaks the illusion immediately.
+
+- Use Pointer Events with `setPointerCapture` so tracking continues even when
+  the pointer leaves the element's bounds.
+- Track a short **velocity/position history** (last few `pointermove` events),
+  not just the current point — you'll need velocity at release.
+
+## 3. Interruptibility — the single most important principle
+
+> "The thought and the gesture happen in parallel."
+
+Every animation must be interruptible and redirectable at any moment.
+
+- **Never lock out input during a transition.**
+- **Always animate from the *presentation* (current) value, never the target
+  value.** On interrupt, read the element's live on-screen transform and start
+  the new animation from there. Starting from the logical/target value causes a
+  visible jump.
+- **Avoid CSS transitions and `@keyframes` for anything gesture-driven** —
+  they can't be smoothly grabbed and reversed mid-flight.
+- **When a gesture reverses, blend velocity — don't hard-cut it.** Spring
+  libraries that carry velocity through a re-target avoid the "brick wall."
+- **Decompose 2D motion into independent X and Y springs.** A single spring on
+  a 2D distance desyncs when X and Y have different velocities.
+
+## 4. Behavior over animation — use springs
+
+> "Think of animation as a conversation between you and the object, not
+> something prescribed by the interface."
+
+A pre-scripted, fixed-duration animation can't respond to new input. A spring
+can — new input just changes the target, and the motion stays continuous.
+
+Apple's two designer-friendly parameters:
+- **Damping ratio** — controls overshoot. `1.0` = critically damped, no bounce.
+  `< 1.0` = overshoots and oscillates.
+- **Response** — how quickly the value reaches the target, in seconds. Lower =
+  snappier. **This is not "duration"** — a spring has no fixed duration.
+
+**Defaults:**
+- Start most UI at **damping `1.0`** (critically damped).
+- Add bounce (**damping ~`0.8`**) **only when the gesture itself carried
+  momentum** (a flick, a throw, a drag release).
+
+**Concrete values Apple ships:**
+
+| Interaction | Damping | Response |
+| --- | --- | --- |
+| Move / reposition (e.g. PiP) | `1.0` | `0.4` |
+| Rotation | `0.8` | `0.4` |
+| Drawer / sheet | `0.8` | `0.3` |
+
+```js
+import { animate } from 'motion';
+
+// Critically damped default (no overshoot)
+animate(el, { transform: 'translateY(0px)' }, { type: 'spring', bounce: 0, duration: 0.4 });
+
+// Momentum interaction — a little bounce, only because a flick preceded it
+animate(el, { transform: `translateY(${target}px)` }, { type: 'spring', bounce: 0.2, duration: 0.4 });
+```
+
+## 5. Velocity handoff
+
+When a gesture ends, the animation must **continue at the finger's exact
+velocity**, so there's no visible seam between dragging and animating.
+
+Pass the pointer's release velocity as the spring's initial velocity. Some
+spring APIs want **relative** velocity — normalize:
+
+```
+relativeVelocity = gestureVelocity / (targetValue - currentValue)
+```
+
+## 6. Momentum projection
+
+> "Take a small input and make a big output."
+
+Don't snap to the nearest boundary from the *release point*. Use velocity to
+**project the resting position** — then snap to the target nearest that
+projected point.
+
+Apple's exact projection function:
+
+```js
+function project(initialVelocity, decelerationRate = 0.998) {
+  return (initialVelocity / 1000) * decelerationRate / (1 - decelerationRate);
+}
+
+const projectedEndpoint = currentPosition + project(releaseVelocity);
+const target = nearestSnapPoint(projectedEndpoint);
+animateSpringTo(target, { velocity: releaseVelocity });
+```
+
+At release, the **sign of the velocity** decides between reverse and commit,
+not the position the gesture reached.
+
+## 7. Spatial consistency
+
+> "If something disappears one way, we expect it to emerge from where it came."
+
+- **Enter and exit along the same path.** A panel that slides in from the right
+  must dismiss to the right.
+- **Anchor interactions to their source.** A menu or popover originates from
+  the element that triggered it, and Repository defaults (Physicality, in
+  Part 2) sets how.
+- **Mirror the easing on reversible transitions** with the inverse
+  cubic-bezier.
+
+## 8. Hint in the direction of the gesture
+
+Intermediate motion should telegraph where things are going — make the
+in-between frames point at the outcome, not just interpolate blindly.
+
+## 9. Rubber-banding — soft boundaries
+
+At an edge, resist progressively instead of stopping hard.
+
+```js
+function rubberband(overshoot, dimension, constant = 0.55) {
+  return (overshoot * dimension * constant) / (dimension + constant * Math.abs(overshoot));
+}
+```
+
+## 10. Gesture design details
+
+- **Tap:** highlight on touch-*down*, commit on touch-*up*. Add ~10px hysteresis
+  and allow cancel-by-dragging-away.
+- **Drag/swipe:** require a small movement threshold (~10px) before committing
+  to a direction, then track 1:1.
+- **Detect all plausible gestures in parallel from the first move**, then
+  confidently cancel the losers once intent is clear.
+- **Minimize disambiguation delays.** Double-tap detection delays single taps;
+  only pay that cost where double-tap truly exists.
+
+## 11. Frame-level smoothness
+
+- Keep per-frame positional change below the perception threshold to avoid
+  strobing.
+- For very fast motion, a subtle **motion blur / stretch** reads better than a
+  hard sharp streak.
+- `requestAnimationFrame` is the web's display-synced clock. Which properties
+  may animate is settled in Repository defaults (Properties, in Part 2).
+
+## 12. Materials & depth
+
+Apple uses translucent materials as a floating functional layer. On the web,
+approximate with `backdrop-filter`. Which surfaces here may be translucent, and
+where a shadow is allowed at all, is settled in `.claude/hooks/guidance/design.md`
+(Elevation), which carries hierarchy on background color, border, backdrop dim,
+spacing, and typography instead.
+
+- **Scroll edge effects, not hard dividers.** Fade a gradient mask where
+  content meets floating chrome.
+- **Materialize, don't just fade.** Animate blur radius and scale together on
+  enter/exit, so the surface reads as a real material arriving.
+
+```css
+.toolbar {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-top: 1px solid rgba(255, 255, 255, 0.4);
+}
+```
+
+## 13. Multimodal feedback
+
+Three rules for combining visual + sound + haptic:
+
+1. **Causality** — trigger on the actual causal event, match character to action.
+2. **Harmony** — visual, sound, and haptic must fire on the **same frame**.
+3. **Utility** — reserve for meaningful moments (success, error, commit, snap).
+
+## 14. Reduced motion & accessibility
+
+Repository defaults (Reduced Motion, in Part 2) sets what this repository does
+under `prefers-reduced-motion`.
+
+## 15. Typography — optical sizing, tracking, leading
+
+- **Tracking and hierarchy.** Both are settled in `.claude/hooks/guidance/design.md`
+  (Typographic Rules).
+- **Leading tracks size inversely.** Tight on large headings, looser on body.
+- **Respect the user's text-size setting.** Scale layout with `rem`/`em`.
+
+```css
+.display {
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-optical-sizing: auto;
+}
+```
+
+---
+
+# Part 2 — Implementation Reference
+
+Precise values, curves, and techniques. Cite these in code and reviews.
+Distilled from Emil Kowalski's design engineering philosophy (animations.dev).
+Repository defaults, the first section below, is what this repository's CSS
+and TSX must do, and the sections after it are the reference behind it.
+
+## Repository defaults
+
+### Frequency
+
+| How often the element is seen | Decision |
+| --- | --- |
+| 100+/day (keyboard shortcuts, command palette) | No animation |
+| Tens/day (hover effects, list navigation) | Remove it, or reduce it |
+| Occasional (modals, drawers, toasts) | Standard animation |
+| Rare or first-time (onboarding, celebrations) | Delight is allowed |
+
+Never animate a keyboard-initiated action.
+
+### Duration
+
+| Element | Duration |
+| --- | --- |
+| Button press feedback | 100-160ms |
+| Tooltips, small popovers | 125-200ms |
+| Dropdowns, selects | 150-250ms |
+| Modals, drawers | 200-500ms |
+| Marketing or explanatory motion | Longer is allowed |
+
+Stay inside the element's row. A longer duration needs a stated reason.
+
+### Easing
+
+Pick the curve from what the element is doing:
+- Entering or exiting: `ease-out`
+- Moving or morphing on screen: `ease-in-out`
+- Hover or a color change: `ease`
+- Constant motion (marquee, progress): `linear`
+- Anything else: `ease-out`
+
+The built-in CSS curves are weak, so define the ones a
+project takes alongside the other design tokens in the global stylesheet:
+
+```css
+--ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+--ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+--ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);      /* iOS-like drawer */
+```
+
+Find further curves at [easing.dev](https://easing.dev/) or
+[easings.co](https://easings.co/).
+
+### Physicality
+
+Where an entrance scales, it starts between `scale(0.9)` and `scale(0.97)` with
+`opacity: 0`, never at `scale(0)`. An entrance pairs its opacity change with a
+transform rather than fading alone.
+
+A popover, dropdown, or tooltip scales from its trigger, so set its
+`transform-origin` to the side that faces the trigger. A modal keeps
+`transform-origin: center`.
+
+A button's press feedback is `transform: scale(0.97)` on `:active` with
+`transition: transform 160ms ease-out`, and the scale stays between `0.95` and
+`0.98`.
+
+Stagger a group's entrance by 30-80ms per item. A longer delay reads as slow,
+and the stagger never blocks interaction while it plays.
+
+### Properties
+
+Animate `transform` and `opacity` only, because the compositor runs them
+without layout or paint. `padding`, `margin`, `height`, `width`, `top`, and
+`left` run all three steps on every frame.
+
+Set `transform` on the element that moves. A CSS variable on the parent driving
+a child's transform recalculates the styles of every child.
+
+### Reduced Motion
+
+`prefers-reduced-motion: reduce` asks for gentler motion rather than none.
+Replace a slide or a spring with a short cross-fade, drop the overshoot, and
+keep opacity and color.
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  .sheet { transition: opacity 200ms ease; transform: none !important; }
+}
+```
+
+Leave out a full-viewport moving background, a slow looping oscillation around
+0.2 Hz, and an abrupt brightness jump.
+
+### Interruptibility
+
+A CSS transition retargets from the current value when something interrupts it,
+and `@keyframes` restarts from zero, so anything triggered rapidly takes a
+transition.
+
+`@starting-style` gives an entrance its start value without JavaScript:
+
+```css
+.toast {
+  opacity: 1; transform: translateY(0);
+  transition: opacity 400ms ease, transform 400ms ease;
+  @starting-style { opacity: 0; transform: translateY(100%); }
+}
+```
+
+## Springs
+
+Feel natural because they simulate physics; no fixed duration.
+
+```js
+// Apple-style (recommended)
+{ type: "spring", duration: 0.5, bounce: 0.2 }
+
+// Traditional physics (more control)
+{ type: "spring", mass: 1, stiffness: 100, damping: 10 }
+```
+
+Keep bounce subtle (0.1-0.3); reserve for drag-to-dismiss and playful
+interactions. Springs maintain velocity when interrupted.
+
+## Asymmetric timing
+
+Slow where the user is deciding, fast where the system responds.
+
+```css
+.overlay { transition: clip-path 200ms ease-out; }            /* release: fast */
+.button:active .overlay { transition: clip-path 2s linear; }  /* press: slow */
+```
+
+## Performance
+
+- **Animated properties.** Repository defaults (Properties) settles which
+  properties may animate.
+- **Motion (Framer Motion) shorthands `x`/`y`/`scale` are NOT
+  hardware-accelerated.** They run on the main thread via rAF and drop frames
+  under load. Use the full transform string:
+  ```jsx
+  <motion.div animate={{ transform: "translateX(100px)" }} />
+  ```
+- **CSS animations beat JS under load** — they run off the main thread.
+- **WAAPI** gives JS control with CSS performance:
+  ```js
+  element.animate(
+    [{ clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0 0)' }],
+    { duration: 1000, fill: 'forwards', easing: 'cubic-bezier(0.77, 0, 0.175, 1)' }
+  );
+  ```
+
+## Transforms & clip-path
+
+- **`translate` percentages** are relative to the element's own size —
+  `translateY(100%)` moves by the element's height regardless of dimensions.
+- **`scale()` scales children too** (font, icons, content).
+- **3D**: `rotateX/Y` + `transform-style: preserve-3d` for depth/orbit/flip.
+- **`clip-path: inset(t r b l)`** drives a hold-to-delete overlay, a seamless
+  tab color transition, and a comparison slider. A reveal gated on scroll is
+  ruled out by `.claude/hooks/guidance/design.md` (Interaction & Content).
+
+## Gestures & drag
+
+- **Momentum dismissal**: compute velocity (`Math.abs(distance)/elapsedMs`);
+  dismiss if `> ~0.11`. A flick should be enough.
+- **Multi-touch protection**: ignore extra touch points after drag begins.
+
+## Masking imperfect crossfades
+
+When a crossfade shows two overlapping states, add subtle `filter: blur(2px)`
+during the transition. Keep blur < 20px (heavy blur is expensive, especially
+Safari).
+
+## Stagger
+
+Repository defaults (Physicality) sets the delay between items and what a
+stagger may not hold up.
+
+```css
+.item { opacity: 0; transform: translateY(8px); animation: fadeIn 300ms ease-out forwards; }
+.item:nth-child(2) { animation-delay: 50ms; }
+.item:nth-child(3) { animation-delay: 100ms; }
+```
+
+## Accessibility (implementation)
+
+`.claude/hooks/guidance/design.md` (Interaction & Content) gates hover animation and bounds
+what a hover may change.
+
+```css
+@media (hover: hover) and (pointer: fine) {
+  .card:hover .card-icon { transform: translateX(2px); }
+}
+```
+
+## Debugging
+
+- **Slow motion**: bump duration 2-5x or use DevTools animation inspector.
+- **Frame-by-frame**: Chrome DevTools Animations panel.
+- **Real devices** for gestures — connect a phone, hit the dev server by IP.
+- **Fresh eyes next day** — imperfections invisible during development surface
+  later.
+
+---
+
+# Part 3 — Review Standards
+
+A review posture for animation and motion code. General application logic,
+business code, and non-motion concerns go to the `code-reviewer` agent.
+
+## Operating Posture
+
+Judge motion by how it feels rather than by whether it runs. A transition that
+lands from the wrong origin, fires too often, or drops frames is a finding.
+
+## The Ten Standards
+
+Every animation in the diff is measured against these. A violation is a finding.
+
+1. **Justified motion.** Every animation must answer "why does this animate?" —
+   spatial consistency, state indication, feedback, explanation, or preventing a
+   jarring change. "It looks cool" on a frequently-seen element is a block.
+
+2. **Frequency-appropriate.** Measured against the frequency table in
+   Repository defaults.
+
+3. **Responsive easing.** Measured against the curve order in
+   Repository defaults.
+
+4. **Duration within range.** Measured against the duration table in
+   Repository defaults.
+
+5. **Origin & physical correctness.** Measured against the physicality rules in
+   Repository defaults.
+
+6. **Interruptibility.** Measured against Repository defaults
+   (Interruptibility) for CSS, and against Part 1 section 3 for gesture-driven
+   motion.
+
+7. **GPU-only properties.** Measured against Repository defaults
+   (Properties). Motion's `x`/`y`/`scale` shorthands run on the main thread, so
+   they are a finding on motion that plays while the page is busy.
+
+8. **Accessibility.** Measured against Repository defaults (Reduced Motion)
+   and the hover paragraph of `.claude/hooks/guidance/design.md` (Interaction & Content).
+
+9. **Asymmetric enter/exit.** Measured against Part 2's Asymmetric timing.
+   Symmetric timing on a press-and-release is a finding.
+
+10. **Cohesion.** Motion matches the component's personality and the rest of the
+    product. Mismatched personality is a finding. Where it is unclear whether
+    the motion feels right, review it as Part 2's Debugging section says before
+    deciding, and deleting it is often the strongest move.
+
+## Remedial Preference Hierarchy
+
+When proposing fixes, prefer earlier moves over later ones:
+
+1. **Delete the animation.**
+2. **Reduce it.**
+3. **Fix the easing.**
+4. **Fix the origin and physicality.**
+5. **Make it interruptible.**
+6. **Move it to the GPU.**
+7. **Make the timing asymmetric.**
+8. **Polish it.**
+9. **Fix the accessibility gating and the cohesion.**
+
+## Review Output Format
+
+Every review carries these three parts, in this order.
+
+### Verdict
+
+The report's first line is the decision, followed by the finding that decided
+it.
+
+- **Block** — any feel-breaking regression, animation on keyboard/high-frequency
+  action, `scale(0)`/`ease-in` on UI, or non-GPU animation with an easy GPU fix.
+- **Approve** — no feel-breaking regressions, durations and easing within
+  bounds, interruptibility handled, reduced-motion respected.
+
+### Findings table
+
+| Before | After | Why |
+| --- | --- | --- |
+| `transition: all 300ms` | `transition: transform 200ms ease-out` | `all` animates unintended properties off-GPU |
+| `transform: scale(0)` | `transform: scale(0.95); opacity: 0` | Nothing appears from nothing |
+
+### Findings by impact tier
+
+Group by impact tier, highest first. Omit empty tiers.
+
+1. **Feel-breaking regressions**
+2. **Missed simplifications**
+3. **Performance**
+4. **Interruptibility & timing**
+5. **Origin, physicality & cohesion**
+6. **Accessibility**
+
+Cite `file:line`. Pull exact values from Part 2 rather than approximating.
+
+---
+
+# Part 4 — Animation Vocabulary
+
+Turn a vague description of a motion effect into the precise term, so you know
+what to ask for. When the user describes an effect loosely, return the matching
+term(s) in the bold-term-then-definition form the sections below use.
+
+If several terms could fit, list the best match first, then 1-2 alternates with
+a one-line note on how they differ.
+
+## Entrances & Exits
+
+- **Fade in / Fade out** — Element appears or disappears by changing opacity.
+- **Slide in** — Element enters by sliding in from off-screen.
+- **Scale in** — Element grows from smaller to full size, often paired with fade.
+- **Pop in** — Element appears with a slight overshoot, like it bounces into place.
+- **Reveal** — Content is uncovered gradually, often by animating a clip-path or mask.
+- **Enter / Exit** — The animation an element plays when added to or removed from the screen.
+
+## Sequencing & Timing
+
+- **Keyframes** — Defined points in an animation that the browser fills between.
+- **Interpolation / Tween** — Generating all in-between frames for continuous motion.
+- **Stagger** — Animate several items one after another with a small delay.
+- **Orchestration** — Timing multiple animations so they feel like one coordinated motion.
+- **Delay** — Time before an animation starts.
+- **Duration** — How long an animation takes.
+- **Fill mode** — Whether an element keeps its first or last frame's styles before/after.
+- **Stepped animation** — Divided into discrete steps, like a countdown timer.
+
+## Movement & Transforms
+
+- **Translate** — Move along the X or Y axis.
+- **Scale** — Make bigger or smaller.
+- **Rotate** — Spin around a point.
+- **Skew** — Slant along an axis, shearing out of rectangular shape.
+- **3D tilt / Flip** — Rotate in 3D space (rotateX / rotateY) for depth.
+- **Perspective** — How strong the 3D effect looks.
+- **Transform origin** — The anchor point a scale or rotation grows/spins from.
+- **Origin-aware animation** — An element animates out of its trigger, not its own center.
+
+## Transitions Between States
+
+- **Crossfade** — One element fades out as another fades in, in the same spot.
+- **Continuity transition** — Visually connecting before and after to keep the user oriented.
+- **Morph** — One shape smoothly turns into another (e.g. Dynamic Island).
+- **Shared element transition** — An element travels and transforms from one position into another.
+- **Layout animation** — Size or position changes animate instead of snapping.
+- **Accordion / Collapse** — Smoothly expands and collapses height.
+- **Direction-aware transition** — Content slides one way going forward, opposite going back.
+
+## Scroll
+
+- **Scroll reveal** — Elements fade or slide in as they enter the viewport.
+- **Scroll-driven animation** — Progress tied directly to scroll position.
+- **Parallax** — Background and foreground move at different speeds.
+- **Page transition** — Animation when navigating from one page to another.
+- **View transition** — Browser morphs between two states, connecting shared elements.
+
+## Feedback & Interaction
+
+- **Hover effect** — Visual change when the cursor moves over an element.
+- **Press / Tap feedback** — Subtle scale-down when clicked, so it feels physical.
+- **Hold to confirm** — Progress effect that fills while the user holds a button.
+- **Drag** — Moving an element by grabbing it, often with momentum on release.
+- **Drag to reorder** — Dragging items in a list to rearrange while others shift.
+- **Swipe to dismiss** — Dragging off-screen to close (drawer, toast).
+- **Rubber-banding** — Resistance and snap-back when dragging past a boundary.
+- **Shake / Wiggle** — Quick side-to-side jitter signaling an error.
+- **Ripple** — Circle expanding from the point of a tap.
+
+## Easing (glossary)
+
+- **Easing** — Rate at which an animation speeds up or slows down.
+- **Ease-out** — Starts fast, ends slow. The default for most UI.
+- **Ease-in** — Starts slow, ends fast. Usually avoided; can feel sluggish.
+- **Ease-in-out** — Slow, fast, slow. Good for on-screen A-to-B movement.
+- **Linear** — Constant speed. Reserve for spinners or marquees.
+- **Cubic-bezier** — Custom easing curve for precise control.
+- **Asymmetric easing** — Accelerates and decelerates at different rates.
+
+## Spring Animations
+
+- **Spring** — Motion driven by physics (tension, mass, damping) rather than duration.
+- **Stiffness / Tension** — How strongly the spring pulls toward its target.
+- **Damping** — How quickly a spring settles. Lower = more bounce.
+- **Mass** — How heavy the animated element feels.
+- **Bounce** — A spring that overshoots and settles.
+- **Perceptual duration** — How long a spring feels finished, even while micro-settling.
+- **Momentum** — Motion that carries velocity, especially after a drag.
+- **Velocity** — How fast and in which direction an element is moving.
+- **Interruptible animation** — Smoothly redirected mid-flight instead of finishing first.
+
+## Looping & Ambient Motion
+
+- **Marquee** — Text or content that scrolls continuously in a loop.
+- **Loop** — An animation that repeats.
+- **Alternate (yoyo)** — A loop that plays forward then reverses each iteration.
+- **Orbit** — An element circling around another.
+- **Pulse** — Gentle repeating scale or opacity change.
+- **Float** — Continuous up-and-down drift, making a static element feel alive.
+- **Idle animation** — Subtle motion while an element is waiting to be interacted with.
+
+## Polish & Effects
+
+- **Blur** — Softening an element or masking imperfections.
+- **Clip-path** — Clipping to a shape for reveals, masks, and before/after sliders.
+- **Mask** — Hiding or revealing parts with soft, fadeable edges.
+- **Before / after slider** — Draggable divider wiping between two overlaid images.
+- **Line drawing** — SVG path that draws itself in.
+- **Text morph** — Text animating character by character when it changes.
+- **Skeleton / Shimmer** — Placeholder with a moving sheen during loading.
+- **Number ticker** — Digits rolling or counting up to a value.
+- **Tabular numbers** — Fixed-width digits so numbers don't shift as they change.
+- **Typewriter** — Text appearing one character at a time.
+
+## Performance (glossary)
+
+- **Frame rate (FPS)** — Frames per second. 60fps is baseline; 120fps on newer displays.
+- **Jank** — Visible stutter from dropped frames.
+- **Dropped frame** — A frame the browser missed its deadline to draw.
+- **Compositing** — GPU moving or fading an element on its own layer.
+- **will-change** — CSS hint that an element is about to animate.
+- **Layout thrashing** — Animating properties that force layout recalculation every frame.
+
+## Principles
+
+- **Anticipation** — Small wind-up in the opposite direction before a move.
+- **Follow-through** — Parts keep moving and settle after the main motion stops.
+- **Squash & stretch** — Deforming to convey weight, speed, and flexibility.
+- **Perceived performance** — The right animation makes an interface feel faster.

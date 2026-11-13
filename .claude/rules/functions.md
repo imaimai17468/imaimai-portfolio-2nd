@@ -1,0 +1,20 @@
+---
+description: "The shape a function takes so its branches can be reached: the decision separated from the effect, values the outside world owns arriving as arguments, and no path that only a test runs"
+paths: "**/*.ts, **/*.tsx, **/*.js, **/*.sh"
+---
+
+# Functions
+
+These hold for every function in the repository: a component, a page loader, a script, a shell helper under `.claude/hooks/`.
+
+**Split the function that decides from the code that acts.** Where a function both branches and performs the effect, the branching becomes a function that maps its inputs to a value naming the outcome, and its caller performs what the value names. A discriminated union carries that value, so one arm's data cannot be read off another. `.claude/hooks/reply-open-gate.sh` is shaped this way: `.claude/hooks/reply-open-gate-decision.sh` decides whether a reply opens with a command, a path or a snippet, and the gate script reads the payload and prints the block.
+
+**A value the outside world owns arrives as an argument.** The clock, a random source, an environment variable, a file on disk. Read one inside the function and the same arguments answer differently on the next machine, and a test has to build that world before it can reach a single branch. No lint reports such a read here, so it is the author who holds it.
+
+**Every branch is reachable by passing values.** A test that builds a scratch directory, stubs a binary, or drives a UI to reach a branch pays that price for where the branch sits rather than for the branch. Move the branch into a function that takes what it decides on, and let the test call it. Where the setup is the subject, such as a check that the entry runs its steps in the right order, it stays.
+
+**A name covers everything the module holds.** A module holding a part its name does not cover sends every reader looking for that part somewhere else, and a directory cut along that name freezes the mistake into the path. Grouping a flat directory is where this surfaces, because a module that owns what its name does not name pulls its owners' shared pieces up to a common ancestor they have no reason to sit at. Move the uncovered part out, or rename, before any file moves.
+
+**A name takes the grammatical form of what it names.** A function is an imperative verb phrase (`fetchUsers`, `parseRow`). A value other than a Boolean is a noun phrase, and a participle or an infinitive says where it stands in time: `runningJobs` are in progress, `usersRemovedByAdmin` are done, `usersToRemove` are next. A Boolean is a statement with a stative verb (`isActive`, `hasEmptyFields`, `canDeploy`). Where a present participle reads as either the actor or the thing acted on (`selectingUsers`), use a noun (`userSelection`). Leave out a word that is already a technical term here (`request`, `function`, `component`) or one so broad it fits anything.
+
+**No path that only a test runs.** A function exports what its callers use. An exported setter, a parameter nothing but a test passes, and a flag that changes behavior under test each put the test on a path production never takes, and the branch it covers then breaks unobserved. A value a caller can genuinely set is an API, and that a test can start from it is a byproduct.
