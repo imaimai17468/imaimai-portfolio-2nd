@@ -1,9 +1,12 @@
 .menu {
   --row: 176px;
+  --row-padding: var(--space-4);
   --main-width: 152px;
   --title-height: 40px;
+  --title-size: 26px;
   --main-icon: 64px;
   --sub-width: 112px;
+  --detail-top: 200px;
   --band-top: calc(50% - var(--row) / 2);
   --main-pos: 0;
 
@@ -13,6 +16,18 @@
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
+}
+
+@media (min-width: 768px) {
+  .menu {
+    --row: 208px;
+    --main-width: 184px;
+    --title-height: 48px;
+    --title-size: 32px;
+    --main-icon: 76px;
+    --sub-width: 136px;
+    --detail-top: 224px;
+  }
 }
 
 html:has(.menu) {
@@ -44,7 +59,7 @@ html:has(.menu) {
   left: 0;
   right: 0;
   height: var(--row);
-  padding: var(--space-3) var(--space-4) 0;
+  padding: var(--row-padding) var(--space-4) 0;
   pointer-events: none;
 }
 
@@ -55,9 +70,10 @@ html:has(.menu) {
 .menu-main-title {
   display: block;
   height: var(--title-height);
-  font-size: 26px;
+  font-size: var(--title-size);
   font-weight: var(--font-weight-heading);
   line-height: var(--title-height);
+  letter-spacing: -0.01em;
   white-space: nowrap;
   opacity: calc(var(--focus) * 2 - 1);
 }
@@ -93,22 +109,22 @@ html:has(.menu) {
 }
 
 .menu-main-icon svg {
-  width: 36px;
-  height: 36px;
+  width: calc(var(--main-icon) * 0.5625);
+  height: calc(var(--main-icon) * 0.5625);
   stroke-width: 2.25;
 }
 
 .menu-main-label {
   margin-top: var(--space-1);
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1.4;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1em;
   white-space: nowrap;
 }
 
 .menu-sub {
   position: absolute;
-  top: calc(var(--space-3) + var(--title-height));
+  top: calc(var(--row-padding) + var(--title-height));
   left: var(--main-width);
   opacity: var(--focus);
   transform: translateX(var(--shift-x));
@@ -144,8 +160,8 @@ html:has(.menu) {
 }
 
 .menu-sub-icon svg {
-  width: 30px;
-  height: 30px;
+  width: calc(var(--main-icon) * 0.47);
+  height: calc(var(--main-icon) * 0.47);
   stroke-width: 2.25;
 }
 
@@ -153,7 +169,7 @@ html:has(.menu) {
   max-width: calc(var(--sub-width) - var(--space-2));
   font-size: 12px;
   line-height: 1.4;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   text-align: center;
 }
 
@@ -296,7 +312,8 @@ html:has(.menu) {
 .menu-detail {
   position: absolute;
   inset: 0;
-  padding: 196px var(--space-4) var(--space-5);
+  padding: var(--detail-top) max(var(--space-4), env(safe-area-inset-right))
+    calc(var(--space-5) + env(safe-area-inset-bottom)) max(var(--space-4), env(safe-area-inset-left));
   overflow-y: auto;
   touch-action: pan-y;
   pointer-events: none;
@@ -331,23 +348,24 @@ html:has(.menu) {
 }
 
 .menu-detail h2 {
-  margin: 0 0 var(--space-3);
-  font-size: 32px;
-  line-height: 1.3;
+  margin: 0 0 var(--space-4);
+  font-size: 34px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
 }
 
 .menu-detail p {
-  margin: 0 0 var(--space-2);
+  margin: 0 0 var(--space-3);
 }
 
 .menu-detail-section {
-  margin-top: var(--space-4);
+  margin-top: var(--space-5);
 }
 
 .menu-detail-section h3 {
   margin: 0 0 var(--space-2);
-  font-size: 14px;
-  letter-spacing: 0.08em;
+  font-size: 13px;
+  letter-spacing: 0.12em;
   color: var(--muted-foreground);
 }
 
@@ -380,7 +398,7 @@ html:has(.menu) {
 .menu-detail-actions {
   display: flex;
   gap: var(--space-2);
-  margin-top: var(--space-4);
+  margin-top: var(--space-5);
 }
 
 .menu-detail-back,
@@ -388,7 +406,8 @@ html:has(.menu) {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  padding: var(--space-2) var(--space-3);
+  min-height: 44px;
+  padding: 0 var(--space-3);
   border: 0;
   border-radius: var(--radius);
   font: inherit;
