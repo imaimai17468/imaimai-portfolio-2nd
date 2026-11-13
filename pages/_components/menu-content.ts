@@ -25,6 +25,7 @@ import {
   Palette,
   PenLine,
   Presentation,
+  Scale,
   School,
   Shapes,
   TrainFront,
@@ -543,6 +544,28 @@ export const MENU: readonly MainItem[] = [
     label: "リンク",
     icon: Link,
     subs: [
+      {
+        id: "licenses",
+        label: "ライセンス",
+        icon: Scale,
+        action: {
+          kind: "detail",
+          paragraphs: ["このサイトで使っているフォント、効果音、ライブラリの作者とライセンスです。ライセンス文の全文は「開く」から読めます。"],
+          sections: [
+            { heading: "フォント", entries: [{ label: "LINE Seed JP", meta: "LY Corporation / SIL Open Font License 1.1" }] },
+            { heading: "効果音", entries: [{ label: "SND02 \"piano\"", meta: "Ayako Taniguchi / SND", href: "https://snd.dev" }] },
+            {
+              heading: "ライブラリ",
+              entries: [
+                { label: "React / React DOM / Scheduler", meta: "Meta Platforms, Inc. and affiliates / MIT" },
+                { label: "Lucide", meta: "Lucide Icons and Contributors / ISC" },
+                { label: "Void / @void/react", meta: "Cloudflare, Inc. / MIT" },
+              ],
+            },
+          ],
+          href: "/licenses.txt",
+        },
+      },
       { id: "github", label: "GitHub", icon: Code, action: { kind: "link", href: "https://github.com/imaimai17468" } },
       { id: "x", label: "X", icon: AtSign, action: { kind: "link", href: "https://x.com/imaimai17468" } },
       { id: "speakerdeck", label: "Speaker Deck", icon: Presentation, action: { kind: "link", href: "https://speakerdeck.com/imaimai17468" } },
