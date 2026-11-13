@@ -12,7 +12,6 @@ import {
   GraduationCap,
   HandHeart,
   Heart,
-  IdCard,
   Layers,
   Link,
   Mail,
@@ -25,7 +24,6 @@ import {
   Palette,
   PenLine,
   Presentation,
-  Quote,
   School,
   Shapes,
   TrainFront,
@@ -97,39 +95,6 @@ export const MENU: readonly MainItem[] = [
             "人材育成・組織運営に興味があり、サポーターズ主催の技育祭ではスポンサー登壇を務めています。また、複数のハッカソンで審査員を務め、学生の制作物に対してフィードバックを行う活動も行なっています。",
             "開発物では、Rust製Webフレームワーク、個人開発向けテンプレートをはじめ、個人で困った時に作ったサービスがぽこぽこあります。",
           ],
-          sections: [
-            {
-              heading: "記事",
-              entries: [
-                { label: "このカエルは何者なんだ", meta: "note 2023.12", href: "https://note.com/imaimai17468/n/nd4bd6756de01" },
-              ],
-            },
-          ],
-        },
-      },
-      {
-        id: "role",
-        label: "肩書き",
-        icon: IdCard,
-        action: {
-          kind: "detail",
-          paragraphs: [
-            "Front-end Developer / Product Engineer",
-            "2001 年生まれ。木更津高専・長岡技科大卒。Front-end / Product Engineer として大規模サイトリニューアルや新規サービス立ち上げに従事しつつ、採用と技術教育プロジェクトのマネジメントも担当。",
-          ],
-        },
-      },
-      {
-        id: "motto",
-        label: "筆先の黒は乾かすな",
-        icon: Quote,
-        action: {
-          kind: "detail",
-          paragraphs: [
-            "自身が達成したい表現を求め続け、手を止めるなという気持ちを込めています。",
-            "どんな時代であれ、アルチザンであり、クラフツマンシップを持ち続けます。",
-            "\"わかってんじゃん、アンタ\"って思ってもらえる人に、私はここにいるって伝えなくちゃいけないんだ。",
-          ],
         },
       },
       {
@@ -142,18 +107,6 @@ export const MENU: readonly MainItem[] = [
           sections: [
             { heading: "スキル", entries: entries(["フロントエンド開発", "UI/UX デザイン", "React / Next.js", "TypeScript"]) },
           ],
-        },
-      },
-      {
-        id: "support",
-        label: "応援",
-        icon: HandHeart,
-        action: {
-          kind: "detail",
-          paragraphs: [
-            "hypersig や個人開発のサービスを気に入っていただけたら、GitHub Sponsors から応援してもらえると嬉しいです。",
-          ],
-          href: "https://github.com/sponsors/imaimai17468",
         },
       },
     ],
@@ -426,7 +379,6 @@ export const MENU: readonly MainItem[] = [
                   meta: "しずかなインターネット 2026.10",
                   href: "https://sizu.me/imaimai17468/posts/xkcvwurhscnu",
                 },
-                { label: "いまいまいの☦️卍x学生・若手向けスーパーアルティメットアドバイスガイドx卍☦️", meta: "note 2025.08", href: "https://note.com/imaimai17468/n/n473521e12dc7" },
               ],
             },
           ],
