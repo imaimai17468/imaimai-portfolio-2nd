@@ -7,6 +7,7 @@ import {
   Calculator,
   Code,
   Component,
+  Contact,
   FileText,
   Gavel,
   GraduationCap,
@@ -88,14 +89,12 @@ export const MENU: readonly MainItem[] = [
       {
         id: "intro",
         label: "自己紹介",
-        icon: UserRound,
+        icon: Contact,
         action: {
           kind: "detail",
           paragraphs: [
             "千葉の田舎でぬくぬくしているエンジニアです。木更津高専、長岡技術科学大学を経て、2024年株式会社ゆめみに入社し、現在は買収によりアクセンチュアでエンジニアとして働きながら、採用活動、DevEx改善に取り組んでいます。",
-            "ものづくりが好きで、C言語に始まり、競技プログラミング、ゲーム（Unity）、ビジュアル表現（Processing）、IoT、AI、そしてWebなど興味本位で多くのものに手を出しています。",
             "人材育成・組織運営に興味があり、サポーターズ主催の技育祭ではスポンサー登壇を務めています。また、複数のハッカソンで審査員を務め、学生の制作物に対してフィードバックを行う活動も行なっています。",
-            "開発物では、Rust製Webフレームワーク、個人開発向けテンプレートをはじめ、個人で困った時に作ったサービスがぽこぽこあります。",
           ],
         },
       },
@@ -105,9 +104,13 @@ export const MENU: readonly MainItem[] = [
         icon: Heart,
         action: {
           kind: "detail",
-          paragraphs: ["ものづくりが好きです。今はフロントエンドとハードウェアに熱が入っています。"],
+          paragraphs: [
+            "ものづくりが好きで、C言語に始まり、競技プログラミング、ゲーム（Unity）、ビジュアル表現（Processing）、IoT、AI、そしてWebなど興味本位で多くのものに手を出しています。",
+            "今はフロントエンドとハードウェアに熱が入っています。",
+          ],
           sections: [
             { heading: "スキル", entries: entries(["フロントエンド開発", "UI/UX デザイン", "React / Next.js", "TypeScript"]) },
+            { heading: "プライベート", entries: entries(["HIPHOP", "Cyberpunk 2077"]) },
           ],
         },
       },
@@ -124,8 +127,17 @@ export const MENU: readonly MainItem[] = [
         icon: School,
         action: {
           kind: "detail",
-          paragraphs: ["2017.04 - 2022.03", "木更津工業高等専門学校 電子制御工学科。研究は光学式心拍センサの精度評価。プログラミング研究同好会に所属。"],
+          paragraphs: [],
           sections: [
+            {
+              heading: "概要",
+              entries: entries([
+                "2017.04 - 2022.03",
+                "木更津工業高等専門学校 電子制御工学科",
+                "研究：光学式心拍センサの精度評価",
+                "所属：プログラミング研究同好会",
+              ]),
+            },
             { heading: "つくったもの", entries: entries(["文化祭での自作ゲーム展示", "研究室の鍵のカードキーシステム化", "学校の単位数計算サイト"]) },
             { heading: "成果", entries: entries(["Paiza S", "AtCoder 緑"]) },
             { heading: "業務委託", entries: entries(["paiza Inc. — 競技プログラミング問題集の作問"]) },
@@ -153,8 +165,17 @@ export const MENU: readonly MainItem[] = [
         icon: GraduationCap,
         action: {
           kind: "detail",
-          paragraphs: ["2022.04 - 2024.03", "長岡技術科学大学 電気電子情報工学課程。研究は睡眠時脳波の構造解析。学園祭実行委員会 情報局（NUTMEG）に所属。"],
+          paragraphs: [],
           sections: [
+            {
+              heading: "概要",
+              entries: entries([
+                "2022.04 - 2024.03",
+                "長岡技術科学大学 電気電子情報工学課程",
+                "研究：睡眠時脳波の構造解析",
+                "所属：学園祭実行委員会 情報局（NUTMEG）",
+              ]),
+            },
             {
               heading: "つくったもの",
               entries: entries([
@@ -191,8 +212,12 @@ export const MENU: readonly MainItem[] = [
         icon: Building,
         action: {
           kind: "detail",
-          paragraphs: ["2024.04 - 2024.12", "Product Engineer / Recruiter / 技育プロジェクト担当"],
+          paragraphs: [],
           sections: [
+            {
+              heading: "概要",
+              entries: entries(["2024.04 - 2024.12", "株式会社ゆめみ", "Product Engineer / Recruiter / 技育プロジェクト担当"]),
+            },
             {
               heading: "担当したこと",
               entries: entries([
@@ -227,12 +252,26 @@ export const MENU: readonly MainItem[] = [
         icon: Briefcase,
         action: {
           kind: "detail",
-          paragraphs: [
-            "2024.12 - 現在",
-            "Product Engineer / Recruiter / 技育プロジェクト担当。買収によりアクセンチュアでエンジニアとして働きながら、採用活動、DevEx改善に取り組んでいます。",
-          ],
+          paragraphs: [],
           sections: [
-            { heading: "担当したこと", entries: entries(["MultiAgent SaaS の開発と提案", "バイクのマイページ系サービス開発"]) },
+            {
+              heading: "概要",
+              entries: entries([
+                "2024.12 - 現在",
+                "アクセンチュア株式会社（ゆめみの買収による）",
+                "Product Engineer / Recruiter / 技育プロジェクト担当",
+                "採用活動・DevEx 改善",
+              ]),
+            },
+            {
+              heading: "担当したこと",
+              entries: entries([
+                "MultiAgent SaaS の開発と提案",
+                "バイクのマイページ系サービス開発",
+                "AI 生成ワークスペースの開発",
+                "家族向けイベントでのデジタル展示物開発",
+              ]),
+            },
           ],
         },
       },

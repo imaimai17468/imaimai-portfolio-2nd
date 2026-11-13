@@ -358,6 +358,10 @@ html:has(.menu) {
   margin-top: var(--space-5);
 }
 
+.menu-detail-body > .menu-detail-section:first-child {
+  margin-top: 0;
+}
+
 .menu-detail-section h3 {
   margin: 0 0 var(--space-2);
   font-size: 13px;
