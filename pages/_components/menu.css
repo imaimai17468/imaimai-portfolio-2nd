@@ -173,6 +173,7 @@ html:has(.menu) {
   line-height: 1.4;
   letter-spacing: 0.02em;
   text-align: center;
+  word-break: keep-all;
 }
 
 .menu-switch {

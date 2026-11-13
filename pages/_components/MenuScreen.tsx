@@ -1,5 +1,14 @@
 import { ArrowLeft, ExternalLink, VolumeOff } from "lucide-react";
-import { useEffect, useEffectEvent, useRef, useState, type CSSProperties, type MouseEvent } from "react";
+import {
+  Fragment,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+  type CSSProperties,
+  type MouseEvent,
+  type ReactNode,
+} from "react";
 import { flushSync } from "react-dom";
 import { piano } from "../../src/lib/piano/player";
 import type { PianoSound } from "../../src/lib/piano/sprite";
@@ -32,6 +41,18 @@ const DETAIL_FADE_OUT_MS = 250;
 
 function countItems(axis: MenuAxis, mainIndex: number): number {
   return axis === "main" ? MENU.length : (MENU[mainIndex]?.subs.length ?? 0);
+}
+
+// Japanese wraps between any two characters, so a label that cannot fit on
+// one line breaks only where its pieces meet.
+function renderLabel({ label, labelPieces }: SubItem): ReactNode {
+  if (!labelPieces) return label;
+  return labelPieces.map((piece, index) => (
+    <Fragment key={piece}>
+      {index > 0 && <wbr />}
+      {piece}
+    </Fragment>
+  ));
 }
 
 function placeStyle(index: number, exit: Exit | null = null): CSSProperties {
@@ -306,7 +327,7 @@ export default function MenuScreen() {
             <span className="menu-sub-icon">
               <sub.icon aria-hidden="true" />
             </span>
-            <span className="menu-sub-label">{sub.label}</span>
+            <span className="menu-sub-label">{renderLabel(sub)}</span>
           </a>
         );
       case "detail":
@@ -315,7 +336,7 @@ export default function MenuScreen() {
             <span className="menu-sub-icon">
               <sub.icon aria-hidden="true" />
             </span>
-            <span className="menu-sub-label">{sub.label}</span>
+            <span className="menu-sub-label">{renderLabel(sub)}</span>
           </button>
         );
     }

@@ -56,6 +56,8 @@ export type SubAction =
 export interface SubItem {
   readonly id: string;
   readonly label: string;
+  /** Where a long label may wrap, as consecutive pieces of `label`. */
+  readonly labelPieces?: readonly string[];
   readonly icon: LucideIcon;
   readonly action: SubAction;
 }
@@ -147,6 +149,7 @@ export const MENU: readonly MainItem[] = [
       {
         id: "nagaoka",
         label: "長岡技術科学大学",
+        labelPieces: ["長岡技術", "科学大学"],
         icon: GraduationCap,
         action: {
           kind: "detail",
@@ -285,6 +288,7 @@ export const MENU: readonly MainItem[] = [
       {
         id: "tsuukin",
         label: "ツウキンプレイス",
+        labelPieces: ["ツウキン", "プレイス"],
         icon: TrainFront,
         action: {
           kind: "detail",
@@ -295,6 +299,7 @@ export const MENU: readonly MainItem[] = [
       {
         id: "palette",
         label: "カラーパレット",
+        labelPieces: ["カラー", "パレット"],
         icon: Palette,
         action: {
           kind: "detail",
@@ -317,6 +322,7 @@ export const MENU: readonly MainItem[] = [
       {
         id: "da-icons",
         label: "デジタル庁アイコン",
+        labelPieces: ["デジタル庁", "アイコン"],
         icon: Shapes,
         action: {
           kind: "detail",
@@ -337,6 +343,7 @@ export const MENU: readonly MainItem[] = [
       {
         id: "credits",
         label: "単位カウンター",
+        labelPieces: ["単位", "カウンター"],
         icon: Calculator,
         action: {
           kind: "detail",
@@ -483,6 +490,7 @@ export const MENU: readonly MainItem[] = [
       {
         id: "sizu",
         label: "しずかなインターネット",
+        labelPieces: ["しずかな", "インターネット"],
         icon: Notebook,
         action: { kind: "link", href: "https://sizu.me/imaimai17468" },
       },
