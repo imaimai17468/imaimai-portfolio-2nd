@@ -24,6 +24,11 @@ const SOUND_VOLUME = 0.6;
 const HERO_SCALE = 1.25;
 const HERO_TARGET = { x: 24, y: 72 };
 const SELECTED_ICON_SCALE = 1.2;
+// The hero icon's way back takes 150ms of delay and 550ms of travel, and the
+// detail text has faded by 250ms, so these clear the scroll once both are done.
+const HERO_RETURN_TRANSITION = "transform 550ms var(--ease-in-out) 150ms";
+const HERO_RETURN_MS = 700;
+const DETAIL_FADE_OUT_MS = 250;
 
 function countItems(axis: MenuAxis, mainIndex: number): number {
   return axis === "main" ? MENU.length : (MENU[mainIndex]?.subs.length ?? 0);
@@ -46,6 +51,9 @@ export default function MenuScreen() {
   const [heroSubIndex, setHeroSubIndex] = useState(0);
   const stageRef = useRef<HTMLElement>(null);
   const backButtonRef = useRef<HTMLButtonElement>(null);
+  const detailRef = useRef<HTMLElement>(null);
+  const heroItemRef = useRef<HTMLElement | null>(null);
+  const closeTimers = useRef<number[]>([]);
   const scrollerRef = useRef<MenuScroller | null>(null);
   const tapCount = useRef(0);
 
@@ -155,6 +163,14 @@ export default function MenuScreen() {
     const { dx, dy } = measureHeroMove(center, icon.offsetWidth * SELECTED_ICON_SCALE * HERO_SCALE, HERO_TARGET);
     subElement.style.setProperty("--hero-dx", `${dx}px`);
     subElement.style.setProperty("--hero-dy", `${dy}px`);
+    for (const timer of closeTimers.current) window.clearTimeout(timer);
+    closeTimers.current = [];
+    heroItemRef.current?.style.removeProperty("transform");
+    heroItemRef.current?.style.removeProperty("transition");
+    subElement.style.removeProperty("transform");
+    subElement.style.removeProperty("transition");
+    heroItemRef.current = subElement;
+    if (detailRef.current) detailRef.current.scrollTop = 0;
     const band = stage.querySelector<HTMLElement>(".menu-band");
     stage.style.setProperty("--band-scale", String((stage.clientHeight / (band?.offsetHeight ?? 1)) * 1.05));
     flushSync(() => {
@@ -167,7 +183,34 @@ export default function MenuScreen() {
     cue("transition_up");
   }
 
+  // The hero icon sits in the menu layer while the text scrolls in its own
+  // panel, so the icon follows the scroll to stay above the heading.
+  function handleDetailScroll() {
+    const hero = heroItemRef.current;
+    const detail = detailRef.current;
+    if (!hero || !detail || !isDetailOpen) return;
+    hero.style.transform = `translate3d(0, ${-detail.scrollTop}px, 0)`;
+  }
+
+  function returnHeroFromScroll() {
+    const hero = heroItemRef.current;
+    const detail = detailRef.current;
+    if (!hero || !detail) return;
+    hero.style.transition = HERO_RETURN_TRANSITION;
+    hero.style.transform = "translate3d(0, 0, 0)";
+    closeTimers.current = [
+      window.setTimeout(() => {
+        detail.scrollTop = 0;
+      }, DETAIL_FADE_OUT_MS),
+      window.setTimeout(() => {
+        hero.style.removeProperty("transition");
+        hero.style.removeProperty("transform");
+      }, HERO_RETURN_MS),
+    ];
+  }
+
   function closeDetail() {
+    returnHeroFromScroll();
     flushSync(() => setIsDetailOpen(false));
     scrollerRef.current?.setInputEnabled(true);
     stageRef.current?.querySelector<HTMLElement>(`[data-row="${mainIndex}"] [data-sub="${subIndex}"]`)?.focus({
@@ -323,7 +366,9 @@ export default function MenuScreen() {
       </nav>
 
       <section
+        ref={detailRef}
         className="menu-detail"
+        onScroll={handleDetailScroll}
         aria-labelledby="menu-detail-title"
         aria-hidden={!isDetailOpen}
         inert={!isDetailOpen}
