@@ -440,8 +440,26 @@ export const MENU: readonly MainItem[] = [
           kind: "detail",
           paragraphs: ["技術カンファレンスでの登壇。"],
           sections: [
-            { heading: "2025", entries: entries(["TSKaigi 2025"]) },
-            { heading: "2024", entries: entries(["フロントエンドカンファレンス北海道 2024"]) },
+            {
+              heading: "2025",
+              entries: [
+                {
+                  label: "TSKaigi 2025",
+                  meta: "型パズルを好きになるために、競プロを型システムだけで解いてみることにした",
+                  href: "https://speakerdeck.com/imaimai17468/xing-pazuruwohao-kininarutameni-jing-purowoxing-sisutemudakedejie-itemirukotonisita",
+                },
+              ],
+            },
+            {
+              heading: "2024",
+              entries: [
+                {
+                  label: "フロントエンドカンファレンス北海道 2024",
+                  meta: "Next.js+yjs+BlockNoteでNotionライクな最高の共同編集エディタを作ろう",
+                  href: "https://speakerdeck.com/imaimai17468/next-dot-js-plus-yjs-plus-blocknotedenotionraikunazui-gao-nogong-tong-bian-ji-edeitawozuo-rou",
+                },
+              ],
+            },
             {
               heading: "スライド",
               entries: [
