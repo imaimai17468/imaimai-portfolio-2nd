@@ -34,6 +34,7 @@ There is no test suite yet. Before reporting a change done:
 - `.claude/rules/functions.md`: the shape a function takes so each branch can be reached. Read it before writing a function.
 - `.claude/rules/design.md`: the design system. Read it before deciding a UI question or editing a stylesheet or a component.
 - The `motion-craft` skill holds the duration, easing and reduced-motion defaults. Use it for any animation or transition.
+- `.claude/skills/` also holds Emil Kowalski's design and animation skills (`animate`, `choreograph`, `gestures`, `review-animations` and others), copied from github.com/emilkowalski/skills under the MIT license in `.claude/skills/LICENSE.emilkowalski-skills`. Where one of them disagrees with `motion-craft` on a value this repository already settled, `motion-craft` wins.
 
 ## Commits
 
