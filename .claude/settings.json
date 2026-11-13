@@ -43,7 +43,7 @@
       "Bash(pnpm run dev)",
       "Bash(pnpm run build)",
       "Bash(pnpm run preview)",
-      "Bash(pnpm exec vp check *)",
+      "Bash(pnpm exec tsc --noEmit)",
       "Bash(npx -y modern-web-guidance@latest *)"
     ],
     "deny": [

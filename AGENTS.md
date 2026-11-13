@@ -19,7 +19,7 @@ Your training data goes stale. Before stating a specific version, flag, configur
 
 There is no test suite yet. Before reporting a change done:
 
-- Run `pnpm exec vp check --no-fmt --no-lint` and confirm the type check passes.
+- Run `pnpm exec tsc --noEmit` and confirm the type check passes.
 - Run `pnpm run build` and confirm it finishes without an error.
 - Run `pnpm run dev`, open the URL it prints, and look at the page in a browser at desktop and at phone width.
 - Report any step you could not run as "not run", never as "passed".
