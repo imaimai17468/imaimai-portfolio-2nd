@@ -14,7 +14,7 @@ import {
   type Exit,
   type MenuAxis,
 } from "./menu-motion";
-import { collectRowElements, paintRow } from "./menu-paint";
+import { clearBandStretch, collectRowElements, paintBand, paintRow } from "./menu-paint";
 import { createMenuScroller, type MenuScroller } from "./menu-scroller";
 import "./menu.css";
 
@@ -77,7 +77,9 @@ export default function MenuScreen() {
   useEffect(() => {
     const stage = stageRef.current;
     const rowsElement = stage?.querySelector<HTMLElement>(".menu-rows");
-    if (!stage || !rowsElement) return;
+    const band = stage?.querySelector<HTMLElement>(".menu-band");
+    if (!stage || !rowsElement || !band) return;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const readSize = (name: string) => Number.parseFloat(getComputedStyle(stage).getPropertyValue(name)) || 1;
     let sizes = { row: readSize("--row"), sub: readSize("--sub-width") };
     function handleResize() {
@@ -91,6 +93,9 @@ export default function MenuScreen() {
       onStep: (axis, index) => onStepped(axis, index),
       paint(frame) {
         rowsElement.style.transform = `translate3d(0, ${-frame.main * sizes.row}px, 0)`;
+        if (stage.dataset.detail !== "open" && !reducedMotion.matches) {
+          paintBand(band, frame, MENU.length);
+        }
         for (const row of rows) paintRow(row, frame, sizes.sub);
       },
     });
@@ -178,6 +183,7 @@ export default function MenuScreen() {
     heroItemRef.current = subElement;
     if (detailRef.current) detailRef.current.scrollTop = 0;
     const band = stage.querySelector<HTMLElement>(".menu-band");
+    if (band) clearBandStretch(band);
     stage.style.setProperty("--band-scale", String((stage.clientHeight / (band?.offsetHeight ?? 1)) * 1.05));
     flushSync(() => {
       setDetailSub(sub);
