@@ -205,6 +205,9 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
   }
 
   function handlePointerDown(event: PointerEvent) {
+    // A touch drag ends without a click, so the flag a drag sets is cleared by
+    // the next touch rather than left to swallow that touch's tap.
+    shouldSuppressClick = false;
     if (!isInputEnabled || !event.isPrimary || event.button !== 0) return;
     for (const state of Object.values(axes)) {
       if (state.target === null) continue;
@@ -240,9 +243,10 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
     if (!drag || event.pointerId !== drag.pointerId) return;
     const gesture = drag;
     drag = null;
-    if (!gesture.isDragging) return;
-    shouldSuppressClick = true;
-    release(gesture, true);
+    // A tap that caught the list mid-motion stopped it between items, so it
+    // settles onto the nearest one; a drag carries its release velocity.
+    if (gesture.isDragging) shouldSuppressClick = true;
+    release(gesture, gesture.isDragging);
   }
 
   function handleClickCapture(event: MouseEvent) {
