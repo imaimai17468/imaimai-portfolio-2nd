@@ -12,7 +12,8 @@
     "@fontsource/line-seed-jp": "5.3.2",
     "hono": "^4.11.9",
     "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react-dom": "^19.2.4",
+    "snd-lib": "1.2.4"
   },
   "devDependencies": {
     "@types/react": "^19.2.14",

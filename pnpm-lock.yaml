@@ -23,6 +23,9 @@ importers:
       react-dom:
         specifier: ^19.2.4
         version: 19.3.1(react@19.3.1)
+      snd-lib:
+        specifier: 1.2.4
+        version: 1.2.4
     devDependencies:
       '@types/react':
         specifier: ^19.2.14
@@ -2137,6 +2140,10 @@ packages:
   estree-walker@3.0.3:
     resolution: {integrity: sha512-7RUKfXgSMMkzt6ZuXmqapOurLGPPfgj6l9uRZ7lRGolvk0y2yocc35LdcxKC5PQZdn2DMqioAQ2NoWcrTKmm6g==}
 
+  events@3.3.0:
+    resolution: {integrity: sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==}
+    engines: {node: '>=0.8.x'}
+
   expect-type@1.4.0:
     resolution: {integrity: sha512-KfYbmpRm0VbLjEvVa9yGwCi9GI34xvi7A/HXYWQO65CSD2u3MczUJSuwXKFIxlGsgBQizV9q5J9NHj4VG0n+pA==}
     engines: {node: '>=12.0.0'}
@@ -2546,6 +2553,9 @@ packages:
   smol-toml@1.9.1:
     resolution: {integrity: sha512-j7WyPdf0CJoutMzMoPLF/bVXHtKZIT9Rb4eGeEbWw8X2t5oirjPgpL+OpaENZrILYaXqYwnVH+qgUwVbl+pUJQ==}
     engines: {node: '>= 18'}
+
+  snd-lib@1.2.4:
+    resolution: {integrity: sha512-Q8DnFVFGGb+buivj5aE4UIyJ3BI4j0qyARwxbkWsJPCEt1jMbBDD3nCTttZl1R0HcWFh5adDR3SHy/dSciwLvw==}
 
   source-map-js@1.2.2:
     resolution: {integrity: sha512-KGj/8Y43x35aZVDtt+J4mK1hoLGHULMYfSkODJNQjNDC3oW1PqPoxMwo0pLUsWM/UEGzON/NxeHywEfNXNP3Vw==}
@@ -4115,6 +4125,8 @@ snapshots:
     dependencies:
       '@types/estree': 1.0.10
 
+  events@3.3.0: {}
+
   expect-type@1.4.0: {}
 
   extend-shallow@2.0.1:
@@ -4511,6 +4523,10 @@ snapshots:
       totalist: 3.0.1
 
   smol-toml@1.9.1: {}
+
+  snd-lib@1.2.4:
+    dependencies:
+      events: 3.3.0
 
   source-map-js@1.2.2: {}
 
