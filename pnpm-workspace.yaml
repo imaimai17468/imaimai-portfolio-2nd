@@ -1,0 +1,11 @@
+overrides:
+  vite@*: npm:@voidzero-dev/vite-plus-core@^1.6.0
+peerDependencyRules:
+  allowedVersions:
+    vite: "*"
+
+allowBuilds:
+  better-sqlite3: false
+  esbuild: true
+  sharp: true
+  workerd: true

@@ -13,3 +13,12 @@
 
 # generator build output
 generator/target/
+
+# node / void
+node_modules
+dist
+.void
+.wrangler
+.cloudflare
+.void-wrangler.jsonc
+*.tsbuildinfo
