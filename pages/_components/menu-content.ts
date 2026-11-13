@@ -18,6 +18,7 @@ import {
   Mail,
   Map,
   Megaphone,
+  Newspaper,
   Mic,
   Notebook,
   Package,
@@ -165,6 +166,18 @@ export const MENU: readonly MainItem[] = [
             { heading: "つくったもの", entries: entries(["文化祭での自作ゲーム展示", "研究室の鍵のカードキーシステム化", "学校の単位数計算サイト"]) },
             { heading: "成果", entries: entries(["Paiza S", "AtCoder 緑"]) },
             { heading: "業務委託", entries: entries(["paiza Inc. — 競技プログラミング問題集の作問"]) },
+            {
+              heading: "記事",
+              entries: [
+                { label: "高専の単位を数えるためのWebページを作る", meta: "Qiita 2021.12", href: "https://qiita.com/imaimai17468/items/0b43c9c9e1f8f16ccea3" },
+                { label: "友達の研究室にArduinoで動くカードキーを設置した話", meta: "Qiita 2021.12", href: "https://qiita.com/imaimai17468/items/8d982b91f99a698a8b6c" },
+                { label: "筋電センサMyoWareを使って腕とサーボモーターを連携させる", meta: "Qiita 2021.08", href: "https://qiita.com/imaimai17468/items/c85319e61eb26c40b1bb" },
+                { label: "Arduinoと筋電センサMyoWareで始める筋電計測", meta: "Qiita 2020.12", href: "https://qiita.com/imaimai17468/items/3f0048cd1c80311c0921" },
+                { label: "新型コロナの感染者数を表示するBOTを作る", meta: "Qiita 2020.03", href: "https://qiita.com/imaimai17468/items/88b6fedf3a0ab8a36783" },
+                { label: "googletransを使ってDiscordで動く翻訳BOTを作ってみた", meta: "Qiita 2019.12", href: "https://qiita.com/imaimai17468/items/a8dea1b188c626f77da0" },
+                { label: "初心者がサイコロを振るDiscord Botを作った", meta: "Qiita 2019.09", href: "https://qiita.com/imaimai17468/items/18541e8734eee403936c" },
+              ],
+            },
           ],
         },
       },
@@ -191,6 +204,17 @@ export const MENU: readonly MainItem[] = [
                 "スタートアップ A 社 — 修理の受注 / 発注ができる LINE アプリの開発",
                 "スタートアップ B 社 — 建築関係のマッチングプラットフォーム / 学会の抄録冊子の自動作成サービス / 履歴書の自動 PDF 化・管理サービス",
               ]),
+            },
+            {
+              heading: "記事",
+              entries: [
+                { label: "学生団体(非IT)で資金管理アプリのPMをやった時の苦労話", meta: "Qiita 2023.12", href: "https://qiita.com/imaimai17468/items/518d8ab5d76f70f750ce" },
+                {
+                  label: "学生団体の開発チームは常に不完全でいい",
+                  meta: "しずかなインターネット 2023.11",
+                  href: "https://sizu.me/imaimai17468/posts/ehr6zu1ozrzd",
+                },
+              ],
             },
           ],
         },
@@ -338,6 +362,14 @@ export const MENU: readonly MainItem[] = [
         action: {
           kind: "detail",
           paragraphs: ["木更津高専の卒業に必要な単位数を自動計算するツール。"],
+          sections: [
+            {
+              heading: "記事",
+              entries: [
+                { label: "高専の単位を数えるためのWebページを作る", meta: "Qiita 2021.12", href: "https://qiita.com/imaimai17468/items/0b43c9c9e1f8f16ccea3" },
+              ],
+            },
+          ],
           href: "https://credits-counter-fo-knct.vercel.app",
         },
       },
@@ -493,6 +525,31 @@ export const MENU: readonly MainItem[] = [
           href: "https://sizu.me/imaimai17468",
         },
       },
+      {
+        id: "qiita",
+        label: "Qiita",
+        icon: Newspaper,
+        action: {
+          kind: "detail",
+          paragraphs: ["高専・大学時代の電子工作や BOT づくり、学生団体での開発の記録。"],
+          sections: [
+            {
+              heading: "新しい順",
+              entries: [
+                { label: "学生団体(非IT)で資金管理アプリのPMをやった時の苦労話", meta: "2023.12", href: "https://qiita.com/imaimai17468/items/518d8ab5d76f70f750ce" },
+                { label: "高専の単位を数えるためのWebページを作る", meta: "2021.12", href: "https://qiita.com/imaimai17468/items/0b43c9c9e1f8f16ccea3" },
+                { label: "友達の研究室にArduinoで動くカードキーを設置した話", meta: "2021.12", href: "https://qiita.com/imaimai17468/items/8d982b91f99a698a8b6c" },
+                { label: "筋電センサMyoWareを使って腕とサーボモーターを連携させる", meta: "2021.08", href: "https://qiita.com/imaimai17468/items/c85319e61eb26c40b1bb" },
+                { label: "Arduinoと筋電センサMyoWareで始める筋電計測", meta: "2020.12", href: "https://qiita.com/imaimai17468/items/3f0048cd1c80311c0921" },
+                { label: "新型コロナの感染者数を表示するBOTを作る", meta: "2020.03", href: "https://qiita.com/imaimai17468/items/88b6fedf3a0ab8a36783" },
+                { label: "googletransを使ってDiscordで動く翻訳BOTを作ってみた", meta: "2019.12", href: "https://qiita.com/imaimai17468/items/a8dea1b188c626f77da0" },
+                { label: "初心者がサイコロを振るDiscord Botを作った", meta: "2019.09", href: "https://qiita.com/imaimai17468/items/18541e8734eee403936c" },
+              ],
+            },
+          ],
+          href: "https://qiita.com/imaimai17468",
+        },
+      },
       { id: "note", label: "note", icon: FileText, action: { kind: "link", href: "https://note.com/imaimai17468" } },
     ],
   },
@@ -503,6 +560,7 @@ export const MENU: readonly MainItem[] = [
     subs: [
       { id: "github", label: "GitHub", icon: Code, action: { kind: "link", href: "https://github.com/imaimai17468" } },
       { id: "x", label: "X", icon: AtSign, action: { kind: "link", href: "https://x.com/imaimai17468" } },
+      { id: "qiita", label: "Qiita", icon: Newspaper, action: { kind: "link", href: "https://qiita.com/imaimai17468" } },
       { id: "speakerdeck", label: "Speaker Deck", icon: Presentation, action: { kind: "link", href: "https://speakerdeck.com/imaimai17468" } },
       { id: "lapras", label: "LAPRAS", icon: Award, action: { kind: "link", href: "https://lapras.com/public/imaimai17468" } },
       { id: "sponsors", label: "Sponsors", icon: HandHeart, action: { kind: "link", href: "https://github.com/sponsors/imaimai17468" } },
