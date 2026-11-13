@@ -112,22 +112,3 @@ export function projectRestingCenter(
     y: current.y + (motion.main - motion.mainIndex) * motion.rowHeight,
   };
 }
-
-// 1 while the list moves slowly, falling to 0 as it speeds up, so a flick
-// travels as a plain band and only a slow move stretches it.
-export function gateBySpeed(speed: number, slow: number, fast: number): number {
-  const magnitude = Math.abs(speed);
-  if (magnitude <= slow) return 1;
-  if (magnitude >= fast) return 0;
-  return 1 - (magnitude - slow) / (fast - slow);
-}
-
-// How far the band stretches past each edge, in rows, while the list sits
-// between two items: zero on an item, largest halfway, so the band reaches
-// for the neighbour it is about to land on and shrinks back once it has.
-// Past either end of the list there is no neighbour, so it stays still.
-export function measureBandStretch(position: number, count: number, amount: number): number {
-  if (position < 0 || position > count - 1) return 0;
-  const between = position - Math.floor(position);
-  return amount * 4 * between * (1 - between);
-}

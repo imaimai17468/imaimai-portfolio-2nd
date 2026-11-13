@@ -1,4 +1,4 @@
-import { gateBySpeed, measureBandStretch, measureFocus } from "./menu-motion";
+import { measureFocus } from "./menu-motion";
 import type { MenuFrame } from "./menu-scroller";
 
 export interface RowElements {
@@ -12,31 +12,6 @@ export interface RowElements {
 
 const DIMMED_OPACITY = 0.45;
 const FOCUSED_SCALE_GAIN = 0.2;
-const BAND_STRETCH_ROWS = 0.3;
-// Rows per second: below the first the band stretches in full, above the
-// second it moves as a plain band.
-const STRETCH_SPEED_ROWS = { slow: 1.5, fast: 4 } as const;
-
-// Stretches the band about its centre while the list moves slowly between
-// items. Off an item, or when moving fast, it clears the inline style, so the
-// stylesheet's own transform (the band opening into a detail) applies untouched.
-export function paintBand(band: HTMLElement, frame: MenuFrame, count: number): void {
-  const gate = gateBySpeed(frame.mainSpeed, STRETCH_SPEED_ROWS.slow, STRETCH_SPEED_ROWS.fast);
-  const stretch = measureBandStretch(frame.main, count, BAND_STRETCH_ROWS) * gate;
-  if (stretch < 0.002) {
-    clearBandStretch(band);
-    return;
-  }
-  // The stylesheet transitions the band's transform for the detail, which
-  // would delay every frame here, so the stretch turns it off while it runs.
-  band.style.transition = "none";
-  band.style.transform = `scaleY(${1 + 2 * stretch})`;
-}
-
-export function clearBandStretch(band: HTMLElement): void {
-  band.style.removeProperty("transform");
-  band.style.removeProperty("transition");
-}
 
 export function collectRowElements(stage: HTMLElement): readonly RowElements[] {
   return [...stage.querySelectorAll<HTMLElement>("[data-row]")].map((row) => ({

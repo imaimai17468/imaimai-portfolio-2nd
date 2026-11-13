@@ -11,7 +11,6 @@ import {
 
 export interface MenuFrame {
   readonly main: number;
-  readonly mainSpeed: number;
   readonly sub: number;
   readonly subOwner: number;
   readonly leftover: { readonly owner: number; readonly shift: number } | null;
@@ -76,7 +75,6 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
   let leftover: { owner: number; spring: SpringState } | null = null;
   let frame = 0;
   let lastFrameTime = 0;
-  let followedMainSpeed = 0;
   let drag: (Gesture & { pointerId: number; lastX: number; lastY: number; isDragging: boolean }) | null = null;
   let wheel: Gesture | null = null;
   let wheelTimer = 0;
@@ -90,7 +88,6 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
   function readFrame(): MenuFrame {
     return {
       main: axes.main.position,
-      mainSpeed: axes.main.target === null ? followedMainSpeed : axes.main.velocity,
       sub: axes.sub.position,
       subOwner: axes.main.lastIndex,
       leftover: leftover && { owner: leftover.owner, shift: leftover.spring.position },
@@ -192,7 +189,6 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
       const samples = gesture.samples[axis];
       samples.push({ time, raw });
       if (samples.length > 20) samples.shift();
-      if (axis === "main") followedMainSpeed = estimateVelocity(samples);
     }
     emitSteps();
     paint();
