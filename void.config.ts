@@ -7,5 +7,14 @@ export default defineConfig({
   },
   "worker": {
     "compatibility_date": "2026-02-24"
+  },
+  "head": {
+    "title": "imaimai17468",
+    "htmlAttrs": { "lang": "ja" },
+    "meta": [
+      { "name": "viewport", "content": "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { "name": "description", "content": "imaimai17468のポートフォリオサイト" }
+    ],
+    "link": [{ "rel": "icon", "href": "/icon.png" }]
   }
 });
