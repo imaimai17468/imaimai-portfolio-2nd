@@ -26,6 +26,15 @@ export function applyRubberBand(position: number, count: number): number {
   return position;
 }
 
+// Inside the list a dragged position is pulled toward the nearest item: near
+// an item it moves less than the finger, between items more, so the list
+// clicks from one item to the next. An exponent of 1 leaves it unchanged.
+export function applyDetent(position: number, exponent: number): number {
+  const nearest = Math.round(position);
+  const offset = position - nearest;
+  return nearest + Math.sign(offset) * 0.5 * (Math.abs(offset) * 2) ** exponent;
+}
+
 // Where a release lands: the position the current velocity would carry it to
 // over a short glide, rounded to an item.
 export function projectTarget(position: number, velocity: number, count: number): number {

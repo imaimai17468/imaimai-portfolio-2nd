@@ -1,4 +1,5 @@
 import {
+  applyDetent,
   applyRubberBand,
   clampIndex,
   isSettled,
@@ -42,7 +43,8 @@ interface Sample {
 }
 
 const AXES = ["main", "sub"] as const;
-const SPRING_PERIOD_S = 0.42;
+const SPRING_PERIOD_S: Record<MenuAxis, number> = { main: 0.32, sub: 0.42 };
+const DETENT_EXPONENT: Record<MenuAxis, number> = { main: 1.8, sub: 1 };
 const WHEEL_IDLE_MS = 140;
 const DRAG_START_PX = 8;
 const VELOCITY_WINDOW_MS = 100;
@@ -132,10 +134,11 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
     const dt = Math.min((time - lastFrameTime) / 1000, 1 / 30);
     lastFrameTime = time;
     let isMoving = false;
-    for (const state of Object.values(axes)) {
+    for (const axis of AXES) {
+      const state = axes[axis];
       if (state.target === null) continue;
       let next: SpringState = state;
-      for (let step = 0; step < 4; step += 1) next = stepSpring(next, state.target, dt / 4, SPRING_PERIOD_S);
+      for (let step = 0; step < 4; step += 1) next = stepSpring(next, state.target, dt / 4, SPRING_PERIOD_S[axis]);
       state.position = next.position;
       state.velocity = next.velocity;
       if (isSettled(state, state.target)) {
@@ -148,7 +151,7 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
     }
     if (leftover) {
       let next = leftover.spring;
-      for (let step = 0; step < 4; step += 1) next = stepSpring(next, 0, dt / 4, SPRING_PERIOD_S);
+      for (let step = 0; step < 4; step += 1) next = stepSpring(next, 0, dt / 4, SPRING_PERIOD_S.sub);
       leftover = isSettled(next, 0) ? null : { owner: leftover.owner, spring: next };
       isMoving ||= leftover !== null;
     }
@@ -176,7 +179,8 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
       const count = countOf(axis);
       const raw = gesture.raw[axis];
       state.target = null;
-      state.position = applyRubberBand(raw, count);
+      const isInside = raw >= 0 && raw <= count - 1;
+      state.position = isInside ? applyDetent(raw, DETENT_EXPONENT[axis]) : applyRubberBand(raw, count);
       const samples = gesture.samples[axis];
       samples.push({ time, raw });
       if (samples.length > 20) samples.shift();
