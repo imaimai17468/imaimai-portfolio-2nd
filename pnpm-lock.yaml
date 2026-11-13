@@ -11,6 +11,9 @@ importers:
 
   .:
     dependencies:
+      '@fontsource/line-seed-jp':
+        specifier: 5.3.2
+        version: 5.3.2
       hono:
         specifier: ^4.11.9
         version: 4.13.18
@@ -689,6 +692,9 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@fontsource/line-seed-jp@5.3.2':
+    resolution: {integrity: sha512-ng/gMt1yI9EAU0TlBcDtBuQAy8fB0FAvjxW3JY9NnYSN3CJgqkciMcEAldt/N0yUC4C4Oai4oeLzU9PYqyeghQ==}
 
   '@img/colour@1.1.0':
     resolution: {integrity: sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ==}
@@ -3172,6 +3178,8 @@ snapshots:
 
   '@esbuild/win32-x64@0.28.2':
     optional: true
+
+  '@fontsource/line-seed-jp@5.3.2': {}
 
   '@img/colour@1.1.0': {}
 

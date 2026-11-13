@@ -9,18 +9,19 @@
     "postinstall": "void prepare"
   },
   "dependencies": {
+    "@fontsource/line-seed-jp": "5.3.2",
     "hono": "^4.11.9",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },
   "devDependencies": {
-    "void": "1.8.0",
-    "vite": "npm:@voidzero-dev/vite-plus-core@^1.6.0",
-    "typescript": "^7.0.2",
-    "vite-plus": "^1.6.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
     "@void/react": "1.8.0",
     "oxc-transform-react": ">=0.152.0 <0.157.0",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3"
+    "typescript": "^7.0.2",
+    "vite": "npm:@voidzero-dev/vite-plus-core@^1.6.0",
+    "vite-plus": "^1.6.0",
+    "void": "1.8.0"
   }
 }

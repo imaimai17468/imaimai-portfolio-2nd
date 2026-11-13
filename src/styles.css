@@ -1,0 +1,20 @@
+@import "@fontsource/line-seed-jp/700.css";
+@import "@fontsource/line-seed-jp/800.css";
+
+:root {
+  --font-sans: "LINE Seed JP", system-ui, sans-serif;
+  --font-weight-body: 700;
+  --font-weight-heading: 800;
+
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-body);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: var(--font-weight-heading);
+}
