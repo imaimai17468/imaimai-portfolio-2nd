@@ -97,6 +97,14 @@ export const MENU: readonly MainItem[] = [
             "人材育成・組織運営に興味があり、サポーターズ主催の技育祭ではスポンサー登壇を務めています。また、複数のハッカソンで審査員を務め、学生の制作物に対してフィードバックを行う活動も行なっています。",
             "開発物では、Rust製Webフレームワーク、個人開発向けテンプレートをはじめ、個人で困った時に作ったサービスがぽこぽこあります。",
           ],
+          sections: [
+            {
+              heading: "記事",
+              entries: [
+                { label: "このカエルは何者なんだ", meta: "note 2023.12", href: "https://note.com/imaimai17468/n/nd4bd6756de01" },
+              ],
+            },
+          ],
         },
       },
       {
@@ -176,6 +184,8 @@ export const MENU: readonly MainItem[] = [
                 { label: "新型コロナの感染者数を表示するBOTを作る", meta: "Qiita 2020.03", href: "https://qiita.com/imaimai17468/items/88b6fedf3a0ab8a36783" },
                 { label: "googletransを使ってDiscordで動く翻訳BOTを作ってみた", meta: "Qiita 2019.12", href: "https://qiita.com/imaimai17468/items/a8dea1b188c626f77da0" },
                 { label: "初心者がサイコロを振るDiscord Botを作った", meta: "Qiita 2019.09", href: "https://qiita.com/imaimai17468/items/18541e8734eee403936c" },
+                { label: "3年間働いたpaizaのアルバイトを退職しました", meta: "note 2023.03", href: "https://note.com/imaimai17468/n/n8dfdac9e6edc" },
+                { label: "非情報系がAtCoderを始めてから１年ちょいが経ってどうなったか", meta: "note 2020.06", href: "https://note.com/imaimai17468/n/n200b90181ab0" },
               ],
             },
           ],
@@ -235,6 +245,22 @@ export const MENU: readonly MainItem[] = [
                 "求人サービスの管理画面開発",
                 "海外向け航空券予約システム開発",
               ]),
+            },
+            {
+              heading: "スライド",
+              entries: [
+                { label: "フロントエンド設計の所感 １年目", meta: "Speaker Deck 2025.01", href: "https://speakerdeck.com/imaimai17468/hurontoendoshe-ji-nosuo-gan-1nian-mu" },
+                { label: "Silk Weave -未来研究大会発表資料-", meta: "Speaker Deck 2024.10", href: "https://speakerdeck.com/imaimai17468/silk-weave-wei-lai-yan-jiu-da-hui-fa-biao-zi-liao" },
+              ],
+            },
+            {
+              heading: "記事",
+              entries: [
+                { label: "新卒1年目、意識して良かったこと集", meta: "note 2024.12", href: "https://note.com/imaimai17468/n/n595ad009b531" },
+                { label: "新卒がゆめみの実情をぶっちゃける 【入社エントリ】", meta: "note 2024.08", href: "https://note.com/imaimai17468/n/n4e86315e080d" },
+                { label: "入社前に昇給申請をした【ゆめみの給与自己決定制度】", meta: "note 2024.03", href: "https://note.com/imaimai17468/n/n37fd434069ae" },
+                { label: "26卒が24卒になった【ゆめみ就活体験記】", meta: "note 2023.01", href: "https://note.com/imaimai17468/n/n64c9e1ad60f3" },
+              ],
             },
           ],
         },
@@ -400,6 +426,7 @@ export const MENU: readonly MainItem[] = [
                   meta: "しずかなインターネット 2026.10",
                   href: "https://sizu.me/imaimai17468/posts/xkcvwurhscnu",
                 },
+                { label: "いまいまいの☦️卍x学生・若手向けスーパーアルティメットアドバイスガイドx卍☦️", meta: "note 2025.08", href: "https://note.com/imaimai17468/n/n473521e12dc7" },
               ],
             },
           ],
@@ -415,6 +442,23 @@ export const MENU: readonly MainItem[] = [
           sections: [
             { heading: "2025", entries: entries(["TSKaigi 2025"]) },
             { heading: "2024", entries: entries(["フロントエンドカンファレンス北海道 2024"]) },
+            {
+              heading: "スライド",
+              entries: [
+                { label: "オートメーション・バカにならないために", meta: "2026.03", href: "https://speakerdeck.com/imaimai17468/otomesiyonbakaninaranaitameni" },
+                { label: "MVP先行の探索型DocDD", meta: "2025.12", href: "https://speakerdeck.com/imaimai17468/mvpxian-xing-notan-suo-xing-docdd" },
+                { label: "コーディングチェックの自動化がしたい！", meta: "2025.06", href: "https://speakerdeck.com/imaimai17468/kodeingutietukunozi-dong-hua-gasitai" },
+                { label: "型パズルを好きになるために、競プロを型システムだけで解いてみることにした", meta: "2025.05", href: "https://speakerdeck.com/imaimai17468/xing-pazuruwohao-kininarutameni-jing-purowoxing-sisutemudakedejie-itemirukotonisita" },
+                { label: "フロントエンド設計の所感 １年目", meta: "2025.01", href: "https://speakerdeck.com/imaimai17468/hurontoendoshe-ji-nosuo-gan-1nian-mu" },
+                { label: "Silk Weave -未来研究大会発表資料-", meta: "2024.10", href: "https://speakerdeck.com/imaimai17468/silk-weave-wei-lai-yan-jiu-da-hui-fa-biao-zi-liao" },
+                { label: "Next.jsでクエリパラメータを楽に扱おう nuqsを紹介！", meta: "2024.09", href: "https://speakerdeck.com/imaimai17468/next-dot-jsdekueriparametawole-nixi-ou-nuqswoshao-jie" },
+                { label: "TailwindCSSで学ぶ技術批判の気をつけ方", meta: "2024.09", href: "https://speakerdeck.com/imaimai17468/tailwindcssdexue-buji-shu-pi-pan-noqi-wotukefang" },
+                { label: "Next.js+yjs+BlockNoteでNotionライクな最高の共同編集エディタを作ろう", meta: "2024.08", href: "https://speakerdeck.com/imaimai17468/next-dot-js-plus-yjs-plus-blocknotedenotionraikunazui-gao-nogong-tong-bian-ji-edeitawozuo-rou" },
+                { label: "BlockNoteを布教するぜ", meta: "2024.08", href: "https://speakerdeck.com/imaimai17468/blocknotewobu-jiao-suruze" },
+                { label: "Marp + Cursorによるスライド生成", meta: "2024.07", href: "https://speakerdeck.com/imaimai17468/marp-plus-cursorniyorusuraidosheng-cheng" },
+                { label: "Next.jsにおけるLazy Loading", meta: "2024.07", href: "https://speakerdeck.com/imaimai17468/next-dot-jsniokerulazy-loading" },
+              ],
+            },
             {
               heading: "記事",
               entries: [
@@ -452,6 +496,7 @@ export const MENU: readonly MainItem[] = [
                   meta: "しずかなインターネット 2025.10",
                   href: "https://sizu.me/imaimai17468/posts/th1ffhnz89sh",
                 },
+                { label: "技育博 2026 vol.1 フィードバック集", meta: "note 2026.06", href: "https://note.com/imaimai17468/n/n7b6986816c42" },
               ],
             },
           ],
