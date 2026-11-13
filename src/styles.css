@@ -2,12 +2,55 @@
 @import "@fontsource/line-seed-jp/800.css";
 
 :root {
+  --white: #f9fafb;
+  --black: #1d1d1d;
+  --background: var(--white);
+  --foreground: var(--black);
+  --muted-foreground: color-mix(in oklab, var(--foreground) 55%, var(--background));
+  --surface: color-mix(in oklab, var(--foreground) 5%, var(--background));
+  --border: color-mix(in oklab, var(--foreground) 14%, var(--background));
+  color-scheme: light;
+
   --font-sans: "LINE Seed JP", system-ui, sans-serif;
   --font-weight-body: 700;
   --font-weight-heading: 800;
 
+  --radius: 12px;
+  --radius-sm: calc(var(--radius) / 2);
+  --radius-lg: calc(var(--radius) * 2);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 40px;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+
   font-family: var(--font-sans);
   font-weight: var(--font-weight-body);
+  line-height: 1.8;
+  letter-spacing: 0.02em;
+  color: var(--foreground);
+  background: var(--background);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: var(--black);
+    --foreground: var(--white);
+    color-scheme: dark;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
 }
 
 h1,
@@ -17,4 +60,5 @@ h4,
 h5,
 h6 {
   font-weight: var(--font-weight-heading);
+  letter-spacing: 0;
 }
