@@ -12,6 +12,10 @@ export interface RowElements {
 
 const DIMMED_OPACITY = 0.45;
 const FOCUSED_SCALE_GAIN = 0.2;
+// A row's sub items soften as the row leaves the band, by how far it has left,
+// so a row resting on the band is always sharp whatever React last rendered.
+const UNFOCUSED_BLUR_PX = 2;
+const FOCUSED = 0.99;
 
 export function collectRowElements(stage: HTMLElement): readonly RowElements[] {
   return [...stage.querySelectorAll<HTMLElement>("[data-row]")].map((row) => ({
@@ -50,6 +54,7 @@ export function paintRow(row: RowElements, frame: MenuFrame, subWidth: number): 
   if (row.subGroup) {
     row.subGroup.style.opacity = String(focus);
     row.subGroup.style.transform = shiftTransform;
+    row.subGroup.style.filter = focus >= FOCUSED ? "none" : `blur(${(1 - focus) * UNFOCUSED_BLUR_PX}px)`;
   }
   for (const sub of row.subs) {
     const subFocus = measureFocus(sub.index - shift);

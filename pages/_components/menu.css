@@ -219,16 +219,6 @@ html:has(.menu) {
   }
 }
 
-/* Rows that leave the band drop back: their sub row softens as the
-   selection changes, a discrete step rather than a per-frame filter. */
-.menu-row:not([data-selected]) .menu-sub {
-  filter: blur(2px);
-}
-
-.menu-sub {
-  transition: filter 200ms ease;
-}
-
 /* Press feedback answers the touch itself, before the release decides
    whether it was a tap or the start of a drag. */
 .menu-main-icon svg,
