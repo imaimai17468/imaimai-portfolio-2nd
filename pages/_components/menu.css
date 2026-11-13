@@ -6,7 +6,6 @@
   --sub-width: 112px;
   --band-top: calc(50% - var(--row) / 2);
   --main-pos: 0;
-  --sub-pos: 0;
 
   position: fixed;
   inset: 0;
@@ -29,63 +28,60 @@ html:has(.menu) {
   background: var(--surface);
 }
 
-.menu-main,
-.menu-sub {
+.menu-rows {
   position: absolute;
   inset: 0;
-  pointer-events: none;
+  transform: translateY(calc(var(--main-pos) * var(--row) * -1));
   will-change: transform;
 }
 
-.menu-main {
-  transform: translateY(calc(var(--main-pos) * var(--row) * -1));
+.menu-row {
+  --focus: 0;
+  --shift: 0;
+  --shift-x: calc(var(--shift) * var(--sub-width) * -1);
+  position: absolute;
+  top: calc(var(--band-top) + var(--i) * var(--row));
+  left: 0;
+  right: 0;
+  height: var(--row);
+  padding: var(--space-3) var(--space-4) 0;
+  pointer-events: none;
 }
 
-.menu-sub {
-  transform: translateX(calc(var(--sub-pos) * var(--sub-width) * -1));
+.menu-row[data-selected] {
+  --focus: 1;
+}
+
+.menu-main-title {
+  display: block;
+  height: var(--title-height);
+  font-size: 26px;
+  font-weight: var(--font-weight-heading);
+  line-height: var(--title-height);
+  white-space: nowrap;
+  opacity: calc(var(--focus) * 2 - 1);
 }
 
 .menu-main-item,
 .menu-sub-item {
-  --focus: 0;
-  position: absolute;
   appearance: none;
   border: 0;
+  padding: 0;
   background: none;
   color: var(--foreground);
   font: inherit;
   text-decoration: none;
   cursor: pointer;
   pointer-events: auto;
-  opacity: calc(0.45 + 0.55 * var(--focus));
   -webkit-tap-highlight-color: transparent;
 }
 
-.menu-main-item[data-selected],
-.menu-sub-item[data-current] {
-  --focus: 1;
-}
-
 .menu-main-item {
-  --shift: 0;
-  top: calc(var(--band-top) + var(--i) * var(--row));
-  transform: translateX(calc(var(--shift) * var(--sub-width) * -1));
-  left: 0;
   display: grid;
-  grid-template-rows: var(--title-height) auto auto;
-  justify-items: start;
-  align-content: start;
-  width: var(--main-width);
-  height: var(--row);
-  padding: var(--space-3) var(--space-4) 0;
-}
-
-.menu-main-title {
-  font-size: 26px;
-  font-weight: var(--font-weight-heading);
-  line-height: var(--title-height);
-  white-space: nowrap;
-  opacity: calc(var(--focus) * 2 - 1);
+  justify-items: center;
+  width: var(--main-icon);
+  opacity: calc(0.45 + 0.55 * var(--focus));
+  transform: translateX(var(--shift-x));
 }
 
 .menu-main-icon {
@@ -103,9 +99,6 @@ html:has(.menu) {
 }
 
 .menu-main-label {
-  display: flex;
-  justify-content: center;
-  width: var(--main-icon);
   margin-top: var(--space-1);
   font-size: 12px;
   line-height: 1.4;
@@ -113,15 +106,33 @@ html:has(.menu) {
   white-space: nowrap;
 }
 
+.menu-sub {
+  position: absolute;
+  top: calc(var(--space-3) + var(--title-height));
+  left: var(--main-width);
+  opacity: var(--focus);
+  transform: translateX(var(--shift-x));
+}
+
+.menu-sub[inert] .menu-sub-item {
+  pointer-events: none;
+}
+
 .menu-sub-item {
-  top: calc(var(--band-top) + var(--space-3) + var(--title-height));
-  left: calc(var(--main-width) + var(--i) * var(--sub-width));
+  --focus: 0;
+  position: absolute;
+  top: 0;
+  left: calc(var(--i) * var(--sub-width));
   display: grid;
   justify-items: center;
   align-content: start;
   gap: var(--space-1);
   width: var(--sub-width);
-  padding: 0;
+  opacity: calc(0.45 + 0.55 * var(--focus));
+}
+
+.menu-sub-item[data-current] {
+  --focus: 1;
 }
 
 .menu-sub-icon {

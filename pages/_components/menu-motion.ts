@@ -1,6 +1,6 @@
 import type { PianoSound } from "../../src/lib/piano/sprite";
 
-const STEP_SOUNDS = ["tap_01", "tap_02", "tap_03", "tap_04", "tap_05"] as const satisfies readonly PianoSound[];
+const TAP_SOUNDS = ["tap_01", "tap_02", "tap_03", "tap_04", "tap_05"] as const satisfies readonly PianoSound[];
 
 export type MenuAxis = "main" | "sub";
 
@@ -9,8 +9,8 @@ export interface SpringState {
   readonly velocity: number;
 }
 
-export function pickStepSound(index: number): PianoSound {
-  return STEP_SOUNDS[index % STEP_SOUNDS.length] ?? STEP_SOUNDS[0];
+export function pickTapSound(count: number): PianoSound {
+  return TAP_SOUNDS[count % TAP_SOUNDS.length] ?? TAP_SOUNDS[0];
 }
 
 export function clampIndex(position: number, count: number): number {

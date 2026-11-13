@@ -19,7 +19,6 @@ export interface MenuScrollerOptions {
   countOf(axis: MenuAxis, mainIndex: number): number;
   sizeOf(axis: MenuAxis): number;
   onStep(axis: MenuAxis, index: number): void;
-  onEdge(): void;
   paint(frame: MenuFrame): void;
 }
 
@@ -47,7 +46,6 @@ const WHEEL_IDLE_MS = 140;
 const DRAG_START_PX = 8;
 const VELOCITY_WINDOW_MS = 100;
 const LINE_HEIGHT_PX = 16;
-const EDGE_CUE_OVERSHOOT = 0.15;
 
 function estimateVelocity(samples: readonly Sample[]): number {
   const last = samples.at(-1);
@@ -56,18 +54,13 @@ function estimateVelocity(samples: readonly Sample[]): number {
   return ((last.raw - first.raw) / (last.time - first.time)) * 1000;
 }
 
-function isPastEdge(raw: number, count: number): boolean {
-  return raw < -EDGE_CUE_OVERSHOOT || raw > count - 1 + EDGE_CUE_OVERSHOOT;
-}
-
 interface Gesture {
   raw: Record<MenuAxis, number>;
   samples: Record<MenuAxis, Sample[]>;
-  hasCuedEdge: boolean;
 }
 
 function startGesture(origin: Record<MenuAxis, number>): Gesture {
-  return { raw: { ...origin }, samples: { main: [], sub: [] }, hasCuedEdge: false };
+  return { raw: { ...origin }, samples: { main: [], sub: [] } };
 }
 
 export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOptions): MenuScroller {
@@ -176,7 +169,6 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
   }
 
   function follow(gesture: Gesture, time: number) {
-    let isOverEdge = false;
     for (const axis of AXES) {
       const state = axes[axis];
       const count = countOf(axis);
@@ -186,12 +178,9 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
       const samples = gesture.samples[axis];
       samples.push({ time, raw });
       if (samples.length > 20) samples.shift();
-      isOverEdge ||= isPastEdge(raw, count);
     }
     emitSteps();
     paint();
-    if (isOverEdge && !gesture.hasCuedEdge) options.onEdge();
-    gesture.hasCuedEdge = isOverEdge;
   }
 
   function release(gesture: Gesture, shouldProject: boolean) {
