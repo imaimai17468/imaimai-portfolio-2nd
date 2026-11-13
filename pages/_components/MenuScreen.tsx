@@ -1,7 +1,5 @@
-import { hapticTrigger } from "ios-haptics";
 import { ArrowLeft, ExternalLink, VolumeOff } from "lucide-react";
 import { useEffect, useEffectEvent, useRef, useState, type UIEvent } from "react";
-import { tickHaptic } from "../../src/lib/haptics/tick";
 import { piano } from "../../src/lib/piano/player";
 import type { PianoSound } from "../../src/lib/piano/sprite";
 import { MENU, type SubItem } from "./menu-content";
@@ -47,7 +45,6 @@ export default function MenuScreen() {
     setMainIndex(index);
     setSubIndex(0);
     cue(pickStepSound("main", index));
-    tickHaptic(navigator, document);
   });
 
   const onPushedPastMainEdge = useEffectEvent((now: number) => cueEdge(now));
@@ -103,7 +100,6 @@ export default function MenuScreen() {
     if (index === subIndex) return;
     setSubIndex(index);
     cue(pickStepSound("sub", index));
-    tickHaptic(navigator, document);
   }
 
   function activateSub(sub: SubItem) {
@@ -183,7 +179,6 @@ export default function MenuScreen() {
               data-menu-item=""
               data-selected={isSelected || undefined}
               aria-current={isSelected ? "true" : undefined}
-              ref={hapticTrigger}
               onClick={() => scrollMainTo(index)}
             >
               <span className="menu-main-title" aria-hidden={!isSelected}>
@@ -226,7 +221,6 @@ export default function MenuScreen() {
               href={sub.action.href}
               target="_blank"
               rel="noreferrer"
-              ref={hapticTrigger}
               onClick={() => activateSub(sub)}
             >
               {content}
@@ -239,7 +233,6 @@ export default function MenuScreen() {
               data-menu-item=""
               data-current={isCurrent || undefined}
               aria-pressed={isPressed}
-              ref={hapticTrigger}
               onClick={() => activateSub(sub)}
             >
               {content}
@@ -260,7 +253,7 @@ export default function MenuScreen() {
       >
         {openedSub && (
           <>
-            <button type="button" className="menu-detail-back" ref={hapticTrigger} onClick={closeDialog}>
+            <button type="button" className="menu-detail-back" onClick={closeDialog}>
               <ArrowLeft aria-hidden="true" />
               戻る
             </button>
