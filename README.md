@@ -2,7 +2,7 @@
 
 [imaim.ai](https://imaim.ai)
 
-imaimai17468 のポートフォリオサイト。React と [Void](https://void.cloud) で作り、Cloudflare Workers に配信する。デザインは作り直し中で、トップページは Void のスターターのまま。
+imaimai17468 のポートフォリオサイト。React と [Void](https://void.cloud) で作り、Cloudflare Workers に配信する。トップページはメニューのプロトタイプで、縦スクロールでメインメニュー、横スクロールでサブメニューを切り替える。
 
 ## 構成
 
