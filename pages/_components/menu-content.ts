@@ -464,92 +464,14 @@ export const MENU: readonly MainItem[] = [
     label: "記事",
     icon: PenLine,
     subs: [
-      {
-        id: "zenn",
-        label: "Zenn",
-        icon: BookOpen,
-        action: {
-          kind: "detail",
-          paragraphs: ["技術記事と知見の共有。"],
-          sections: [
-            {
-              heading: "新しい順",
-              entries: [
-                { label: "Rust だけで画面もブラウザの動きも書くWebフレームワーク「hypersig」を作った", meta: "2026.10", href: "https://zenn.dev/imaimai17468/articles/4ef759d08862ae" },
-                { label: "良いAIの行動、メモ", meta: "2026.09", href: "https://zenn.dev/imaimai17468/articles/4fe1531b71929b" },
-                { label: "MarpのHTMLをコネコネして、biim式RTA画面で登壇した", meta: "2026.07", href: "https://zenn.dev/imaimai17468/articles/d045e19b191102" },
-                {
-                  label: "別モデルによるクロスレビューは有効なのか？同一モデルの継続セッション・別セッションと比較する（React習熟度スコア基準）",
-                  meta: "2026.06",
-                  href: "https://zenn.dev/imaimai17468/articles/c5440b98a6e766",
-                },
-                { label: "新しいデザインシステム・コンポーネント管理のかたち「shadcn/ui registry」", meta: "2025.12", href: "https://zenn.dev/imaimai17468/articles/774e42f5613b15" },
-                { label: "もっと気軽にDocDD(SpecDD)でAI駆動開発したい", meta: "2025.11", href: "https://zenn.dev/imaimai17468/articles/5df32a0bcfc75a" },
-                { label: "OKLCHで高コントラストなカラーパレットを生成するサイトを作った【ダークテーマ対応】", meta: "2024.10", href: "https://zenn.dev/yumemi_inc/articles/4f530d30ef395b" },
-                { label: "TS Kaigiの配信likeなスライド画面共有用サイトを作った", meta: "2024.09", href: "https://zenn.dev/yumemi_inc/articles/ecdac199cf8380" },
-                { label: "Next.js + shadcn/ui + TanStackTableでモダンなテーブルを作ろう", meta: "2024.01", href: "https://zenn.dev/imaimai17468/articles/10763ce1dd3bc4" },
-                { label: "簡単Flexboxコンポーネントでコードを綺麗にしよう", meta: "2023.12", href: "https://zenn.dev/imaimai17468/articles/7d3e91cbaae0a6" },
-                { label: "Next.js+yjs+BlockNoteでGoogle Docs+Notionのような共同編集エディタを作ろう", meta: "2023.10", href: "https://zenn.dev/imaimai17468/articles/af22e695ed24a8" },
-                { label: "Next.js+WebSpeechAPIで超簡単音声認識をしてみよう", meta: "2023.09", href: "https://zenn.dev/imaimai17468/articles/a3e29a59765ab6" },
-              ],
-            },
-          ],
-          href: "https://zenn.dev/imaimai17468",
-        },
-      },
+      { id: "zenn", label: "Zenn", icon: BookOpen, action: { kind: "link", href: "https://zenn.dev/imaimai17468" } },
       {
         id: "sizu",
         label: "しずかなインターネット",
         icon: Notebook,
-        action: {
-          kind: "detail",
-          paragraphs: ["落ち着いた発信のための場。"],
-          sections: [
-            {
-              heading: "新しい順",
-              entries: [
-                { label: "社長の代わりに代表登壇した技育祭2026まとめ", meta: "2026.10", href: "https://sizu.me/imaimai17468/posts/xkcvwurhscnu" },
-                { label: "半年で20kg痩せた（頑張らずに、トラップは避ける）", meta: "2026.09", href: "https://sizu.me/imaimai17468/posts/7c58d71rk2w6" },
-                { label: "仕事はやりたくないし、らくしたいもの", meta: "2026.05", href: "https://sizu.me/imaimai17468/posts/wvk69whu0c1f" },
-                { label: "もう新卒って言いづらいね（３年目）", meta: "2026.04", href: "https://sizu.me/imaimai17468/posts/z5avi4c813m8" },
-                { label: "2025年振り返りと来年のこと", meta: "2025.12", href: "https://sizu.me/imaimai17468/posts/dr14aaisx4eb" },
-                { label: "モチベという言葉を使うのをやめようの会 2025", meta: "2025.11", href: "https://sizu.me/imaimai17468/posts/8d3b7uoiisz4" },
-                { label: "フロントエンド エッセンス集", meta: "2025.11", href: "https://sizu.me/imaimai17468/posts/mn48hb4kfrr3" },
-                { label: "ゆめみが消えるのでこれまでのキャリアと金の変遷を書く", meta: "2025.10", href: "https://sizu.me/imaimai17468/posts/tmbfa621u8fs" },
-                { label: "技術力に優劣はない（技育などに参加している学生に向けて）", meta: "2025.10", href: "https://sizu.me/imaimai17468/posts/th1ffhnz89sh" },
-                { label: "自分を弱いと思うとき / 適者生存 / 先輩を舐めろ", meta: "2024.12", href: "https://sizu.me/imaimai17468/posts/zxa393668fku" },
-                { label: "学生団体の開発チームは常に不完全でいい", meta: "2023.11", href: "https://sizu.me/imaimai17468/posts/ehr6zu1ozrzd" },
-              ],
-            },
-          ],
-          href: "https://sizu.me/imaimai17468",
-        },
+        action: { kind: "link", href: "https://sizu.me/imaimai17468" },
       },
-      {
-        id: "qiita",
-        label: "Qiita",
-        icon: Newspaper,
-        action: {
-          kind: "detail",
-          paragraphs: ["高専・大学時代の電子工作や BOT づくり、学生団体での開発の記録。"],
-          sections: [
-            {
-              heading: "新しい順",
-              entries: [
-                { label: "学生団体(非IT)で資金管理アプリのPMをやった時の苦労話", meta: "2023.12", href: "https://qiita.com/imaimai17468/items/518d8ab5d76f70f750ce" },
-                { label: "高専の単位を数えるためのWebページを作る", meta: "2021.12", href: "https://qiita.com/imaimai17468/items/0b43c9c9e1f8f16ccea3" },
-                { label: "友達の研究室にArduinoで動くカードキーを設置した話", meta: "2021.12", href: "https://qiita.com/imaimai17468/items/8d982b91f99a698a8b6c" },
-                { label: "筋電センサMyoWareを使って腕とサーボモーターを連携させる", meta: "2021.08", href: "https://qiita.com/imaimai17468/items/c85319e61eb26c40b1bb" },
-                { label: "Arduinoと筋電センサMyoWareで始める筋電計測", meta: "2020.12", href: "https://qiita.com/imaimai17468/items/3f0048cd1c80311c0921" },
-                { label: "新型コロナの感染者数を表示するBOTを作る", meta: "2020.03", href: "https://qiita.com/imaimai17468/items/88b6fedf3a0ab8a36783" },
-                { label: "googletransを使ってDiscordで動く翻訳BOTを作ってみた", meta: "2019.12", href: "https://qiita.com/imaimai17468/items/a8dea1b188c626f77da0" },
-                { label: "初心者がサイコロを振るDiscord Botを作った", meta: "2019.09", href: "https://qiita.com/imaimai17468/items/18541e8734eee403936c" },
-              ],
-            },
-          ],
-          href: "https://qiita.com/imaimai17468",
-        },
-      },
+      { id: "qiita", label: "Qiita", icon: Newspaper, action: { kind: "link", href: "https://qiita.com/imaimai17468" } },
       { id: "note", label: "note", icon: FileText, action: { kind: "link", href: "https://note.com/imaimai17468" } },
     ],
   },
@@ -560,7 +482,6 @@ export const MENU: readonly MainItem[] = [
     subs: [
       { id: "github", label: "GitHub", icon: Code, action: { kind: "link", href: "https://github.com/imaimai17468" } },
       { id: "x", label: "X", icon: AtSign, action: { kind: "link", href: "https://x.com/imaimai17468" } },
-      { id: "qiita", label: "Qiita", icon: Newspaper, action: { kind: "link", href: "https://qiita.com/imaimai17468" } },
       { id: "speakerdeck", label: "Speaker Deck", icon: Presentation, action: { kind: "link", href: "https://speakerdeck.com/imaimai17468" } },
       { id: "lapras", label: "LAPRAS", icon: Award, action: { kind: "link", href: "https://lapras.com/public/imaimai17468" } },
       { id: "sponsors", label: "Sponsors", icon: HandHeart, action: { kind: "link", href: "https://github.com/sponsors/imaimai17468" } },
