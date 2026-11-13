@@ -1,30 +1,37 @@
 # Project Instructions
 
-This repository is a static site whose pages are generated. `generator/` is a Rust program that builds them with [hypersig](https://github.com/imaimai17468/hypersig) and writes the top page `index.html`, the about page `about/index.html`, and the hypersig runtime `hypersig.js` to the repository root. `scripts/subset_fonts.py` writes `fonts/zen-kurenaido.woff2` from the font source and its OFL license in `fonts/src/`. The rest of the root holds the files the page loads (`frog.svg`, `pencil.svg`, `paper.svg` for the background texture, `avatar.png` for the profile on the about page, `icon.png` for the favicon) and `og.png`, the 1200×630 share image for OG and Twitter Card. The generated files are committed, and Vercel serves the repository root with the "Other" framework preset and no build command, so a merge to `main` deploys whatever was committed. `scripts/build.sh` runs both, and needs `cargo`, `uv`, and the network: the generator fetches the RSS feeds of Zenn and sizu (`generator/src/feed.rs`) and lists their articles newest first, so the list changes only when the build runs and its output is committed. There is no package manager for the browser side, test suite, linter, or CI.
+This repository is the portfolio site, a React app built with [Void](https://void.cloud), the Vite-based framework and deploy CLI for Cloudflare Workers. Pages are files under `pages/` that render on the server first and hydrate in the browser, shared code lives in `src/`, and files in `public/` are served as they are. `vite.config.ts` loads `voidPlugin()` and `voidReact()`, and `void.config.ts` holds the Void settings. Void's APIs postdate your training data, so before working with Void read the relevant Markdown docs in `node_modules/void/docs/`, starting with `guide/pages-routing/overview.md` for pages and `reference/cli.md` for commands.
+
+`mise.toml` pins Node and pnpm. Void needs Node 24.22+ or 26.12+, so run commands through `mise exec --` where the shell's Node is older. Install with `pnpm install`, which runs `void prepare` to generate `.void/`.
 
 ## Site Constraints
 
-- **Edit the generator, never the HTML.** Each page's content, the `<head>` and header they share (`layout`), and the styles live in `generator/src/main.rs`. Links between pages come from the routes in its `routes!` block. Styles are written with `hypersig::style` (hypersig_style) and go into `<style>` elements in `<head>`, so there is no stylesheet file. Run `scripts/build.sh` after each change and commit the regenerated `index.html`, `about/index.html`, `hypersig.js`, and `fonts/zen-kurenaido.woff2` with the source change that produced them. The font keeps only the kana and the characters in the pages' text, so a character added to a page shows in Yu Gothic until the build runs.
-- **No outside resources.** Every text on the site, Latin and Japanese, headings included, is set in Zen Kurenaido, which has one weight, so a bold heading is drawn bolder by the browser. It is served from `fonts/`, so the page loads nothing from another origin. Its digits differ in width, so a column of dates takes a fixed width. Adding another page, a script beyond the hypersig runtime, another image, another font, or a third-party embed is a design change the user decides, never a side effect of another task.
-- **Two colors.** The page uses `#f9fafb` and `#1d1d1d` (`WHITE` and `BLACK` in the `look` module of `generator/src/main.rs`). The `background` and `foreground` tokens hold them: dark text on light in light mode, swapped by the `Theme` under `prefers-color-scheme: dark`. Add a lighter shade by mixing those two with `Color::mix` instead of adding a third color.
-- **Everything at the repository root is public.** Vercel serves the whole root, so never commit a secret, a private address, or a note meant only for the owner.
+- **The design is being rebuilt.** `pages/index.tsx`, `pages/style.css` and the SVGs in `public/` other than the site's own images are the Void starter, kept until the redesign replaces them. `public/avatar.png`, `public/icon.png` and `public/og.png` are the profile image, the favicon and the 1200×630 share image, carried over from the previous site.
+- **3D models and interactive animation are planned.** Code that needs `window`, a WebGL context or `requestAnimationFrame` runs only in the browser, as `.claude/rules/react.md` (Browser-only Code) says, because the server render runs in a Worker that has none of them. Check the current Cloudflare limits on Worker bundle size and static asset file size before adding a 3D library or a model file (not verified here).
+- **Deploys go to the owner's Cloudflare account.** `void deploy` builds, provisions and publishes, so the owner runs it, never an agent. The previous site was served by Vercel from the repository root, and that project no longer has a page to serve once this layout is on `main`.
+- **Everything in `public/` and in the built output is public.** Never commit a secret, a private address, or a note meant only for the owner. Void reads local values from `.env` alone and refuses to start while `.env.local` exists.
 
 ## Knowledge Currency
 
-Your training data goes stale. Before stating a specific version, flag, configuration key, or how an external tool behaves (Vercel included), check the current official documentation, and say "not verified" where you could not.
+Your training data goes stale. Before stating a specific version, flag, configuration key, or how an external tool behaves (Void and Cloudflare included), check the current official documentation or `node_modules/void/docs/`, and say "not verified" where you could not.
 
 ## Verification
 
-With no linter or test suite, verification is by hand. Before reporting a change done:
+There is no test suite yet. Before reporting a change done:
 
-- Run `scripts/build.sh` and confirm it writes the pages and the font without a compile error or a panic.
-- Serve the root with `python3 -m http.server` and look at the page in a browser, at desktop and at phone width.
+- Run `pnpm exec vp check --no-fmt --no-lint` and confirm the type check passes.
+- Run `pnpm run build` and confirm it finishes without an error.
+- Run `pnpm run dev`, open the URL it prints, and look at the page in a browser at desktop and at phone width.
 - Report any step you could not run as "not run", never as "passed".
 
 ## Rules
 
 - `.claude/rules/prose.md`: writing standards for comments, docs, and commit messages. Always applies.
 - `.claude/rules/replies.md`: the shape of replies to the user. Always applies, and `.claude/hooks/reply-open-gate.sh` enforces its opening line.
+- `.claude/rules/react.md`: effects, hooks, component props and splitting, module placement under `pages/` and `src/`, and browser-only code. Read it before editing a `.ts` or `.tsx` file.
+- `.claude/rules/functions.md`: the shape a function takes so each branch can be reached. Read it before writing a function.
+- `.claude/rules/design.md`: the design system. Read it before deciding a UI question or editing a stylesheet or a component.
+- The `motion-craft` skill holds the duration, easing and reduced-motion defaults. Use it for any animation or transition.
 
 ## Commits
 
