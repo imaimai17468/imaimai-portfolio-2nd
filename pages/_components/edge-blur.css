@@ -1,0 +1,66 @@
+/* Carried over from the previous site, built with Hypersig: eight stacked
+   backdrop blurs, each masked to its own eighth of the band, under a tint that
+   is nearly opaque at the edge and gone by 70 percent of the band. */
+.edge-blur {
+  --edge-inward: to bottom;
+  position: fixed;
+  inset-inline: 0;
+  z-index: 1;
+  height: calc(6rem + var(--edge-safe-area, 0px));
+  pointer-events: none;
+}
+
+.edge-blur[data-edge="top"] {
+  --edge-safe-area: env(safe-area-inset-top);
+  top: 0;
+}
+
+.edge-blur[data-edge="bottom"] {
+  --edge-inward: to top;
+  --edge-safe-area: env(safe-area-inset-bottom);
+  bottom: 0;
+}
+
+.edge-blur-layer {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  mask-image: var(--mask);
+}
+
+/* The tint matches what is under the band: the page in the menu, and the
+   opened band once a detail fills the screen. Registered as a color, it turns
+   from one to the other while the band opens and closes. */
+@property --edge-tint {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: transparent;
+}
+
+.edge-blur-tint {
+  --edge-tint: var(--background);
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+    var(--edge-inward),
+    color-mix(in oklab, var(--edge-tint) 95%, transparent) 18px,
+    color-mix(in oklab, var(--edge-tint) 48%, transparent) 42%,
+    transparent 70%
+  );
+}
+
+.menu[data-detail="open"] .edge-blur-tint {
+  --edge-tint: var(--surface);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .edge-blur-tint {
+    transition: --edge-tint 550ms var(--ease-in-out) 150ms;
+  }
+
+  .menu[data-detail="open"] .edge-blur-tint {
+    transition-duration: 700ms;
+    transition-delay: 0ms;
+  }
+}

@@ -13,6 +13,7 @@ import {
 import { flushSync } from "react-dom";
 import { piano } from "../../src/lib/piano/player";
 import type { PianoSound } from "../../src/lib/piano/sprite";
+import { EdgeBlur } from "./EdgeBlur";
 import { MENU, type SubItem } from "./menu-content";
 import {
   findLeadExit,
@@ -523,6 +524,9 @@ export default function MenuScreen() {
           )}
         </div>
       </section>
+
+      <EdgeBlur edge="top" />
+      <EdgeBlur edge="bottom" />
     </main>
   );
 }

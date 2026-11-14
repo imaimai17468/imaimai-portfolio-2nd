@@ -5,5 +5,7 @@ declare module "react" {
     "--i"?: number;
     "--k"?: number;
     "--n"?: number;
+    "--blur"?: string;
+    "--mask"?: string;
   }
 }
