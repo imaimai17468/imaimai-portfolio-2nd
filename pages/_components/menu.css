@@ -246,14 +246,17 @@ html:has(.menu) {
   scale: 0.97;
 }
 
-/* Opening a detail: everything else leaves away from the opened item,
-   farthest first, while the band opens to fill the screen behind it. The
-   item's icon and label grow in place with a spring, then travel to the
-   heading, and the text comes in as they land. Closing runs it backwards. */
+/* Opening a detail runs in four beats. The tapped item bounces. Everything
+   else leaves away from it, farthest first, while the band opens to fill the
+   screen behind it. The item's icon and label grow in place, then travel to
+   the heading, and the text comes in as they land. Closing runs it
+   backwards. */
 
 .menu {
   --exit-step: 90ms;
-  --hero-travel-delay: 400ms;
+  --exit-start: 150ms;
+  --hero-grow-delay: 550ms;
+  --hero-travel-delay: 850ms;
 }
 
 .menu-band {
@@ -263,8 +266,8 @@ html:has(.menu) {
 
 .menu[data-detail="open"] .menu-band {
   transform: scaleY(var(--band-scale, 4));
-  transition-duration: 700ms;
-  transition-delay: 0ms;
+  transition-duration: 600ms;
+  transition-delay: var(--exit-start);
 }
 
 [data-exit] {
@@ -277,7 +280,7 @@ html:has(.menu) {
 .menu[data-detail="open"] [data-exit] {
   filter: blur(8px);
   transition-timing-function: var(--ease-in-out);
-  transition-delay: calc((3 - var(--k)) * var(--exit-step));
+  transition-delay: calc(var(--exit-start) + (3 - var(--k)) * var(--exit-step));
 }
 
 .menu[data-detail="open"] [data-exit="up"] {
@@ -307,11 +310,25 @@ html:has(.menu) {
   transform-origin: var(--label-origin, 50% 0);
 }
 
+.menu[data-detail="open"] .menu-sub-item[data-hero] {
+  animation: menu-hero-bounce 400ms var(--ease-out);
+}
+
+@keyframes menu-hero-bounce {
+  35% {
+    scale: 1.08;
+  }
+
+  70% {
+    scale: 0.98;
+  }
+}
+
 .menu[data-detail="open"] .menu-sub-item[data-hero] .menu-sub-icon,
 .menu[data-detail="open"] .menu-sub-item[data-hero] .menu-sub-label {
-  transition-duration: var(--ease-spring-duration), var(--ease-spring-duration);
-  transition-timing-function: var(--ease-spring), var(--ease-spring);
-  transition-delay: var(--hero-travel-delay), 0ms;
+  transition-duration: var(--ease-spring-duration), var(--ease-pop-duration);
+  transition-timing-function: var(--ease-spring), var(--ease-pop);
+  transition-delay: var(--hero-travel-delay), var(--hero-grow-delay);
 }
 
 .menu[data-detail="open"] .menu-sub-item[data-hero] .menu-sub-icon {
@@ -418,7 +435,7 @@ html:has(.menu) {
   filter: none;
   transition-duration: 450ms;
   transition-timing-function: var(--ease-out);
-  transition-delay: calc(750ms + var(--n) * 80ms);
+  transition-delay: calc(1250ms + var(--n) * 80ms);
 }
 
 .menu-detail h2 {
@@ -540,6 +557,10 @@ html:has(.menu) {
   .menu-sub-item[data-hero] .menu-sub-label,
   .menu-detail h2 {
     transition: none;
+  }
+
+  .menu[data-detail="open"] .menu-sub-item[data-hero] {
+    animation: none;
   }
 
   .menu[data-detail="open"] [data-exit] {
