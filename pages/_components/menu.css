@@ -247,29 +247,31 @@ html:has(.menu) {
 }
 
 /* Opening a detail: everything else leaves away from the opened item,
-   farthest first, then the band opens to fill the screen, then the icon
-   travels to the heading, then the text comes in. Closing runs it backwards. */
+   farthest first, while the band opens to fill the screen behind it. The
+   item's icon and label grow in place with a spring, then travel to the
+   heading, and the text comes in as they land. Closing runs it backwards. */
 
 .menu {
   --exit-step: 90ms;
+  --hero-travel-delay: 400ms;
 }
 
 .menu-band {
   transform-origin: 50% 50%;
-  transition: transform 550ms var(--ease-in-out) 600ms;
+  transition: transform 550ms var(--ease-in-out) 150ms;
 }
 
 .menu[data-detail="open"] .menu-band {
   transform: scaleY(var(--band-scale, 4));
-  transition-duration: 600ms;
-  transition-delay: 700ms;
+  transition-duration: 700ms;
+  transition-delay: 0ms;
 }
 
 [data-exit] {
   transition-property: translate, filter;
   transition-duration: 520ms;
   transition-timing-function: var(--ease-out);
-  transition-delay: calc(1100ms + (var(--k) - 1) * var(--exit-step));
+  transition-delay: calc(300ms + (var(--k) - 1) * var(--exit-step));
 }
 
 .menu[data-detail="open"] [data-exit] {
@@ -294,32 +296,49 @@ html:has(.menu) {
   translate: 100vw 0;
 }
 
-.menu-sub-item[data-hero] .menu-sub-icon {
+.menu-sub-item[data-hero] .menu-sub-icon,
+.menu-sub-item[data-hero] .menu-sub-label {
   transition:
     translate 550ms var(--ease-in-out) 150ms,
     scale 550ms var(--ease-in-out) 150ms;
 }
 
+.menu-sub-item[data-hero] .menu-sub-label {
+  transform-origin: var(--label-origin, 50% 0);
+}
+
+.menu[data-detail="open"] .menu-sub-item[data-hero] .menu-sub-icon,
+.menu[data-detail="open"] .menu-sub-item[data-hero] .menu-sub-label {
+  transition-duration: var(--ease-spring-duration), var(--ease-spring-duration);
+  transition-timing-function: var(--ease-spring), var(--ease-spring);
+  transition-delay: var(--hero-travel-delay), 0ms;
+}
+
 .menu[data-detail="open"] .menu-sub-item[data-hero] .menu-sub-icon {
   translate: var(--hero-dx, 0) var(--hero-dy, 0);
   scale: 1.25;
-  transition-duration: 600ms;
-  transition-delay: 1100ms;
 }
 
-.menu-sub-item[data-hero] .menu-sub-label {
-  transition: opacity 300ms ease 300ms;
-}
-
-/* The copy inside the detail scrolls with the text, so the flying icon hides
-   once it has landed on the copy. */
-.menu[data-hero-landed] .menu-sub-item[data-hero] .menu-sub-icon {
-  opacity: 0;
-}
-
+/* The label grows to the heading's size before it travels; the heading takes
+   its weight once it shows. */
 .menu[data-detail="open"] .menu-sub-item[data-hero] .menu-sub-label {
+  translate: var(--label-dx, 0) var(--label-dy, 0);
+  scale: var(--label-scale, 1);
+}
+
+/* The flying label is set like the heading before it is measured, so the
+   heading that takes its place on landing matches it glyph for glyph. */
+.menu-sub-item[data-hero-typeset] .menu-sub-label {
+  font-weight: var(--font-weight-heading);
+  letter-spacing: -0.01em;
+}
+
+/* The copies inside the detail scroll with the text, so the flying icon and
+   label hide once they have landed on them. Both swap at once: a crossfade
+   between two copies in the same place shows them lighter halfway through. */
+.menu[data-hero-landed] .menu-sub-item[data-hero] .menu-sub-icon,
+.menu[data-hero-landed] .menu-sub-item[data-hero] .menu-sub-label {
   opacity: 0;
-  transition-delay: 1100ms;
 }
 
 .menu-detail {
@@ -371,8 +390,19 @@ html:has(.menu) {
   stroke-width: 2.25;
 }
 
-.menu-detail > :not(.menu-detail-icon) {
+.menu-detail > * {
   max-width: 560px;
+}
+
+.menu-detail h2 {
+  opacity: 0;
+}
+
+.menu[data-hero-landed] .menu-detail h2 {
+  opacity: 1;
+}
+
+.menu-detail > :not(.menu-detail-icon, h2) {
   opacity: 0;
   transform: translateY(8px);
   filter: blur(5px);
@@ -382,13 +412,13 @@ html:has(.menu) {
     filter 250ms ease;
 }
 
-.menu[data-detail="open"] .menu-detail > :not(.menu-detail-icon) {
+.menu[data-detail="open"] .menu-detail > :not(.menu-detail-icon, h2) {
   opacity: 1;
   transform: none;
   filter: none;
   transition-duration: 450ms;
   transition-timing-function: var(--ease-out);
-  transition-delay: calc(1600ms + var(--n) * 80ms);
+  transition-delay: calc(750ms + var(--n) * 80ms);
 }
 
 .menu-detail h2 {
@@ -487,7 +517,9 @@ html:has(.menu) {
 
   .menu-band,
   [data-exit],
-  .menu-sub-item[data-hero] .menu-sub-icon {
+  .menu-sub-item[data-hero] .menu-sub-icon,
+  .menu-sub-item[data-hero] .menu-sub-label,
+  .menu-detail h2 {
     transition: none;
   }
 
@@ -503,8 +535,8 @@ html:has(.menu) {
     opacity: 0;
   }
 
-  .menu-detail > :not(.menu-detail-icon),
-  .menu[data-detail="open"] .menu-detail > :not(.menu-detail-icon) {
+  .menu-detail > :not(.menu-detail-icon, h2),
+  .menu[data-detail="open"] .menu-detail > :not(.menu-detail-icon, h2) {
     transform: none;
     transition: opacity 200ms ease;
   }

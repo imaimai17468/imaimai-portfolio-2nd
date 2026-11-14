@@ -19,6 +19,7 @@ import {
   findRowExit,
   findSubExit,
   measureHeroMove,
+  measureLabelMove,
   pickTapSound,
   projectRestingCenter,
   type Exit,
@@ -53,6 +54,14 @@ function renderLabel({ label, labelPieces }: SubItem): ReactNode {
       {piece}
     </Fragment>
   ));
+}
+
+// The box the text itself takes up, which inside a centred label is narrower
+// than the label.
+function readTextRect(element: HTMLElement): DOMRect {
+  const range = document.createRange();
+  range.selectNodeContents(element);
+  return range.getBoundingClientRect();
 }
 
 function placeStyle(index: number, exit: Exit | null = null): CSSProperties {
@@ -164,33 +173,58 @@ export default function MenuScreen() {
 
   function openDetail(sub: DetailSub, index: number) {
     const stage = stageRef.current;
+    const detail = detailRef.current;
     const subElement = stage?.querySelector<HTMLElement>(`[data-row="${mainIndex}"] [data-sub="${index}"]`);
     const icon = subElement?.querySelector<HTMLElement>(".menu-sub-icon");
-    if (!stage || !subElement || !icon) return;
+    const label = subElement?.querySelector<HTMLElement>(".menu-sub-label");
+    if (!stage || !detail || !subElement || !icon || !label) return;
     const frame = scrollerRef.current?.readFrame();
     if (!frame) return;
     const readSize = (name: string) => Number.parseFloat(getComputedStyle(stage).getPropertyValue(name)) || 0;
+    const motion = {
+      shift: frame.subOwner === mainIndex ? frame.sub : 0,
+      subIndex: index,
+      subWidth: readSize("--sub-width"),
+      main: frame.main,
+      mainIndex,
+      rowHeight: readSize("--row"),
+    };
     const rect = icon.getBoundingClientRect();
-    const center = projectRestingCenter(
-      { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 },
-      {
-        shift: frame.subOwner === mainIndex ? frame.sub : 0,
-        subIndex: index,
-        subWidth: readSize("--sub-width"),
-        main: frame.main,
-        mainIndex,
-        rowHeight: readSize("--row"),
-      },
-    );
+    const center = projectRestingCenter({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }, motion);
     // The heading's left edge follows the detail's padding, which grows past the
     // notch in landscape, so the icon lands where the text starts.
-    const textLeft = detailRef.current ? Number.parseFloat(getComputedStyle(detailRef.current).paddingLeft) : 0;
+    const textLeft = Number.parseFloat(getComputedStyle(detail).paddingLeft);
     const { dx, dy } = measureHeroMove(center, icon.offsetWidth * SELECTED_ICON_SCALE * HERO_SCALE, {
       x: textLeft,
       y: readSize("--hero-top"),
     });
     subElement.style.setProperty("--hero-dx", `${dx}px`);
     subElement.style.setProperty("--hero-dy", `${dy}px`);
+    // The heading takes this item's label before it is measured, while the
+    // detail is still hidden and scrolled to the top.
+    flushSync(() => setDetailSub(sub));
+    heroItemRef.current?.removeAttribute("data-hero-typeset");
+    subElement.setAttribute("data-hero-typeset", "");
+    detail.scrollTop = 0;
+    const heading = detail.querySelector("h2");
+    if (heading) {
+      const labelRect = label.getBoundingClientRect();
+      const labelText = readTextRect(label);
+      const headingText = readTextRect(heading);
+      const restingBox = projectRestingCenter({ x: labelRect.left, y: labelRect.top }, motion);
+      const restingText = projectRestingCenter({ x: labelText.left, y: labelText.top }, motion);
+      const scale = Number.parseFloat(getComputedStyle(heading).fontSize) / Number.parseFloat(getComputedStyle(label).fontSize);
+      const move = measureLabelMove(
+        { ...restingText, width: labelText.width },
+        restingBox,
+        { x: headingText.left, y: headingText.top },
+        scale,
+      );
+      subElement.style.setProperty("--label-origin", `${move.originX}px ${move.originY}px`);
+      subElement.style.setProperty("--label-dx", `${move.dx}px`);
+      subElement.style.setProperty("--label-dy", `${move.dy}px`);
+      subElement.style.setProperty("--label-scale", String(scale));
+    }
     for (const timer of closeTimers.current) window.clearTimeout(timer);
     closeTimers.current = [];
     heroItemRef.current?.style.removeProperty("transform");
@@ -198,14 +232,12 @@ export default function MenuScreen() {
     subElement.style.removeProperty("transform");
     subElement.style.removeProperty("transition");
     heroItemRef.current = subElement;
-    if (detailRef.current) detailRef.current.scrollTop = 0;
     const band = stage.querySelector<HTMLElement>(".menu-band");
     stage.style.setProperty("--band-scale", String((stage.clientHeight / (band?.offsetHeight ?? 1)) * 1.05));
     // Without motion the icon jumps to the heading, so no transition end arrives
     // to report the landing.
     const isMotionReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     flushSync(() => {
-      setDetailSub(sub);
       setHeroSubIndex(index);
       setIsDetailOpen(true);
       setIsHeroLanded(isMotionReduced);
@@ -241,6 +273,7 @@ export default function MenuScreen() {
       window.setTimeout(() => {
         hero.style.removeProperty("transition");
         hero.style.removeProperty("transform");
+        hero.removeAttribute("data-hero-typeset");
       }, HERO_RETURN_MS),
     ];
   }
@@ -451,7 +484,7 @@ export default function MenuScreen() {
             <detailSub.icon />
           </span>
         )}
-        <h2 id="menu-detail-title" style={{ "--n": 0 }}>
+        <h2 id="menu-detail-title">
           {detailSub?.label}
         </h2>
         <div className="menu-detail-body" style={{ "--n": 1 }}>

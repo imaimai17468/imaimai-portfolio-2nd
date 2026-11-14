@@ -93,11 +93,30 @@ export interface Point {
   readonly y: number;
 }
 
+export interface Rect extends Point {
+  readonly width: number;
+}
+
 // The translation that moves an element whose centre will rest at `center`,
 // and whose final size is `size`, so its top-left corner lands on the target.
 // Scaling happens about the centre, so only the centre and the final size count.
 export function measureHeroMove(center: Point, size: number, target: Point) {
   return { dx: target.x + size / 2 - center.x, dy: target.y + size / 2 - center.y };
+}
+
+// How the label becomes the heading: it first grows in place about the middle
+// of its text's top edge, so it stays centred under the icon and clear of it,
+// and the translation then carries the grown text's top-left corner onto the
+// heading's. `text` is where the label's text will rest and `box` where the
+// label's own box will, both in viewport coordinates.
+export function measureLabelMove(text: Rect, box: Point, heading: Point, scale: number) {
+  const middle = text.x + text.width / 2;
+  return {
+    originX: middle - box.x,
+    originY: text.y - box.y,
+    dx: heading.x - (middle - (text.width * scale) / 2),
+    dy: heading.y - text.y,
+  };
 }
 
 // Where an element's centre will be once the menu stops moving: the rows are

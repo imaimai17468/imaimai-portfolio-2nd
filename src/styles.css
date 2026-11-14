@@ -27,6 +27,10 @@
 
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  /* A spring with damping ratio 0.8 sampled over 700ms: it overshoots by 1.5%
+     and settles, so the time a transition takes with it is 700ms. */
+  --ease-spring-duration: 700ms;
+  --ease-spring: linear(0, 0.0169, 0.061, 0.1235, 0.1975, 0.2777, 0.3597, 0.4405, 0.5177, 0.5899, 0.656, 0.7156, 0.7684, 0.8146, 0.8545, 0.8884, 0.9169, 0.9404, 0.9596, 0.975, 0.9871, 0.9963, 1.0033, 1.0082, 1.0116, 1.0137, 1.0148, 1.0152, 1.0149, 1.0143, 1.0133, 1.0122, 1.011, 1.0097, 1.0085, 1.0073, 1.0062, 1.0052, 1.0043, 1.0035, 1);
 
   font-family: var(--font-sans);
   font-weight: var(--font-weight-body);
