@@ -100,11 +100,11 @@ export function measureHeroMove(center: Point, size: number, target: Point) {
   return { dx: target.x + size / 2 - center.x, dy: target.y + size / 2 - center.y };
 }
 
-// How far the label travels to become the heading. It rests scaled down by
-// `restScale` about `origin`, the middle of its top edge, and grows back to
-// scale 1 about the same point, so each part of its text moves away from the
-// origin by the inverse of `restScale`; the translation then carries the
-// text's top-left corner onto the heading's. `text` and `origin` are where
+// How far the label's copy travels to become the heading. It rests scaled
+// down by `restScale` about `origin`, the middle of its top edge, and grows
+// back to scale 1 about the same point, so each part of its text moves away
+// from the origin by the inverse of `restScale`; the translation then carries
+// the text's top-left corner onto the heading's. `text` and `origin` are where
 // they will rest, in viewport coordinates.
 export function measureLabelMove(text: Point, origin: Point, heading: Point, restScale: number) {
   return {

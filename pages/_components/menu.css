@@ -10,6 +10,9 @@
   --detail-top: 200px;
   --hero-top: 72px;
   --band-top: calc(50% - var(--row) / 2);
+  /* Unitless, so the label's copy can be scaled by their ratio. */
+  --label-size: 12;
+  --heading-size: 34;
   --main-pos: 0;
 
   position: fixed;
@@ -185,8 +188,9 @@ html:has(.menu) {
 }
 
 .menu-sub-label {
+  grid-area: 2 / 1;
   max-width: calc(var(--sub-width) - var(--space-2));
-  font-size: 12px;
+  font-size: calc(var(--label-size) * 1px);
   line-height: 1.4;
   letter-spacing: 0.02em;
   text-align: center;
@@ -302,8 +306,7 @@ html:has(.menu) {
   translate: 100vw 0;
 }
 
-.menu-sub-item[data-hero] .menu-sub-icon,
-.menu-sub-item[data-hero] .menu-sub-label {
+.menu-sub-item[data-hero] .menu-sub-icon {
   transition:
     translate 550ms var(--ease-in-out) 150ms,
     scale 550ms var(--ease-in-out) 150ms;
@@ -323,8 +326,7 @@ html:has(.menu) {
   }
 }
 
-.menu[data-detail="open"] .menu-sub-item[data-hero] .menu-sub-icon,
-.menu[data-detail="open"] .menu-sub-item[data-hero] .menu-sub-label {
+.menu[data-detail="open"] .menu-sub-item[data-hero] .menu-sub-icon {
   transition-duration: var(--ease-spring-duration), var(--ease-pop-duration);
   transition-timing-function: var(--ease-spring), var(--ease-pop);
   transition-delay: var(--hero-travel-delay), var(--hero-grow-delay);
@@ -335,35 +337,73 @@ html:has(.menu) {
   scale: 1.25;
 }
 
-/* The flying label is set like the heading, on one line and at its size,
-   and scaled down to the label's size until it grows, so the heading that
-   takes its place on landing matches it glyph for glyph. */
-.menu-sub-item[data-hero-typeset] .menu-sub-label {
-  max-width: none;
-  font-size: var(--label-heading-size);
+/* A copy of the label set like the heading, on one line and at its size,
+   rests hidden over the label, scaled down to the label's size. When the item
+   grows, the copy shows and the label fades out over it, and the two travel
+   together; only the copy remains to land, matching the heading glyph for
+   glyph. */
+.menu-sub-heading {
+  grid-area: 2 / 1;
+  font-size: calc(var(--heading-size) * 1px);
   font-weight: var(--font-weight-heading);
+  line-height: 1.25;
   letter-spacing: -0.01em;
   white-space: nowrap;
+  opacity: 0;
   transform-origin: 50% 0;
-  scale: var(--label-rest-scale, 1);
+  scale: calc(var(--label-size) / var(--heading-size));
+  pointer-events: none;
 }
 
-/* A <wbr> still breaks a nowrap line, so the pieces join on one line. */
-.menu-sub-item[data-hero-typeset] .menu-sub-label wbr {
-  display: none;
+.menu-sub-label {
+  transform-origin: 50% 0;
+}
+
+.menu-sub-item[data-hero] .menu-sub-heading {
+  transition:
+    translate 550ms var(--ease-in-out) 150ms,
+    scale 550ms var(--ease-in-out) 150ms,
+    opacity 0ms linear 700ms;
+}
+
+.menu-sub-item[data-hero] .menu-sub-label {
+  transition:
+    translate 550ms var(--ease-in-out) 150ms,
+    scale 550ms var(--ease-in-out) 150ms,
+    opacity 200ms ease 500ms;
+}
+
+.menu[data-detail="open"] .menu-sub-item[data-hero] .menu-sub-heading,
+.menu[data-detail="open"] .menu-sub-item[data-hero] .menu-sub-label {
+  translate: var(--label-dx, 0) var(--label-dy, 0);
+  transition-duration: var(--ease-spring-duration), var(--ease-pop-duration), 0ms;
+  transition-timing-function: var(--ease-spring), var(--ease-pop), linear;
+  transition-delay: var(--hero-travel-delay), var(--hero-grow-delay), var(--hero-grow-delay);
+}
+
+.menu[data-detail="open"] .menu-sub-item[data-hero] .menu-sub-heading {
+  opacity: 1;
+  scale: 1;
 }
 
 .menu[data-detail="open"] .menu-sub-item[data-hero] .menu-sub-label {
-  translate: var(--label-dx, 0) var(--label-dy, 0);
-  scale: 1;
+  opacity: 0;
+  scale: calc(var(--heading-size) / var(--label-size));
+  transition-duration: var(--ease-spring-duration), var(--ease-pop-duration), 200ms;
+  transition-timing-function: var(--ease-spring), var(--ease-pop), ease;
 }
 
 /* The copies inside the detail scroll with the text, so the flying icon and
    label hide once they have landed on them. Both swap at once: a crossfade
    between two copies in the same place shows them lighter halfway through. */
-.menu[data-hero-landed] .menu-sub-item[data-hero] .menu-sub-icon,
-.menu[data-hero-landed] .menu-sub-item[data-hero] .menu-sub-label {
+.menu[data-hero-landed] .menu-sub-item[data-hero] .menu-sub-icon {
   opacity: 0;
+}
+
+/* The copy hides by visibility, which has no transition, so on closing it
+   shows at once and keeps its opacity until it is back over the label. */
+.menu[data-hero-landed] .menu-sub-item[data-hero] .menu-sub-heading {
+  visibility: hidden;
 }
 
 .menu-detail {
@@ -448,7 +488,7 @@ html:has(.menu) {
 
 .menu-detail h2 {
   margin: 0 0 var(--space-4);
-  font-size: 34px;
+  font-size: calc(var(--heading-size) * 1px);
   line-height: 1.25;
   letter-spacing: -0.01em;
 }
@@ -563,6 +603,7 @@ html:has(.menu) {
   [data-exit],
   .menu-sub-item[data-hero] .menu-sub-icon,
   .menu-sub-item[data-hero] .menu-sub-label,
+  .menu-sub-item[data-hero] .menu-sub-heading,
   .menu-detail h2 {
     transition: none;
   }

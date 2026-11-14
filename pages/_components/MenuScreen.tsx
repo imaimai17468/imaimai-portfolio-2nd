@@ -65,16 +65,6 @@ function readTextRect(element: HTMLElement): DOMRect {
   return range.getBoundingClientRect();
 }
 
-// Switches the label between its own size and the heading's without the scale
-// transition playing: the size and the scale change together, so the label
-// looks the same before and after.
-function typesetInstantly(label: HTMLElement, change: () => void) {
-  label.style.transition = "none";
-  change();
-  label.getBoundingClientRect();
-  label.style.removeProperty("transition");
-}
-
 function placeStyle(index: number, exit: Exit | null = null): CSSProperties {
   return exit ? { "--i": index, "--k": exit.distance } : { "--i": index };
 }
@@ -188,7 +178,8 @@ export default function MenuScreen() {
     const subElement = stage?.querySelector<HTMLElement>(`[data-row="${mainIndex}"] [data-sub="${index}"]`);
     const icon = subElement?.querySelector<HTMLElement>(".menu-sub-icon");
     const label = subElement?.querySelector<HTMLElement>(".menu-sub-label");
-    if (!stage || !detail || !subElement || !icon || !label) return;
+    const copy = subElement?.querySelector<HTMLElement>(".menu-sub-heading");
+    if (!stage || !detail || !subElement || !icon || !label || !copy) return;
     const frame = scrollerRef.current?.readFrame();
     if (!frame) return;
     const readSize = (name: string) => Number.parseFloat(getComputedStyle(stage).getPropertyValue(name)) || 0;
@@ -217,20 +208,16 @@ export default function MenuScreen() {
     detail.scrollTop = 0;
     const heading = detail.querySelector("h2");
     if (heading) {
-      // The label is set at the heading's size and scaled down to look as it
-      // did, so it ends the flight at scale 1 as the same text the heading is,
-      // rather than as small text blown up.
+      // The copy of the label set like the heading, scaled down to the label's
+      // size, is what lands: it ends the flight at scale 1 as the same text the
+      // heading is, rather than as small text blown up.
       const restScale = Number.parseFloat(getComputedStyle(label).fontSize) / Number.parseFloat(getComputedStyle(heading).fontSize);
-      subElement.style.setProperty("--label-heading-size", getComputedStyle(heading).fontSize);
-      subElement.style.setProperty("--label-rest-scale", String(restScale));
-      heroItemRef.current?.removeAttribute("data-hero-typeset");
-      typesetInstantly(label, () => subElement.setAttribute("data-hero-typeset", ""));
-      const labelRect = label.getBoundingClientRect();
-      const labelText = readTextRect(label);
+      const copyRect = copy.getBoundingClientRect();
+      const copyText = readTextRect(copy);
       const headingText = readTextRect(heading);
       const move = measureLabelMove(
-        projectRestingCenter({ x: labelText.left, y: labelText.top }, motion),
-        projectRestingCenter({ x: labelRect.left + labelRect.width / 2, y: labelRect.top }, motion),
+        projectRestingCenter({ x: copyText.left, y: copyText.top }, motion),
+        projectRestingCenter({ x: copyRect.left + copyRect.width / 2, y: copyRect.top }, motion),
         { x: headingText.left, y: headingText.top },
         restScale,
       );
@@ -285,8 +272,6 @@ export default function MenuScreen() {
       window.setTimeout(() => {
         hero.style.removeProperty("transition");
         hero.style.removeProperty("transform");
-        const heroLabel = hero.querySelector<HTMLElement>(".menu-sub-label");
-        if (heroLabel) typesetInstantly(heroLabel, () => hero.removeAttribute("data-hero-typeset"));
       }, HERO_RETURN_MS),
     ];
   }
@@ -412,6 +397,9 @@ export default function MenuScreen() {
               <sub.icon aria-hidden="true" />
             </span>
             <span className="menu-sub-label">{renderLabel(sub)}</span>
+            <span className="menu-sub-heading" aria-hidden="true">
+              {sub.label}
+            </span>
           </button>
         );
     }
