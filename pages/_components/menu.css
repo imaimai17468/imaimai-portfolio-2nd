@@ -340,10 +340,11 @@ html:has(.menu) {
 /* A copy of the label set like the heading, on one line and at its size,
    rests hidden over the label, scaled down to the label's size, and the two
    travel together. The copy paints over the label, so the switch between
-   them is the copy fading while the label stays opaque under it: in as the
-   item starts to grow, and out halfway through the shrink on the way back,
-   both while the text is moving. Only the copy lands, matching the heading
-   glyph for glyph. */
+   them is the copy fading while the label stays opaque under it: in once the
+   text has grown and starts to travel, and out halfway through the shrink on
+   the way back. Each runs while the text moves across the screen, where the
+   change of weight is hardest to see. Only the copy lands, matching the
+   heading glyph for glyph. */
 .menu-sub-heading {
   grid-area: 2 / 1;
   font-size: calc(var(--heading-size) * 1px);
@@ -384,15 +385,15 @@ html:has(.menu) {
 .menu[data-detail="open"] .menu-sub-item[data-hero] .menu-sub-heading {
   opacity: 1;
   scale: 1;
-  transition-duration: var(--ease-spring-duration), var(--ease-pop-duration), 200ms;
-  transition-delay: var(--hero-travel-delay), var(--hero-grow-delay), var(--hero-grow-delay);
+  transition-duration: var(--ease-spring-duration), var(--ease-pop-duration), 300ms;
+  transition-delay: var(--hero-travel-delay), var(--hero-grow-delay), var(--hero-travel-delay);
 }
 
 .menu[data-detail="open"] .menu-sub-item[data-hero] .menu-sub-label {
   opacity: 0;
   scale: calc(var(--heading-size) / var(--label-size));
   transition-duration: var(--ease-spring-duration), var(--ease-pop-duration), 0ms;
-  transition-delay: var(--hero-travel-delay), var(--hero-grow-delay), calc(var(--hero-grow-delay) + 200ms);
+  transition-delay: var(--hero-travel-delay), var(--hero-grow-delay), calc(var(--hero-travel-delay) + 300ms);
 }
 
 /* The copies inside the detail scroll with the text, so the flying icon and
