@@ -473,8 +473,13 @@ html:has(.menu) {
   color: var(--muted-foreground);
 }
 
+/* The actions stay at the bottom of the text column while the text runs past
+   the screen, and settle under the text at its end. */
 .menu-detail-actions {
+  position: sticky;
+  bottom: 0;
   display: flex;
+  align-items: center;
   gap: var(--space-2);
   margin-top: var(--space-5);
 }
@@ -504,6 +509,18 @@ html:has(.menu) {
 .menu-detail-link svg {
   width: 16px;
   height: 16px;
+}
+
+.menu-detail-back {
+  justify-content: center;
+  width: 44px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.menu-detail-back svg {
+  width: 20px;
+  height: 20px;
 }
 
 @media (prefers-reduced-motion: reduce) {

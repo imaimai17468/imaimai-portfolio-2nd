@@ -512,9 +512,8 @@ export default function MenuScreen() {
           ))}
         </div>
         <div className="menu-detail-actions" style={{ "--n": 2 }}>
-          <button type="button" className="menu-detail-back" ref={backButtonRef} onClick={closeDetail}>
+          <button type="button" className="menu-detail-back" ref={backButtonRef} onClick={closeDetail} aria-label="戻る">
             <ArrowLeft aria-hidden="true" />
-            戻る
           </button>
           {detailSub?.action.href && (
             <a className="menu-detail-link" href={detailSub.action.href} target="_blank" rel="noreferrer">
