@@ -156,6 +156,9 @@ html:has(.menu) {
   top: 0;
   left: calc(var(--i) * var(--sub-width));
   display: grid;
+  /* The column keeps the item's width when the flying label, set at the
+     heading's size, is wider, so the icon stays where it was. */
+  grid-template-columns: minmax(0, 1fr);
   justify-items: center;
   align-content: start;
   gap: var(--space-1);
@@ -306,10 +309,6 @@ html:has(.menu) {
     scale 550ms var(--ease-in-out) 150ms;
 }
 
-.menu-sub-item[data-hero] .menu-sub-label {
-  transform-origin: var(--label-origin, 50% 0);
-}
-
 .menu[data-detail="open"] .menu-sub-item[data-hero] {
   animation: menu-hero-bounce 400ms var(--ease-out);
 }
@@ -336,18 +335,27 @@ html:has(.menu) {
   scale: 1.25;
 }
 
-/* The label grows to the heading's size before it travels; the heading takes
-   its weight once it shows. */
-.menu[data-detail="open"] .menu-sub-item[data-hero] .menu-sub-label {
-  translate: var(--label-dx, 0) var(--label-dy, 0);
-  scale: var(--label-scale, 1);
-}
-
-/* The flying label is set like the heading before it is measured, so the
-   heading that takes its place on landing matches it glyph for glyph. */
+/* The flying label is set like the heading, on one line and at its size,
+   and scaled down to the label's size until it grows, so the heading that
+   takes its place on landing matches it glyph for glyph. */
 .menu-sub-item[data-hero-typeset] .menu-sub-label {
+  max-width: none;
+  font-size: var(--label-heading-size);
   font-weight: var(--font-weight-heading);
   letter-spacing: -0.01em;
+  white-space: nowrap;
+  transform-origin: 50% 0;
+  scale: var(--label-rest-scale, 1);
+}
+
+/* A <wbr> still breaks a nowrap line, so the pieces join on one line. */
+.menu-sub-item[data-hero-typeset] .menu-sub-label wbr {
+  display: none;
+}
+
+.menu[data-detail="open"] .menu-sub-item[data-hero] .menu-sub-label {
+  translate: var(--label-dx, 0) var(--label-dy, 0);
+  scale: 1;
 }
 
 /* The copies inside the detail scroll with the text, so the flying icon and
