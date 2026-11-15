@@ -387,7 +387,10 @@ export default function MenuScreen() {
             <span className="menu-sub-icon">
               <sub.icon aria-hidden="true" />
             </span>
-            <span className="menu-sub-label">{renderLabel(sub)}</span>
+            <span className="menu-sub-label">
+              {renderLabel(sub)}
+              <ExternalLink className="menu-sub-external" aria-hidden="true" />
+            </span>
           </a>
         );
       case "detail":

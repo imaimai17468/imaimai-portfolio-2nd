@@ -187,6 +187,15 @@ html:has(.menu) {
   stroke-width: 2.25;
 }
 
+/* A sub item that opens another site says so after its label, the same mark
+   the detail's 開く button carries. */
+.menu-sub-external {
+  width: 10px;
+  height: 10px;
+  margin-inline-start: 2px;
+  vertical-align: -1px;
+}
+
 .menu-sub-label {
   grid-area: 2 / 1;
   max-width: calc(var(--sub-width) - var(--space-2));
