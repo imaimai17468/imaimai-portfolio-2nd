@@ -504,7 +504,7 @@ export const MENU: readonly MainItem[] = [
           kind: "detail",
           paragraphs: ["複数のハッカソンで審査員を務め、学生の制作物に対してフィードバックを行っています。"],
           sections: [
-            { heading: "2026", entries: entries(["技育博 2025 Vol.6", "Gemini 3 ハッカソン 東京（予選審査）", "技育博 2026 Vol.1"]) },
+            { heading: "2026", entries: entries(["技育博 2025 Vol.6", "Gemini 3 ハッカソン 東京（予選審査）", "技育博 2026 Vol.1", "DevFest GDGoC Japan Hackathon 2026 東京（予選審査）"]) },
             { heading: "2025", entries: entries(["技育博 2025 Vol.1", "技育博 2025 Vol.2"]) },
             {
               heading: "記事",
