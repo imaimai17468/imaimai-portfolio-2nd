@@ -30,7 +30,7 @@ import {
 import { measureFade, type Fade } from "./fade";
 import { chooseQualityLevel, QUALITY_LEVELS } from "./quality";
 import { readTokenColor } from "./tokens";
-import { createWobble, measureWobble, type Wobble } from "./wobble";
+import { createWobble, measureRimOffset, measureWobble, type Wobble } from "./wobble";
 
 export interface SceneLayout {
   readonly row: number;
@@ -89,6 +89,9 @@ const SHADOW_OPACITY = 0.5;
 // The opened item's piece crosses with its 2D icon, which fades in CSS over
 // the same time (menu.css).
 const HERO_FADE_MS = 250;
+// How far from the base centre a rattling piece pivots, in model units: a
+// little inside the 0.7 footprint, since most bases are narrower than it.
+const RIM_RADIUS = 0.28;
 const SWITCH_MODEL = "/models/sound--switch.glb";
 
 function collectMaterials(root: Object3D): Piece["materials"] {
@@ -256,12 +259,12 @@ export async function createTabletopScene(
     return measureFade(motion.value, elapsed);
   }
 
-  function readTilt(id: string, now: number): { x: number; z: number } {
+  function readTip(id: string, now: number): { angle: number; direction: number } {
     const motion = wobbles.get(id);
-    if (!motion) return { x: 0, z: 0 };
-    const tilt = measureWobble(motion.value, now - motion.startedAt);
-    if (!tilt) wobbles.delete(id);
-    return tilt ?? { x: 0, z: 0 };
+    if (!motion) return { angle: 0, direction: 0 };
+    const angle = measureWobble(motion.value, now - motion.startedAt);
+    if (angle === null) wobbles.delete(id);
+    return { angle: angle ?? 0, direction: motion.value.direction };
   }
 
   function setOpacity(piece: Piece, opacity: number) {
@@ -296,11 +299,14 @@ export async function createTabletopScene(
       piece.root.visible = opacity >= MIN_OPACITY;
       if (!piece.root.visible) continue;
       setOpacity(piece, opacity);
-      const tilt = readTilt(piece.slot.id, now);
-      piece.root.position.set(point.x, FOCUSED_LIFT * focus * scale, point.z);
-      piece.root.rotation.set(tilt.x, 0, tilt.z);
       // A fading hero piece shrinks a little as it gives way to its icon.
-      piece.root.scale.setScalar(scale * (1 + FOCUSED_SCALE_GAIN * focus) * (0.92 + 0.08 * fade));
+      const pieceScale = scale * (1 + FOCUSED_SCALE_GAIN * focus) * (0.92 + 0.08 * fade);
+      const tip = readTip(piece.slot.id, now);
+      const rim = measureRimOffset(tip.angle, tip.direction, RIM_RADIUS * pieceScale);
+      piece.root.position.set(point.x + rim.x, FOCUSED_LIFT * focus * scale + rim.y, point.z + rim.z);
+      // Tipping toward +x turns about -z, toward +z about +x.
+      piece.root.rotation.set(tip.angle * Math.sin(tip.direction), 0, -tip.angle * Math.cos(tip.direction));
+      piece.root.scale.setScalar(pieceScale);
       const strength = DIMMED + (1 - DIMMED) * focus;
       for (const { material } of piece.materials) {
         const base = material.userData.base;

@@ -672,7 +672,22 @@ html:has(.menu) {
   position: absolute;
   inset: 0;
   transform-origin: 50% 50%;
-  transition: transform 500ms var(--ease-in-out) 150ms;
+  transition:
+    transform 500ms var(--ease-in-out) 150ms,
+    opacity 300ms var(--ease-out);
+}
+
+/* While the 3D scene loads, the table shows empty instead of the 2D menu,
+   which would flash before the scene replaces it. Without scripts the 2D
+   menu shows at once, since nothing would ever clear the wait. */
+@media (scripting: enabled) {
+  .menu[data-scene-loading] {
+    background: var(--table);
+  }
+
+  .menu[data-scene-loading] .menu-board {
+    opacity: 0;
+  }
 }
 
 .menu[data-scene="ready"] {
@@ -729,13 +744,9 @@ html:has(.menu) {
   opacity: 0;
 }
 
-/* The pieces stand for the items, so no text is printed on the table. The
-   labels stay in the buttons for screen readers, drawn in no colour; the
-   row title is aria-hidden and painted inline, so it hides by visibility. */
-.menu[data-scene="ready"] :is(.menu-main-label, .menu-sub-label) {
-  color: transparent;
-}
-
+/* The row title would be printed where the pieces stand, so it goes; the item
+   labels stay printed under their pieces. The title is aria-hidden and painted
+   inline, so it hides by visibility. */
 .menu[data-scene="ready"] .menu-main-title {
   visibility: hidden;
 }

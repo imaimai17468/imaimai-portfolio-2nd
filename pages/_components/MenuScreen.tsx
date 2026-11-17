@@ -32,6 +32,7 @@ import { createMenuScroller, type MenuFrame, type MenuScroller } from "./menu-sc
 import type { BoardView } from "./scene/placement";
 import type { SceneState, TabletopScene } from "./scene/scene";
 import { listModelUrls, readSlotOrigins } from "./scene/slots";
+import { detectArrival, type ArrivalState } from "./scene/arrival";
 import { readTranslate } from "./scene/translate";
 import "./menu.css";
 
@@ -48,6 +49,8 @@ const DETAIL_FADE_OUT_MS = 250;
 // Long enough for the farthest exit (150ms + 2 steps of 90ms + 520ms) and the
 // hero's way back (700ms) to finish before the 3D pieces stop following them.
 const EXIT_FOLLOW_MS = 1600;
+// How long the menu waits hidden for the 3D scene before showing the 2D menu.
+const SCENE_WAIT_MS = 5000;
 // Paints further apart than this are separate gestures, not one slow frame.
 const FRAME_GAP_MS = 100;
 
@@ -122,6 +125,9 @@ export default function MenuScreen() {
   const [heroSubIndex, setHeroSubIndex] = useState(0);
   const [isHeroLanded, setIsHeroLanded] = useState(false);
   const [isSceneReady, setIsSceneReady] = useState(false);
+  // True from the server render until the 3D scene is ready or has given up,
+  // so the 2D menu does not flash before the scene replaces it (menu.css).
+  const [isSceneLoading, setIsSceneLoading] = useState(true);
   // The opened item whose 3D piece gives way to its 2D icon, from opening until
   // the icon has flown back after closing.
   const [sceneHeroId, setSceneHeroId] = useState<string | null>(null);
@@ -158,11 +164,6 @@ export default function MenuScreen() {
       setSubIndex(0);
     } else {
       setSubIndex(index);
-      // The piece that arrives on the band rocks on its base; reduced motion
-      // keeps it still.
-      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        sceneRef.current?.wobble(`sub-${mainIndex}-${index}`, Math.random);
-      }
     }
     cue("select");
   });
@@ -188,6 +189,7 @@ export default function MenuScreen() {
     let board = readBoard();
     let lastPaintTime = 0;
     let pendingFrame: MenuFrame | null = null;
+    let arrival: ArrivalState = { owner: 0, isArmed: false, previous: 0 };
     let sceneFrameId = 0;
     let isDisposed = false;
 
@@ -238,6 +240,13 @@ export default function MenuScreen() {
         rowsElement.style.transform = `translate3d(0, ${-frame.main * sizes.row}px, 0)`;
         for (const row of rows) paintRow(row, frame, sizes.sub);
         if (!sceneRef.current) return;
+        // The piece a sub slide comes to rest on rattles once it is there;
+        // reduced motion keeps it still.
+        const detected = detectArrival(arrival, frame);
+        arrival = detected.state;
+        if (detected.arrivedSub !== null && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          sceneRef.current.wobble(`sub-${frame.subOwner}-${detected.arrivedSub}`, Math.random);
+        }
         // Drag and wheel paint once per input event, which can come several
         // times a frame; the scene draws the latest once per frame, and its
         // frame time is measured between those draws.
@@ -256,8 +265,11 @@ export default function MenuScreen() {
     scrollerRef.current = scroller;
     paintSceneRef.current = (frame) => sceneRef.current?.render(buildSceneState(frame ?? scroller.readFrame()));
 
-    // The 3D library loads only in the browser and only after the 2D menu is
-    // on screen; where it cannot start, the 2D menu simply stays.
+    // The 3D library loads only in the browser. Where it cannot start, or is
+    // not ready within the wait, the 2D menu shows instead; a scene that is
+    // ready later still takes over.
+    const loadingTimer = window.setTimeout(() => setIsSceneLoading(false), SCENE_WAIT_MS);
+    if (!canvas) setIsSceneLoading(false);
     if (canvas) {
       void import("./scene/scene").then(async ({ createTabletopScene }) => {
         const root = document.documentElement;
@@ -267,7 +279,10 @@ export default function MenuScreen() {
           sceneRef.current = null;
           setIsSceneReady(false);
         });
-        if (!scene) return;
+        if (!scene) {
+          setIsSceneLoading(false);
+          return;
+        }
         if (isDisposed) {
           scene.dispose();
           return;
@@ -277,11 +292,15 @@ export default function MenuScreen() {
         // measured after it applies.
         flushSync(() => setIsSceneReady(true));
         handleResize();
-      });
+        // Measuring pauses the board's transitions, so the board fades in from
+        // the next frame, once they are back.
+        window.requestAnimationFrame(() => setIsSceneLoading(false));
+      }).catch(() => setIsSceneLoading(false));
     }
 
     return () => {
       isDisposed = true;
+      window.clearTimeout(loadingTimer);
       window.cancelAnimationFrame(sceneFrameId);
       exitFollowRef.current.generation += 1;
       exitFollowRef.current.isRunning = false;
@@ -647,6 +666,7 @@ export default function MenuScreen() {
       data-detail={isDetailOpen ? "open" : undefined}
       data-hero-landed={isHeroLanded || undefined}
       data-scene={isSceneReady ? "ready" : undefined}
+      data-scene-loading={isSceneLoading || undefined}
       data-scene-hero={sceneHeroId ? "" : undefined}
     >
       <div className="menu-board">
