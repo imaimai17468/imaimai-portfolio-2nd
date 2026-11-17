@@ -11,6 +11,19 @@
   --border: color-mix(in oklab, var(--foreground) 14%, var(--background));
   color-scheme: light;
 
+  /* The 3D menu reads these with getComputedStyle, so they stay hex literals:
+     a custom property's computed value is its declared text. */
+  --table: #eeeeec;
+  --table-band: #dcdcda;
+  --piece-white: #f2f2f0;
+  --piece-grey: #9a9ca3;
+  --piece-dark: #3a3b40;
+  --piece-blue: #9cc3ec;
+  --piece-gold: #edc977;
+  --piece-red: #d46a64;
+  --piece-green: #9ccfa8;
+  --piece-wood: #d9b48a;
+
   --font-sans: "LINE Seed JP", system-ui, sans-serif;
   --font-weight-body: 700;
   --font-weight-heading: 800;
@@ -49,6 +62,17 @@
     --background: var(--black);
     --foreground: var(--white);
     color-scheme: dark;
+
+    --table: #232323;
+    --table-band: #2f2f2f;
+    --piece-white: #d9d9d6;
+    --piece-grey: #8a8c93;
+    --piece-dark: #5a5c63;
+    --piece-blue: #86aed8;
+    --piece-gold: #d6b464;
+    --piece-red: #c25d57;
+    --piece-green: #87b993;
+    --piece-wood: #c29e76;
   }
 }
 
