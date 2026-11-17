@@ -1,11 +1,8 @@
 import {
-  BufferAttribute,
-  BufferGeometry,
   Color,
   DirectionalLight,
   HemisphereLight,
   Mesh,
-  MeshBasicMaterial,
   MeshStandardMaterial,
   PerspectiveCamera,
   PCFShadowMap,
@@ -19,7 +16,17 @@ import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { WebGPURenderer } from "three/webgpu";
 import type { MenuFrame } from "../menu-scroller";
-import { measureEmphasis, measureSlotCenter, projectToTable, toNdc, type ScreenPoint, type SlotOrigin } from "./placement";
+import {
+  measureEmphasis,
+  measureSlotCenter,
+  placeBoardCamera,
+  projectToTable,
+  toNdc,
+  toTablePoint,
+  type BoardView,
+  type ScreenPoint,
+  type SlotOrigin,
+} from "./placement";
 import { chooseQualityLevel, QUALITY_LEVELS } from "./quality";
 import { readTokenColor } from "./tokens";
 
@@ -27,12 +34,12 @@ export interface SceneLayout {
   readonly row: number;
   readonly subWidth: number;
   readonly iconSize: number;
+  readonly board: BoardView;
 }
 
 export interface SceneState {
   readonly frame: MenuFrame;
   readonly layout: SceneLayout;
-  readonly band: { readonly top: number; readonly height: number };
   readonly offsets: ReadonlyMap<string, ScreenPoint>;
   readonly heroId: string | null;
   readonly isSoundOn: boolean;
@@ -59,20 +66,12 @@ interface Piece {
 const DIMMED = 0.45;
 const FOCUSED_SCALE_GAIN = 0.2;
 const FOCUSED_LIFT = 0.12;
-// A model's footprint is at most 0.7 units; on screen at the band it spans
-// this many times the 2D icon it replaces.
+// A model's footprint is at most 0.7 units; on the board it spans this many
+// times the 2D icon it replaces. The table is measured in the board's CSS px.
 const MODEL_FOOTPRINT = 0.7;
-const SCREEN_SPAN_PER_ICON = 0.95;
+const SPAN_PER_ICON = 1.1;
 const LEVER_ANGLE = (25 * Math.PI) / 180;
 const SWITCH_MODEL = "/models/sound--switch.glb";
-
-function placeCamera(camera: PerspectiveCamera): void {
-  // Above and slightly to the front right of the table, looking down about
-  // 50 degrees. A wider swing to the side, or a wider lens, tips the pieces at
-  // the screen's edges outward, so the lens is long and the camera far.
-  camera.position.set(3.3, 26.5, 21.5);
-  camera.lookAt(0, 0, 0);
-}
 
 function collectMaterials(root: Object3D): Piece["materials"] {
   const found: { material: MeshStandardMaterial; token: string }[] = [];
@@ -95,12 +94,15 @@ export async function createTabletopScene(
   readToken: (name: string) => string,
   modelUrls: readonly string[],
 ): Promise<TabletopScene | null> {
-  const renderer = new WebGPURenderer({ canvas, antialias: true, alpha: false });
+  // Transparent: the table and the printed labels are the DOM under the canvas,
+  // so a piece in front hides the print behind it.
+  const renderer = new WebGPURenderer({ canvas, antialias: true, alpha: true });
   try {
     await renderer.init();
   } catch {
     return null;
   }
+  renderer.setClearColor(0x000000, 0);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = PCFShadowMap;
 
@@ -118,8 +120,7 @@ export async function createTabletopScene(
   );
 
   const scene = new Scene();
-  const camera = new PerspectiveCamera(18, 1, 0.1, 400);
-  placeCamera(camera);
+  const camera = new PerspectiveCamera(30, 1, 1, 20000);
 
   const hemisphere = new HemisphereLight(0xffffff, 0xffffff, 1.6);
   const sun = new DirectionalLight(0xffffff, 2.2);
@@ -128,19 +129,13 @@ export async function createTabletopScene(
   sun.shadow.bias = -0.0005;
   scene.add(hemisphere, sun, sun.target);
 
-  // The table is the background colour itself; this plane only receives the
-  // pieces' shadows, so the table matches the CSS token exactly.
+  // The table is the DOM under the canvas; this plane only receives the
+  // pieces' shadows.
   const shadowCatcher = new Mesh(new PlaneGeometry(400, 400), new ShadowMaterial({ opacity: 0.16 }));
   shadowCatcher.rotation.x = -Math.PI / 2;
-  shadowCatcher.position.y = 0.002;
+  shadowCatcher.position.y = 0;
   shadowCatcher.receiveShadow = true;
-  const bandGeometry = new BufferGeometry();
-  bandGeometry.setAttribute("position", new BufferAttribute(new Float32Array(12), 3));
-  bandGeometry.setIndex([0, 2, 1, 1, 2, 3]);
-  const bandMaterial = new MeshBasicMaterial();
-  const band = new Mesh(bandGeometry, bandMaterial);
-  band.frustumCulled = false;
-  scene.add(shadowCatcher, band);
+  scene.add(shadowCatcher);
 
   let pieces: Piece[] = [];
   let viewport = { width: 1, height: 1 };
@@ -156,8 +151,6 @@ export async function createTabletopScene(
 
   function applyColors() {
     tableColor.setHex(readColor("--table", 0xeeeeec));
-    scene.background = tableColor.clone();
-    bandMaterial.color.setHex(readColor("--table-band", 0xdcdcda));
     for (const piece of pieces) {
       for (const { material, token } of piece.materials) {
         material.userData.base = new Color(readColor(token, 0xffffff));
@@ -180,69 +173,47 @@ export async function createTabletopScene(
     return projectToTable(toNdc(point, viewport), camera);
   }
 
-  // The world size of one screen pixel on the table at the band's centre, so a
-  // piece there spans `SCREEN_SPAN_PER_ICON` icons. Pieces further back come out
-  // smaller and nearer ones larger, which is the perspective.
-  function measurePieceScale(state: SceneState): number {
-    const y = state.band.top + state.band.height / 2;
-    const a = tablePointAt({ x: viewport.width / 2, y });
-    const b = tablePointAt({ x: viewport.width / 2 + 100, y });
-    if (!a || !b) return 1;
-    const worldPerPx = a.distanceTo(b) / 100;
-    return (state.layout.iconSize * SCREEN_SPAN_PER_ICON * worldPerPx) / MODEL_FOOTPRINT;
-  }
-
-  function placeBand(state: SceneState) {
-    const corners = [
-      { x: -viewport.width, y: state.band.top },
-      { x: viewport.width * 2, y: state.band.top },
-      { x: -viewport.width, y: state.band.top + state.band.height },
-      { x: viewport.width * 2, y: state.band.top + state.band.height },
-    ].map(tablePointAt);
-    const position = bandGeometry.getAttribute("position");
-    band.visible = corners.every(Boolean);
-    corners.forEach((corner, index) => {
-      if (corner) position.setXYZ(index, corner.x, 0.001, corner.z);
-    });
-    position.needsUpdate = true;
-  }
-
   // The sun's shadow box covers the table the screen shows.
-  function fitShadow() {
+  function fitShadow(state: SceneState) {
     const corners = [
       { x: 0, y: 0 },
       { x: viewport.width, y: 0 },
       { x: 0, y: viewport.height },
       { x: viewport.width, y: viewport.height },
     ]
-      .map(tablePointAt)
+      .map((point) => projectToTable(toNdc(point, viewport), camera))
       .filter((point): point is Vector3 => point !== null);
     if (corners.length === 0) return;
     const center = corners.reduce((sum, point) => sum.add(point), new Vector3()).divideScalar(corners.length);
-    const radius = Math.max(...corners.map((point) => point.distanceTo(center))) + 2;
+    const radius = Math.max(...corners.map((point) => point.distanceTo(center))) + state.layout.iconSize * 2;
+    const distance = state.layout.board.perspective * 2;
     sun.target.position.copy(center);
-    sun.position.copy(center).add(new Vector3(-8, 20, 10));
+    sun.position.copy(center).add(new Vector3(-0.35, 0.85, 0.4).normalize().multiplyScalar(distance));
     const shadowCamera = sun.shadow.camera;
     shadowCamera.left = -radius;
     shadowCamera.right = radius;
     shadowCamera.top = radius;
     shadowCamera.bottom = -radius;
-    shadowCamera.near = 1;
-    shadowCamera.far = 60;
+    shadowCamera.near = distance * 0.2;
+    shadowCamera.far = distance * 2;
     shadowCamera.updateProjectionMatrix();
   }
 
   function draw(state: SceneState) {
+    const isViewChanged = lastState?.layout.board !== state.layout.board;
     lastState = state;
-    placeBand(state);
-    const scale = measurePieceScale(state);
+    if (isViewChanged) {
+      placeBoardCamera(camera, state.layout.board, viewport.height);
+      fitShadow(state);
+    }
+    const scale = (state.layout.iconSize * SPAN_PER_ICON) / MODEL_FOOTPRINT;
     for (const piece of pieces) {
       const center = measureSlotCenter(piece.slot, state.frame, state.layout);
       const offset = state.offsets.get(piece.slot.id) ?? { x: 0, y: 0 };
-      const point = tablePointAt({ x: center.x + offset.x, y: center.y + offset.y });
+      const point = toTablePoint({ x: center.x + offset.x, y: center.y + offset.y }, state.layout.board);
       const { visibility, focus } = measureEmphasis(piece.slot, state.frame);
-      piece.root.visible = point !== null && visibility > 0 && piece.slot.id !== state.heroId;
-      if (!piece.root.visible || !point) continue;
+      piece.root.visible = visibility > 0 && piece.slot.id !== state.heroId;
+      if (!piece.root.visible) continue;
       piece.root.position.set(point.x, FOCUSED_LIFT * focus * scale, point.z);
       piece.root.scale.setScalar(scale * (1 + FOCUSED_SCALE_GAIN * focus));
       const strength = visibility * (DIMMED + (1 - DIMMED) * focus);
@@ -278,8 +249,10 @@ export async function createTabletopScene(
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
       applyQuality();
-      fitShadow();
-      if (lastState) draw(lastState);
+      if (!lastState) return;
+      placeBoardCamera(camera, lastState.layout.board, height);
+      fitShadow(lastState);
+      draw(lastState);
     },
     refreshColors() {
       applyColors();
@@ -296,7 +269,6 @@ export async function createTabletopScene(
     },
     dispose() {
       renderer.dispose();
-      bandGeometry.dispose();
     },
   };
 }

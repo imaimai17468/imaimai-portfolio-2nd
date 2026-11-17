@@ -29,6 +29,7 @@ import {
 } from "./menu-motion";
 import { collectRowElements, paintRow } from "./menu-paint";
 import { createMenuScroller, type MenuFrame, type MenuScroller } from "./menu-scroller";
+import type { BoardView } from "./scene/placement";
 import type { SceneState, TabletopScene } from "./scene/scene";
 import { listModelUrls, readSlotOrigins } from "./scene/slots";
 import { readTranslate } from "./scene/translate";
@@ -49,6 +50,26 @@ const DETAIL_FADE_OUT_MS = 250;
 const EXIT_FOLLOW_MS = 1600;
 // Paints further apart than this are separate gestures, not one slow frame.
 const FRAME_GAP_MS = 100;
+
+// Lays the board flat for a measurement, so rects come back in the board's own
+// layout, which is also where the open-item flight and the 3D pieces work.
+function flattenBoard(stage: HTMLElement): () => void {
+  const board = stage.querySelector<HTMLElement>(".menu-board");
+  if (!board) return () => {};
+  board.style.transition = "none";
+  board.style.transform = "none";
+  return () => {
+    board.style.removeProperty("transform");
+    // The transform must be computed before the transition comes back, or
+    // the restore animates.
+    board.getBoundingClientRect();
+    board.style.removeProperty("transition");
+  };
+}
+
+function readAngle(value: string): number {
+  return (Number.parseFloat(value) * Math.PI) / 180 || 0;
+}
 
 function readExitOffset(stage: HTMLElement, id: string): { x: number; y: number } {
   const [kind, row, sub] = id.split("-");
@@ -142,10 +163,19 @@ export default function MenuScreen() {
     if (!stage || !rowsElement) return;
     const stageElement = stage;
     const readSize = (name: string) => Number.parseFloat(getComputedStyle(stage).getPropertyValue(name)) || 1;
-    const bandElement = stage.querySelector<HTMLElement>(".menu-band");
     const canvas = stage.querySelector<HTMLCanvasElement>(".menu-scene");
     let sizes = { row: readSize("--row"), sub: readSize("--sub-width"), icon: readSize("--main-icon") };
-    let band = { top: bandElement?.offsetTop ?? 0, height: bandElement?.offsetHeight ?? 0 };
+    const readBoard = (): BoardView => {
+      const style = getComputedStyle(stageElement);
+      return {
+        perspective: readSize("--board-perspective"),
+        tilt: readAngle(style.getPropertyValue("--board-tilt")),
+        twist: readAngle(style.getPropertyValue("--board-twist")),
+        originX: stageElement.clientWidth / 2,
+        originY: stageElement.clientHeight / 2,
+      };
+    };
+    let board = readBoard();
     let lastPaintTime = 0;
     let isDisposed = false;
 
@@ -153,8 +183,7 @@ export default function MenuScreen() {
       const input = sceneInputRef.current;
       return {
         frame,
-        layout: { row: sizes.row, subWidth: sizes.sub, iconSize: sizes.icon },
-        band,
+        layout: { row: sizes.row, subWidth: sizes.sub, iconSize: sizes.icon, board },
         offsets: input.offsets,
         heroId: input.heroId,
         isSoundOn: input.isSoundOn,
@@ -162,13 +191,15 @@ export default function MenuScreen() {
     }
     function placeScene(scene: TabletopScene) {
       const frame = scroller.readFrame();
+      const restoreBoard = flattenBoard(stageElement);
       scene.setSlots(readSlotOrigins(stageElement, frame, { row: sizes.row, subWidth: sizes.sub }));
+      restoreBoard();
       scene.resize(window.innerWidth, window.innerHeight, window.devicePixelRatio);
       scene.render(buildSceneState(frame));
     }
     function handleResize() {
       sizes = { row: readSize("--row"), sub: readSize("--sub-width"), icon: readSize("--main-icon") };
-      band = { top: bandElement?.offsetTop ?? 0, height: bandElement?.offsetHeight ?? 0 };
+      board = readBoard();
       if (sceneRef.current) placeScene(sceneRef.current);
     }
     window.addEventListener("resize", handleResize);
@@ -203,8 +234,10 @@ export default function MenuScreen() {
           return;
         }
         sceneRef.current = scene;
-        placeScene(scene);
-        setIsSceneReady(true);
+        // The ready state widens the main column's inset, so the slots are
+        // measured after it applies.
+        flushSync(() => setIsSceneReady(true));
+        handleResize();
       });
     }
 
@@ -319,6 +352,7 @@ export default function MenuScreen() {
     if (!stage || !detail || !subElement || !icon || !label || !copy) return;
     const frame = scrollerRef.current?.readFrame();
     if (!frame) return;
+    const restoreBoard = flattenBoard(stage);
     const readSize = (name: string) => Number.parseFloat(getComputedStyle(stage).getPropertyValue(name)) || 0;
     const motion = {
       shift: frame.subOwner === mainIndex ? frame.sub : 0,
@@ -361,6 +395,7 @@ export default function MenuScreen() {
       subElement.style.setProperty("--label-dx", `${move.dx}px`);
       subElement.style.setProperty("--label-dy", `${move.dy}px`);
     }
+    restoreBoard();
     for (const timer of closeTimers.current) window.clearTimeout(timer);
     closeTimers.current = [];
     heroItemRef.current?.style.removeProperty("transform");
@@ -564,9 +599,8 @@ export default function MenuScreen() {
       data-scene={isSceneReady ? "ready" : undefined}
       data-scene-hero={sceneHeroId ? "" : undefined}
     >
-      <canvas className="menu-scene" aria-hidden="true" />
+      <div className="menu-board">
       <div className="menu-band" aria-hidden="true" />
-
       <nav className="menu-rows" aria-label="メインメニュー" inert={isDetailOpen}>
         <img
           className="menu-mark"
@@ -620,6 +654,8 @@ export default function MenuScreen() {
           );
         })}
       </nav>
+      </div>
+      <canvas className="menu-scene" aria-hidden="true" />
 
       <section
         ref={detailRef}

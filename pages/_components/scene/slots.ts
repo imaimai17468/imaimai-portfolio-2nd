@@ -7,11 +7,11 @@ import { modelUrlOf } from "./tokens";
 // The switch draws its own track instead of an icon, so it marks the slot.
 const MARK_SELECTOR = ".menu-sub-icon, .menu-switch";
 
-// A piece stands a little above the bottom centre of the 2D mark it replaces,
-// so it rises out of the place the icon took and clears the label below.
+// A piece stands on the centre of the 2D mark it replaces, so its base stays
+// clear of the label printed in front of it on the table.
 function readBase(element: Element): { x: number; y: number } {
   const rect = element.getBoundingClientRect();
-  return { x: rect.left + rect.width / 2, y: rect.bottom - rect.height * 0.15 };
+  return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
 }
 
 // Reads where each icon sits now and undoes the paint that moved it, so the

@@ -656,9 +656,46 @@ html:has(.menu) {
    ready; until then, and wherever it cannot start, the 2D menu shows as it is.
    The 2D icons stay in the layout, so the pieces can be placed under them. */
 
+.menu {
+  /* The board lies on the table: the 3D scene reads these to place its camera
+     where CSS draws from, so the pieces stand on the printed labels. */
+  --board-perspective: 1200px;
+  --board-tilt: 36deg;
+  --board-twist: 8deg;
+  perspective: var(--board-perspective);
+  perspective-origin: 50% 50%;
+}
+
+/* Flat until the scene is ready, so the 2D menu stays as it is wherever the
+   renderer cannot start. */
+.menu-board {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 50%;
+  transition: transform 500ms var(--ease-in-out) 150ms;
+}
+
+.menu[data-scene="ready"] {
+  /* Nearer rows spread outward from the screen centre, so the main column
+     starts further in to keep them on screen. */
+  --inset-left: max(var(--space-4), 14vw, env(safe-area-inset-left, 0px));
+}
+
+.menu[data-scene="ready"] .menu-board {
+  transform: rotateX(var(--board-tilt)) rotateZ(var(--board-twist));
+}
+
+/* The board stands up flat as the item opens, so the icon flies to a flat
+   heading, and lies back down as it closes. */
+.menu[data-scene="ready"][data-detail="open"] .menu-board {
+  transform: none;
+  transition-delay: 300ms;
+}
+
 .menu-scene {
   position: absolute;
   inset: 0;
+  pointer-events: none;
   width: 100%;
   height: 100%;
   display: block;
@@ -666,8 +703,16 @@ html:has(.menu) {
   transition: opacity 400ms var(--ease-in-out) var(--hero-grow-delay);
 }
 
+/* The board tilts into place first, then the pieces appear on it. */
 .menu[data-scene="ready"] .menu-scene {
   visibility: visible;
+  animation: menu-scene-in 300ms var(--ease-out) 650ms both;
+}
+
+@keyframes menu-scene-in {
+  from {
+    opacity: 0;
+  }
 }
 
 .menu[data-detail="open"] .menu-scene {
@@ -684,20 +729,24 @@ html:has(.menu) {
   opacity: 1;
 }
 
-/* The band is drawn on the table while browsing, and the DOM band appears
-   only to expand into the detail, then clears once it has shrunk back. */
+/* The band is printed on the table in the scene's colours, and takes the
+   detail's surface as it expands into it. */
+.menu[data-scene="ready"] {
+  background: var(--table);
+}
+
 .menu[data-scene="ready"] .menu-band {
-  background-color: transparent;
+  background-color: var(--table-band);
   transition:
     transform 550ms var(--ease-in-out) 150ms,
-    background-color 0ms linear 700ms;
+    background-color 300ms var(--ease-in-out);
 }
 
 .menu[data-scene="ready"][data-detail="open"] .menu-band {
   background-color: var(--surface);
   transition:
     transform 600ms var(--ease-in-out) var(--exit-start),
-    background-color 0ms;
+    background-color 300ms var(--ease-in-out) var(--exit-start);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -709,5 +758,13 @@ html:has(.menu) {
   .menu[data-scene="ready"] .menu-band,
   .menu[data-scene="ready"][data-detail="open"] .menu-band {
     transition: none;
+  }
+
+  .menu-board {
+    transition: none;
+  }
+
+  .menu[data-scene="ready"] .menu-scene {
+    animation: none;
   }
 }

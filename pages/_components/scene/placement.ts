@@ -1,4 +1,4 @@
-import { Plane, Raycaster, Vector2, Vector3, type Camera } from "three";
+import { Plane, Raycaster, Vector2, Vector3, type Camera, type PerspectiveCamera } from "three";
 import { measureFocus } from "../menu-motion";
 import { measureRowShift } from "../menu-paint";
 import type { MenuFrame } from "../menu-scroller";
@@ -53,4 +53,39 @@ export function projectToTable(ndc: ScreenPoint, camera: Camera): Vector3 | null
   const raycaster = new Raycaster();
   raycaster.setFromCamera(new Vector2(ndc.x, ndc.y), camera);
   return raycaster.ray.intersectPlane(TABLE, new Vector3());
+}
+
+// How the DOM board is laid on the table: `.menu` holds `perspective` with its
+// origin at the screen centre, and `.menu-board` turns by `rotateX(tilt)
+// rotateZ(twist)` about (originX, originY), all in CSS px and radians.
+export interface BoardView {
+  readonly perspective: number;
+  readonly tilt: number;
+  readonly twist: number;
+  readonly originX: number;
+  readonly originY: number;
+}
+
+// A point in the board's own layout (before the CSS transform) on the table,
+// whose origin is the transform origin, +x right and +z toward the viewer.
+// rotateZ is applied first, as the CSS transform list applies right to left.
+export function toTablePoint(local: ScreenPoint, board: BoardView): { x: number; z: number } {
+  const dx = local.x - board.originX;
+  const dy = local.y - board.originY;
+  const cos = Math.cos(board.twist);
+  const sin = Math.sin(board.twist);
+  return { x: dx * cos - dy * sin, z: dx * sin + dy * cos };
+}
+
+// The camera CSS uses to draw the tilted board, expressed in the table's frame:
+// it sits `perspective` px in front of the screen centre, which the board's
+// origin occupies, and the screen's up is tilted with the board.
+export function placeBoardCamera(camera: PerspectiveCamera, board: BoardView, viewportHeight: number): void {
+  const cos = Math.cos(board.tilt);
+  const sin = Math.sin(board.tilt);
+  camera.position.set(0, board.perspective * cos, board.perspective * sin);
+  camera.up.set(0, sin, -cos);
+  camera.lookAt(0, 0, 0);
+  camera.fov = (2 * Math.atan(viewportHeight / 2 / board.perspective) * 180) / Math.PI;
+  camera.updateProjectionMatrix();
 }
