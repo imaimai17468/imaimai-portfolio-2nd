@@ -18,7 +18,7 @@
 - No textures. Flat-colour materials only.
 - The scene renders only on a scroller paint, a resize, a theme change, a sound switch change, or during the open/close transition window; never in an idle loop.
 - Where `WebGPURenderer` cannot initialise at all, the canvas stays empty and the 2D menu stays exactly as it is today.
-- Seven `.glb` files under `public/models/`, one per piece kind, all seven together at most 400 KB.
+- 36 `.glb` files under `public/models/`, one per menu item (`<main id>.glb`, `<main id>--<sub id>.glb`), all together at most 1 MB. No brand marks or logos are modelled.
 - Commits follow `AGENTS.md` (Commits): one purpose each, explicit paths, Japanese body, `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`, and **ask the owner before each commit**.
 - Before reporting a task done: `mise exec -- pnpm exec tsc --noEmit` passes; tasks touching the page also pass `mise exec -- pnpm run build`.
 
@@ -51,16 +51,17 @@
 ### Task 2: Piece models
 
 **Files:**
-- Create: `public/models/{bell,king,pawn,block,die,card,domino}.glb`
+- Create: `public/models/<main id>.glb` (7) and `public/models/<main id>--<sub id>.glb` (29), one per row of the spec's Pieces table.
 
 **Interfaces:**
-- Produces: each `.glb` holds one root object named after its kind, origin at the centre of its base, standing on y = 0 (glTF Y-up), footprint at most 0.7 × 0.7 units, height at most 1.6 units. Every material is named after the token that colours it, without the leading `--`: `piece-<kind>` for the body, and `piece-pip`, `piece-pip-light`, `piece-mark` for details. No textures, no lights, no cameras.
+- Produces: each `.glb` holds one root node named after its file stem, origin at the centre of its base, standing on y = 0 (glTF Y-up), footprint at most 0.7 × 0.7 units, height at most 1.3 units. Every material is named after the palette token that colours it, without the leading `--`: `piece-white`, `piece-grey`, `piece-dark`, `piece-blue`, `piece-gold`, `piece-red`, `piece-green`, `piece-wood`. `sound--switch.glb` has a child node named `lever` whose origin is its pivot. No textures, lights or cameras.
 
-- [ ] **Step 1: Rebuild the seven pieces** in the live Blender (the approved mock-up is still in the open scene; its proportions are the reference) with `execute_blender_code`, renaming materials to the token names above. Domino pips and line use `piece-pip-light`, die pips `piece-pip`, the die's one red pip and the card's mark `piece-mark`, the card stand `piece-domino`.
-- [ ] **Step 2: Look** at all seven with `look` (`mode: "angles"`) and fix anything that reads wrong at small size (pips too small to see at 60 px tall is the likely one).
-- [ ] **Step 3: Export** each root object alone with `bpy.ops.export_scene.gltf(filepath=..., use_selection=True, export_format="GLB", export_apply=True, export_yup=True)` into `public/models/<kind>.glb`. Read the operator's option names from `bpy.ops.export_scene.gltf.get_rna_type().properties` first rather than trusting these.
-- [ ] **Step 4: Check size** `du -ch public/models/*.glb`. Expected: total ≤ 400 KB. Lower segment counts if not.
-- [ ] **Step 5: Ask the owner and commit** `public/models/*.glb` as `feat: メニューの駒にする7種類の3Dモデルを用意する`.
+- [ ] **Step 1: Model the 7 main objects** in the live Blender with `execute_blender_code`, one per spec table row, in the mock-up's matte style (bevelled edges, smooth shading, two or three palette materials each). Clear the mock-up objects first.
+- [ ] **Step 2: Model the 29 sub objects** row by row in the same way.
+- [ ] **Step 3: Look** at each row with `look` (`mode: "angles"`, `shading: "material"`) and fix anything that does not read as its item at about 60 px tall.
+- [ ] **Step 4: Render one contact sheet** of all 36 from the menu camera angle into the scratchpad and send it to the owner with `SendUserFile` (no need to wait for an answer before Task 3).
+- [ ] **Step 5: Export** each root alone with `bpy.ops.export_scene.gltf(filepath=..., use_selection=True, export_format="GLB", export_apply=True, export_yup=True)` (option names were checked on 2026-11-18).
+- [ ] **Step 6: Check** `du -ck public/models/*.glb | tail -1` ≤ 1024, and that every material name in every file is a palette token (read the glb JSON chunk). Commit as `feat: メニューの各項目を表す36個の3Dモデルを用意する`.
 
 ### Task 3: Colour tokens and token reading
 
@@ -70,14 +71,14 @@
 
 **Interfaces:**
 - Produces:
-  - `type PieceKind = "bell" | "king" | "pawn" | "block" | "die" | "card" | "domino"`
-  - `PIECE_BY_MAIN: Readonly<Record<string, PieceKind>>` keyed by `MENU[i].id`: sound→bell, profile→king, career→pawn, products→block, activities→die, articles→card, links→domino.
+  - `modelUrlOf(mainId: string, subId: string | null): string` — `/models/<mainId>.glb` or `/models/<mainId>--<subId>.glb`.
+  - `PALETTE_TOKENS: readonly string[]` — the eight token names, with the leading `--`.
   - `readTokenColor(read: (name: string) => string, token: string): number | null` — `read` is `(name) => getComputedStyle(root).getPropertyValue(name)`; returns `0xRRGGBB` for a `#rrggbb` value after trimming, `null` otherwise.
 
-- [ ] **Step 1: Write failing tests:** `readTokenColor(() => " #f2f2f0 ", "--piece-king") === 0xf2f2f0`; `readTokenColor(() => "", "--x") === null`; `readTokenColor(() => "red", "--x") === null`; and every `MENU` item's `id` has an entry in `PIECE_BY_MAIN`.
+- [ ] **Step 1: Write failing tests:** `readTokenColor(() => " #f2f2f0 ", "--piece-white") === 0xf2f2f0`; `readTokenColor(() => "", "--x") === null`; `readTokenColor(() => "red", "--x") === null`; `modelUrlOf("career", null) === "/models/career.glb"`; `modelUrlOf("career", "kosen") === "/models/career--kosen.glb"`; and every `modelUrlOf` for every `MENU` item and sub names a file that exists under `public/models/` (read with `node:fs`).
 - [ ] **Step 2: Run** `mise exec -- pnpm test pages/_components/scene/tokens.test.ts`. Expected: FAIL, module not found.
 - [ ] **Step 3: Implement** `tokens.ts`.
-- [ ] **Step 4: Add tokens** as hex literals (so `getPropertyValue` returns hex): light `--table: #eeeeec`, `--table-band: #dcdcda`, `--piece-bell: #edc977`, `--piece-king: #f2f2f0`, `--piece-pawn: #5d6068`, `--piece-block: #9cc3ec`, `--piece-die: #f5f5f3`, `--piece-card: #f8f8f6`, `--piece-domino: #3a3b40`, `--piece-pip: #232326`, `--piece-pip-light: #f2f2f2`, `--piece-mark: #d46a64`. Dark values are the implementer's choice under one rule: `--table` and `--table-band` sit near `--black`, and every piece stays distinguishable from `--table-band` at a glance.
+- [ ] **Step 4: Add tokens** as hex literals (so `getPropertyValue` returns hex): light `--table: #eeeeec`, `--table-band: #dcdcda`, `--piece-white: #f2f2f0`, `--piece-grey: #9a9ca3`, `--piece-dark: #3a3b40`, `--piece-blue: #9cc3ec`, `--piece-gold: #edc977`, `--piece-red: #d46a64`, `--piece-green: #9ccfa8`, `--piece-wood: #d9b48a`. Dark values are the implementer's choice under one rule: `--table` and `--table-band` sit near `--black`, and every piece stays distinguishable from `--table-band` at a glance.
 - [ ] **Step 5: Run the tests.** Expected: PASS. Ask the owner and commit as `feat: 3D の机と駒の色をトークンとして定義する`.
 
 ### Task 4: Placement
@@ -88,7 +89,7 @@
 **Interfaces:**
 - Consumes: `MenuFrame` from `../menu-scroller`, `measureRowShift` from `../menu-paint`, `measureFocus` from `../menu-motion`.
 - Produces:
-  - `interface SlotOrigin { readonly id: string; readonly kind: PieceKind; readonly row: number; readonly sub: number | null; readonly x: number; readonly y: number }` — the icon's screen centre in CSS px when `frame.main === 0` and the row's shift is 0; `sub === null` for a main piece.
+  - `interface SlotOrigin { readonly id: string; readonly modelUrl: string; readonly row: number; readonly sub: number | null; readonly x: number; readonly y: number }` — the icon's screen centre in CSS px when `frame.main === 0` and the row's shift is 0; `sub === null` for a main piece.
   - `measureSlotCenter(origin: SlotOrigin, frame: MenuFrame, layout: { readonly row: number; readonly subWidth: number }): { x: number; y: number }` — `y = origin.y - frame.main * layout.row`, `x = origin.x - measureRowShift(origin.row, frame) * layout.subWidth` (main items shift with their row, as `paintRow` shifts them).
   - `measureEmphasis(origin: SlotOrigin, frame: MenuFrame): { visibility: number; focus: number }` — main piece: `visibility 1`, `focus = measureFocus(row - frame.main)`; sub piece: `visibility = measureFocus(row - frame.main)`, `focus = measureFocus(sub - measureRowShift(row, frame))`.
   - `toNdc(point: { x: number; y: number }, viewport: { width: number; height: number }): { x: number; y: number }`
@@ -120,7 +121,7 @@
 - Create: `pages/_components/scene/scene.ts`, `pages/_components/scene/translate.ts`, `pages/_components/scene/translate.test.ts`
 
 **Interfaces:**
-- Consumes: Task 3 (`PieceKind`, `readTokenColor`), Task 4 (all), Task 5 (all).
+- Consumes: Task 3 (`modelUrlOf`, `readTokenColor`, `PALETTE_TOKENS`), Task 4 (all), Task 5 (all).
 - Produces:
   - `readTranslate(value: string): { x: number; y: number }` — parses a computed `translate` value: `"none"` → `{0,0}`, `"12px"` → `{12,0}`, `"12px -40px"` → `{12,-40}`, `"12px -40px 0px"` → `{12,-40}`.
   - `interface SceneState { readonly frame: MenuFrame; readonly layout: { row: number; subWidth: number }; readonly band: { top: number; height: number }; readonly offsets: ReadonlyMap<string, { x: number; y: number }>; readonly heroId: string | null; readonly isSoundOn: boolean }`
@@ -128,8 +129,8 @@
   - `createTabletopScene(canvas: HTMLCanvasElement, readToken: (name: string) => string): Promise<TabletopScene | null>` — resolves `null` when `renderer.init()` throws.
 
 - [ ] **Step 1: Write failing tests** for `readTranslate` with the four values above, run, expect FAIL, implement, expect PASS.
-- [ ] **Step 2: Implement `createTabletopScene`:** `WebGPURenderer({ canvas, antialias: true, alpha: false })`, `await renderer.init()`; a `PerspectiveCamera` with a 30° vertical field of view, pitched about 50° down and yawed so it looks from the front right as in the mock-up (exact values are the builder's, as long as every screen point of the menu area hits the table); a `RoomEnvironment` (from `three/addons/environments/RoomEnvironment.js`) through `PMREMGenerator` for soft ambient light, one shadow-casting `DirectionalLight` from the front left, a large table plane coloured `--table`, a band plane coloured `--table-band` spanning the screen width between the table points under `band.top` and `band.top + band.height`; load the seven models with `GLTFLoader`, clone one per slot, colour each material from `--${material.name}`.
-- [ ] **Step 3: Implement `render(state)`:** for each slot, screen point = `measureSlotCenter` + `offsets.get(id)`; table point = `projectToTable(toNdc(...))`; hide the piece when `null` or when `id === heroId`; set position, raise the piece by `0.12 × focus`, scale `1 + 0.2 × focus` (the DOM's `FOCUSED_SCALE_GAIN`), and drive visibility by `visibility` (fade material opacity, hide at 0). The bell lies on its side (rotation 90° about the camera-facing horizontal axis) when `isSoundOn` is false. Apply the quality level's pixel ratio and shadow map size. Render once.
+- [ ] **Step 2: Implement `createTabletopScene`:** `WebGPURenderer({ canvas, antialias: true, alpha: false })`, `await renderer.init()`; a `PerspectiveCamera` with a 30° vertical field of view, pitched about 50° down and yawed so it looks from the front right as in the mock-up (exact values are the builder's, as long as every screen point of the menu area hits the table); a `RoomEnvironment` (from `three/addons/environments/RoomEnvironment.js`) through `PMREMGenerator` for soft ambient light, one shadow-casting `DirectionalLight` from the front left, a large table plane coloured `--table`, a band plane coloured `--table-band` spanning the screen width between the table points under `band.top` and `band.top + band.height`; load each slot's `modelUrl` with `GLTFLoader` (36 files, loaded in parallel; the scene reports ready once all have loaded or failed, and a failed model leaves its slot empty), colour each material from `--${material.name}`.
+- [ ] **Step 3: Implement `render(state)`:** for each slot, screen point = `measureSlotCenter` + `offsets.get(id)`; table point = `projectToTable(toNdc(...))`; hide the piece when `null` or when `id === heroId`; set position, raise the piece by `0.12 × focus`, scale `1 + 0.2 × focus` (the DOM's `FOCUSED_SCALE_GAIN`), and drive visibility by `visibility` (fade material opacity, hide at 0). The `lever` node of the sound switch model rotates +25° about its local x axis when `isSoundOn` is true and −25° when false. Apply the quality level's pixel ratio and shadow map size. Render once.
 - [ ] **Step 4: Run** `tsc --noEmit` and the scene tests. Ask the owner and commit tasks 5–6 as `feat: 机の上に駒を並べて描く 3D の場面を作る`.
 
 ### Task 7: Wire the scene into the menu
@@ -141,12 +142,12 @@
 
 **Interfaces:**
 - Consumes: Tasks 3, 4, 6.
-- Produces: `readSlotOrigins(stage: HTMLElement, frame: MenuFrame, layout: { row: number; subWidth: number }): SlotOrigin[]` — for every `.menu-main-icon` and `.menu-sub-icon`, its rect centre with the current paint undone (`y + frame.main * row`, `x + measureRowShift(row, frame) * subWidth`); ids are `main-<row>` and `sub-<row>-<sub>`; kind from `PIECE_BY_MAIN[MENU[row].id]`.
+- Produces: `readSlotOrigins(stage: HTMLElement, frame: MenuFrame, layout: { row: number; subWidth: number }): SlotOrigin[]` — for every `.menu-main-icon` and `.menu-sub-icon`, its rect centre with the current paint undone (`y + frame.main * row`, `x + measureRowShift(row, frame) * subWidth`); ids are `main-<row>` and `sub-<row>-<sub>`; `modelUrl` from `modelUrlOf(MENU[row].id, sub === null ? null : MENU[row].subs[sub].id)`.
 
 - [ ] **Step 1: Mount the canvas.** Render `<canvas className="menu-scene" aria-hidden="true" />` as the first child of `.menu`, fixed to the viewport behind `.menu-rows`. In the scroller effect, after the scroller exists, `import("./scene/scene")` and `createTabletopScene`; on success call `setSlots(readSlotOrigins(...))`, `resize`, render once, then set `data-scene="ready"` on `.menu` through state. Dispose on cleanup. If the effect is cleaned up before the import resolves, dispose the scene when it arrives.
 - [ ] **Step 2: Render on every paint.** In the scroller's `paint(frame)`, after `paintRow`, call `scene.render(...)` with the current `isSoundOn` and `heroId` read through refs (the paint callback is created once), and `recordFrameTime` with the time since the previous paint while frames arrive less than 100 ms apart. In `handleResize`, re-read slots, `resize`, render.
 - [ ] **Step 3: Hide the 2D parts once ready** in `menu.css`: under `.menu[data-scene="ready"]`, `.menu-main-icon` and `.menu-sub-icon` get `opacity: 0`, except `.menu[data-detail="open"] [data-hero] .menu-sub-icon`; `.menu-band` gets a transparent background except under `[data-detail="open"]`, with `background-color` added to its transition; `.menu` drops its own background where the canvas draws.
 - [ ] **Step 4: Follow the open/close transition.** On `openDetail` and `closeDetail`, run a `requestAnimationFrame` loop for 1600 ms that builds `offsets` from `readTranslate(getComputedStyle(el).translate)` summed over each slot's `.menu-row` and its `.menu-main-item` or `.menu-sub-item`, sets `heroId` to the opened sub's id while open, and renders. Fade the canvas under the expanding band: `.menu[data-detail="open"] .menu-scene { opacity: 0 }` with a 400 ms `var(--ease-in-out)` transition delayed by `var(--hero-grow-delay)`; under `prefers-reduced-motion: reduce`, a 200 ms `ease` opacity change with no delay, matching `.menu-rows`.
 - [ ] **Step 5: Follow sound and theme.** Render when `isSoundOn` changes (an effect that synchronises the scene with `isSoundOn`), and on `matchMedia("(prefers-color-scheme: dark)")` change call `refreshColors` and render.
-- [ ] **Step 6: Verify in the browser** (`mise exec -- pnpm run dev`) at desktop width and at 390 × 844: pieces sit under their labels while scrolling by wheel, drag and arrow keys; each step still plays one `select` sound; resizing mid-scroll keeps them aligned; opening and closing an item sends pieces out farthest first and back; the bell lies down when sound is off; switching the OS theme recolours without a reload; with reduced motion the canvas only fades; with `navigator.gpu` and WebGL both unavailable (Chrome `--disable-gpu --disable-software-rasterizer`, or the renderer forced to fail) the 2D menu shows unchanged. Report any check not run as "not run".
+- [ ] **Step 6: Verify in the browser** (`mise exec -- pnpm run dev`) at desktop width and at 390 × 844: pieces sit under their labels while scrolling by wheel, drag and arrow keys; each step still plays one `select` sound; resizing mid-scroll keeps them aligned; opening and closing an item sends pieces out farthest first and back; the switch lever flips when sound is toggled; switching the OS theme recolours without a reload; with reduced motion the canvas only fades; with `navigator.gpu` and WebGL both unavailable (Chrome `--disable-gpu --disable-software-rasterizer`, or the renderer forced to fail) the 2D menu shows unchanged. Report any check not run as "not run".
 - [ ] **Step 7: Run** `tsc --noEmit`, all tests, and `pnpm run build`; note the client chunk size that holds `three`. Update `AGENTS.md`. Ask the owner and commit as `feat: トップのメニューを机の上に並ぶ 3D の駒で見せる`.

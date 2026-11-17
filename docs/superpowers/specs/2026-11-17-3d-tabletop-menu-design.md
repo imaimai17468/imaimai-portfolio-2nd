@@ -74,12 +74,45 @@ The owner approved a Blender mock-up of this layout on 2026-11-17: the main colu
 
 ### Pieces
 
-- Each main item gets its own kind of play piece. Its sub items are pieces of the same kind, so the row tells the visitor where they are.
-- Seven kinds are modelled in Blender, one per main item, as approved in the mock-up: sound → a bell, profile → a chess king, career → a chess pawn, products → a building block, activities → a die, articles → a playing card standing on a stand, links → a domino. These are generic play objects drawn for this site.
-- Sub items in one row are identical pieces, told apart by their DOM labels alone, as in the approved mock-up. This keeps the model count at seven.
-- Each piece is a single `.glb` under `public/models/`, kept small (low hundreds of KB in total for all seven, as a target), with flat colours and no textures.
-- Piece colours are muted, one per kind, as in the mock-up (gold bell, white king, grey pawn, light blue block, white die, white card, near-black domino). They are added to `src/styles.css` as new colour tokens with light and dark values, and the scene reads them with `getComputedStyle`. The values are the designer's call, taken from the mock-up.
-- The sound switch piece stands upright when sound is on and lies on its side when it is off.
+The owner revised this on 2026-11-18, after the mock-up: every menu item gets its own object, shaped after what the item is, in the same matte, untextured style as the mock-up. The mock-up's chess pieces and dice are replaced.
+
+- 36 objects: one per main item (7) and one per sub item (29). Each takes the meaning of its current lucide icon and label, drawn as a small desk-toy object. Brand marks and logos (GitHub, X, Zenn, Qiita, note, LAPRAS, the companies) are never modelled; those items take the generic object their lucide icon already stands for.
+
+| Item | Object | Item | Object |
+|---|---|---|---|
+| sound | speaker | sound / switch | toggle switch |
+| profile | peg doll | intro | name card on a stand |
+| | | likes | heart |
+| career | briefcase | kosen | school building with a clock |
+| | | nagaoka | graduation cap |
+| | | yumemi | low office building |
+| | | accenture | tall office tower |
+| products | parcel box | hypersig | three stacked layers |
+| | | template | `</>` code block |
+| | | osampo | folded map with a pin |
+| | | tsuukin | train car |
+| | | palette | paint palette |
+| | | da-icons | cube, sphere and cone together |
+| | | imaimai-ui | puzzle piece |
+| | | credits | calculator |
+| activities | microphone | recruiting-talks | megaphone |
+| | | tech-talks | easel with a slide |
+| | | judge | gavel on its block |
+| articles | fountain pen | zenn | open book |
+| | | sizu | spiral notebook |
+| | | qiita | folded newspaper |
+| | | note | sheet of paper with lines |
+| links | chain link | licenses | balance scales |
+| | | github | laptop |
+| | | x | `@` block |
+| | | speakerdeck | stack of slides |
+| | | lapras | medal on a ribbon |
+| | | sponsors | gift box with a heart |
+| | | mail | envelope |
+
+- Each object is a `.glb` under `public/models/`, named `<main id>.glb` for a main item and `<main id>--<sub id>.glb` for a sub item, all 36 together at most 1 MB, with flat colours and no textures.
+- Colours come from a shared palette of tokens rather than one token per object: `--piece-white`, `--piece-grey`, `--piece-dark`, `--piece-blue`, `--piece-gold`, `--piece-red`, `--piece-green` and `--piece-wood`, each with a light and a dark value in `src/styles.css`. Every material in a model is named after the palette token that colours it, and the scene reads the token with `getComputedStyle`.
+- The toggle switch's lever points one way when sound is on and the other way when it is off.
 
 ### How it is built
 
