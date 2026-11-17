@@ -93,6 +93,7 @@ export async function createTabletopScene(
   canvas: HTMLCanvasElement,
   readToken: (name: string) => string,
   modelUrls: readonly string[],
+  onLost: () => void,
 ): Promise<TabletopScene | null> {
   // Transparent: the table and the printed labels are the DOM under the canvas,
   // so a piece in front hides the print behind it.
@@ -114,10 +115,19 @@ export async function createTabletopScene(
       try {
         models.set(url, (await loader.loadAsync(url)).scene);
       } catch {
-        // A model that fails to load leaves its slot empty.
+        // Counted below.
       }
     }),
   );
+  // The 2D icons hide once the scene is ready, so a scene missing any model
+  // would leave that item with a label and nothing above it.
+  if (models.size < new Set(modelUrls).size) {
+    void renderer.dispose();
+    return null;
+  }
+  // After the GPU device is lost the renderer draws nothing, so the menu goes
+  // back to its 2D icons.
+  renderer.onDeviceLost = () => onLost();
 
   const scene = new Scene();
   const camera = new PerspectiveCamera(30, 1, 1, 20000);
@@ -229,8 +239,13 @@ export async function createTabletopScene(
   }
 
   return {
+    // The pieces are built once; later calls, after a resize, only move them.
     setSlots(slots) {
-      for (const piece of pieces) scene.remove(piece.root);
+      if (pieces.length > 0) {
+        const byId = new Map(slots.map((slot) => [slot.id, slot]));
+        pieces = pieces.map((piece) => ({ ...piece, slot: byId.get(piece.slot.id) ?? piece.slot }));
+        return;
+      }
       pieces = slots.flatMap((slot) => {
         const model = models.get(slot.modelUrl);
         if (!model) return [];
@@ -268,7 +283,8 @@ export async function createTabletopScene(
       applyQuality();
     },
     dispose() {
-      renderer.dispose();
+      for (const piece of pieces) for (const { material } of piece.materials) material.dispose();
+      void renderer.dispose();
     },
   };
 }

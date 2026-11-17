@@ -724,8 +724,9 @@ html:has(.menu) {
   opacity: 0;
 }
 
-/* The opened item's 2D icon flies to the heading and back in place of its piece. */
-.menu[data-scene-hero] .menu-sub-item[data-hero] .menu-sub-icon {
+/* The opened item's 2D icon flies to the heading and back in place of its
+   piece, and still gives way to its copy in the detail once it has landed. */
+.menu[data-scene-hero]:not([data-hero-landed]) .menu-sub-item[data-hero] .menu-sub-icon {
   opacity: 1;
 }
 

@@ -134,6 +134,11 @@ export default function MenuScreen() {
   const tapCount = useRef(0);
   const sceneRef = useRef<TabletopScene | null>(null);
   const paintSceneRef = useRef<(frame?: MenuFrame) => void>(() => {});
+  // Re-measures the pieces' places once the board is at rest again.
+  const placeSceneRef = useRef<() => void>(() => {});
+  const needsPlaceRef = useRef(false);
+  // Each open or close starts a new follow; an older one stops at its next frame.
+  const exitFollowRef = useRef({ generation: 0, isRunning: false });
   const sceneInputRef = useRef<{ isSoundOn: boolean; heroId: string | null; offsets: ReadonlyMap<string, { x: number; y: number }> }>({
     isSoundOn: false,
     heroId: null,
@@ -177,6 +182,8 @@ export default function MenuScreen() {
     };
     let board = readBoard();
     let lastPaintTime = 0;
+    let pendingFrame: MenuFrame | null = null;
+    let sceneFrameId = 0;
     let isDisposed = false;
 
     function buildSceneState(frame: MenuFrame): SceneState {
@@ -189,19 +196,33 @@ export default function MenuScreen() {
         isSoundOn: input.isSoundOn,
       };
     }
+    // The icons are measured only while nothing but the scroll moves them:
+    // while an item is open, or its items are leaving or returning, their exit
+    // translate and the flying icon would land in the measurement.
     function placeScene(scene: TabletopScene) {
       const frame = scroller.readFrame();
-      const restoreBoard = flattenBoard(stageElement);
-      scene.setSlots(readSlotOrigins(stageElement, frame, { row: sizes.row, subWidth: sizes.sub }));
-      restoreBoard();
-      scene.resize(window.innerWidth, window.innerHeight, window.devicePixelRatio);
+      if (stageElement.dataset.detail === "open" || exitFollowRef.current.isRunning) {
+        needsPlaceRef.current = true;
+      } else {
+        needsPlaceRef.current = false;
+        const restoreBoard = flattenBoard(stageElement);
+        scene.setSlots(readSlotOrigins(stageElement, frame, { row: sizes.row, subWidth: sizes.sub }));
+        restoreBoard();
+      }
+      scene.resize(stageElement.clientWidth, stageElement.clientHeight, window.devicePixelRatio);
       scene.render(buildSceneState(frame));
     }
     function handleResize() {
       sizes = { row: readSize("--row"), sub: readSize("--sub-width"), icon: readSize("--main-icon") };
       board = readBoard();
+      // The DOM is moved by the old sizes until the scroller paints with the
+      // new ones, and the slots undo that paint.
+      scroller.repaint();
       if (sceneRef.current) placeScene(sceneRef.current);
     }
+    placeSceneRef.current = () => {
+      if (sceneRef.current) placeScene(sceneRef.current);
+    };
     window.addEventListener("resize", handleResize);
     const rows = collectRowElements(stage);
     const scroller = createMenuScroller(stage, {
@@ -211,12 +232,20 @@ export default function MenuScreen() {
       paint(frame) {
         rowsElement.style.transform = `translate3d(0, ${-frame.main * sizes.row}px, 0)`;
         for (const row of rows) paintRow(row, frame, sizes.sub);
-        const scene = sceneRef.current;
-        if (!scene) return;
-        const now = performance.now();
-        if (now - lastPaintTime < FRAME_GAP_MS) scene.recordFrameTime(now - lastPaintTime);
-        lastPaintTime = now;
-        scene.render(buildSceneState(frame));
+        if (!sceneRef.current) return;
+        // Drag and wheel paint once per input event, which can come several
+        // times a frame; the scene draws the latest once per frame, and its
+        // frame time is measured between those draws.
+        pendingFrame = frame;
+        if (sceneFrameId) return;
+        sceneFrameId = window.requestAnimationFrame((now) => {
+          sceneFrameId = 0;
+          const scene = sceneRef.current;
+          if (!scene || !pendingFrame) return;
+          if (now - lastPaintTime < FRAME_GAP_MS) scene.recordFrameTime(now - lastPaintTime);
+          lastPaintTime = now;
+          scene.render(buildSceneState(pendingFrame));
+        });
       },
     });
     scrollerRef.current = scroller;
@@ -227,7 +256,12 @@ export default function MenuScreen() {
     if (canvas) {
       void import("./scene/scene").then(async ({ createTabletopScene }) => {
         const root = document.documentElement;
-        const scene = await createTabletopScene(canvas, (name) => getComputedStyle(root).getPropertyValue(name), listModelUrls());
+        const scene = await createTabletopScene(canvas, (name) => getComputedStyle(root).getPropertyValue(name), listModelUrls(), () => {
+          // The GPU went away: drop the scene and show the 2D icons again.
+          sceneRef.current?.dispose();
+          sceneRef.current = null;
+          setIsSceneReady(false);
+        });
         if (!scene) return;
         if (isDisposed) {
           scene.dispose();
@@ -243,6 +277,9 @@ export default function MenuScreen() {
 
     return () => {
       isDisposed = true;
+      window.cancelAnimationFrame(sceneFrameId);
+      exitFollowRef.current.generation += 1;
+      exitFollowRef.current.isRunning = false;
       window.removeEventListener("resize", handleResize);
       scroller.destroy();
       scrollerRef.current = null;
@@ -282,13 +319,17 @@ export default function MenuScreen() {
       return;
     }
     const startedAt = performance.now();
+    const follow = exitFollowRef.current;
+    follow.generation += 1;
+    follow.isRunning = true;
+    const generation = follow.generation;
     const ids = [...stage.querySelectorAll<HTMLElement>("[data-row]")].flatMap((rowElement) => {
       const row = rowElement.dataset.row;
       const subIds = [...rowElement.querySelectorAll<HTMLElement>("[data-sub]")].map((sub) => `sub-${row}-${sub.dataset.sub}`);
       return [`main-${row}`, ...subIds];
     });
     function step(now: number) {
-      if (!stage) return;
+      if (!stage || generation !== follow.generation) return;
       sceneInputRef.current.offsets = new Map(ids.map((id) => [id, readExitOffset(stage, id)]));
       paintSceneRef.current();
       if (now - startedAt < EXIT_FOLLOW_MS) {
@@ -296,7 +337,9 @@ export default function MenuScreen() {
         return;
       }
       sceneInputRef.current.offsets = new Map();
+      follow.isRunning = false;
       onDone?.();
+      if (needsPlaceRef.current && stage.dataset.detail !== "open") placeSceneRef.current();
       paintSceneRef.current();
     }
     window.requestAnimationFrame(step);
