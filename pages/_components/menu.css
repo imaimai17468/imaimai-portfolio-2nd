@@ -706,7 +706,9 @@ html:has(.menu) {
 /* The board tilts into place first, then the pieces appear on it. */
 .menu[data-scene="ready"] .menu-scene {
   visibility: visible;
-  animation: menu-scene-in 300ms var(--ease-out) 650ms both;
+  /* backwards only: a fill held after the end would pin the opacity, and the
+     fade on opening an item would jump to 0 instead of transitioning. */
+  animation: menu-scene-in 300ms var(--ease-out) 650ms backwards;
 }
 
 @keyframes menu-scene-in {
@@ -715,17 +717,54 @@ html:has(.menu) {
   }
 }
 
+/* The pieces leave with their items, and the scene fades only after the
+   opened piece has crossed into its icon (250ms), so that crossfade shows. */
 .menu[data-detail="open"] .menu-scene {
   opacity: 0;
-  transition-delay: var(--exit-start);
+  transition-duration: 300ms;
+  transition-delay: 250ms;
 }
 
 .menu[data-scene="ready"] :is(.menu-main-icon, .menu-sub-icon, .menu-switch) {
   opacity: 0;
 }
 
-/* The opened item's 2D icon flies to the heading and back in place of its
-   piece, and still gives way to its copy in the detail once it has landed. */
+/* The pieces stand for the items, so no text is printed on the table. The
+   labels stay in the buttons for screen readers, drawn in no colour; the
+   row title is aria-hidden and painted inline, so it hides by visibility. */
+.menu[data-scene="ready"] :is(.menu-main-label, .menu-sub-label) {
+  color: transparent;
+}
+
+.menu[data-scene="ready"] .menu-main-title {
+  visibility: hidden;
+}
+
+/* The opened item's 2D icon crosses with its piece, which fades in the scene
+   over the same 250ms, then flies to the heading. It gives way to its copy in
+   the detail at once when it lands, and shows at once as it flies back. */
+.menu[data-scene="ready"] .menu-sub-item[data-hero] .menu-sub-icon {
+  transition:
+    translate 550ms var(--ease-in-out) 150ms,
+    scale 550ms var(--ease-in-out) 150ms,
+    opacity 250ms var(--ease-out);
+}
+
+.menu[data-scene="ready"][data-detail="open"] .menu-sub-item[data-hero] .menu-sub-icon {
+  transition:
+    translate var(--ease-spring-duration) var(--ease-spring) var(--hero-travel-delay),
+    scale var(--ease-pop-duration) var(--ease-pop) var(--hero-grow-delay),
+    opacity 250ms var(--ease-out);
+}
+
+.menu[data-scene="ready"][data-hero-landed] .menu-sub-item[data-hero] .menu-sub-icon,
+.menu[data-scene="ready"][data-scene-hero]:not([data-detail="open"]) .menu-sub-item[data-hero] .menu-sub-icon {
+  transition:
+    translate 550ms var(--ease-in-out) 150ms,
+    scale 550ms var(--ease-in-out) 150ms,
+    opacity 0ms;
+}
+
 .menu[data-scene-hero]:not([data-hero-landed]) .menu-sub-item[data-hero] .menu-sub-icon {
   opacity: 1;
 }
@@ -736,7 +775,9 @@ html:has(.menu) {
   background: var(--table);
 }
 
+/* The band runs past both screen edges, so the turned board never shows its end. */
 .menu[data-scene="ready"] .menu-band {
+  inset-inline: -100vw;
   background-color: var(--table-band);
   transition:
     transform 550ms var(--ease-in-out) 150ms,

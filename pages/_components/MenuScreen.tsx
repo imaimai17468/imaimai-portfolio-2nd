@@ -158,6 +158,11 @@ export default function MenuScreen() {
       setSubIndex(0);
     } else {
       setSubIndex(index);
+      // The piece that arrives on the band rocks on its base; reduced motion
+      // keeps it still.
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        sceneRef.current?.wobble(`sub-${mainIndex}-${index}`, Math.random);
+      }
     }
     cue("select");
   });
@@ -503,7 +508,9 @@ export default function MenuScreen() {
     stageRef.current?.querySelector<HTMLElement>(`[data-row="${mainIndex}"] [data-sub="${subIndex}"]`)?.focus({
       preventScroll: true,
     });
-    followExit(() => setSceneHeroId(null));
+    followExit();
+    // The piece takes the icon's place again once the icon is back over it.
+    closeTimers.current.push(window.setTimeout(() => setSceneHeroId(null), HERO_RETURN_MS));
     cue("transition_down");
   }
 

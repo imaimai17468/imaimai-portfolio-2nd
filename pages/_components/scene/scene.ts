@@ -27,8 +27,10 @@ import {
   type ScreenPoint,
   type SlotOrigin,
 } from "./placement";
+import { measureFade, type Fade } from "./fade";
 import { chooseQualityLevel, QUALITY_LEVELS } from "./quality";
 import { readTokenColor } from "./tokens";
+import { createWobble, measureWobble, type Wobble } from "./wobble";
 
 export interface SceneLayout {
   readonly row: number;
@@ -51,6 +53,8 @@ export interface TabletopScene {
   resize(width: number, height: number, devicePixelRatio: number): void;
   refreshColors(): void;
   recordFrameTime(ms: number): void;
+  // Rocks the piece once, as a sub step brings it onto the band.
+  wobble(id: string, random: () => number): void;
   dispose(): void;
 }
 
@@ -58,7 +62,13 @@ interface Piece {
   readonly slot: SlotOrigin;
   readonly root: Object3D;
   readonly lever: Object3D | null;
+  readonly meshes: readonly Mesh[];
   readonly materials: readonly { readonly material: MeshStandardMaterial; readonly token: string }[];
+}
+
+interface Motion<T> {
+  readonly value: T;
+  readonly startedAt: number;
 }
 
 // Matches the DOM: an item away from the band shows at 45%, and the focused
@@ -71,6 +81,14 @@ const FOCUSED_LIFT = 0.12;
 const MODEL_FOOTPRINT = 0.7;
 const SPAN_PER_ICON = 1.1;
 const LEVER_ANGLE = (25 * Math.PI) / 180;
+// Below this the piece is not drawn at all; a sliver of a fading row would
+// otherwise flicker in and out as the scroll settles a hair off a whole row.
+const MIN_OPACITY = 0.02;
+// A faint piece casts no shadow; a shadow cannot fade with it.
+const SHADOW_OPACITY = 0.5;
+// The opened item's piece crosses with its 2D icon, which fades in CSS over
+// the same time (menu.css).
+const HERO_FADE_MS = 250;
 const SWITCH_MODEL = "/models/sound--switch.glb";
 
 function collectMaterials(root: Object3D): Piece["materials"] {
@@ -153,6 +171,10 @@ export async function createTabletopScene(
   let qualityLevel = 0;
   let frameTimes: number[] = [];
   let lastState: SceneState | null = null;
+  let heroId: string | null = null;
+  const fades = new Map<string, Motion<Fade>>();
+  const wobbles = new Map<string, Motion<Wobble>>();
+  let animationId = 0;
   const tableColor = new Color();
 
   function readColor(token: string, fallback: number): number {
@@ -209,6 +231,51 @@ export async function createTabletopScene(
     shadowCamera.updateProjectionMatrix();
   }
 
+  // Fades and wobbles play on time rather than on the scroll, so while one
+  // runs the scene redraws every frame from the last state.
+  function keepAnimating() {
+    if (animationId || (fades.size === 0 && wobbles.size === 0)) return;
+    animationId = window.requestAnimationFrame(() => {
+      animationId = 0;
+      if (lastState) draw(lastState);
+    });
+  }
+
+  function startHeroFades(next: string | null) {
+    const now = performance.now();
+    if (heroId) fades.set(heroId, { value: { from: 0, to: 1, durationMs: HERO_FADE_MS }, startedAt: now });
+    if (next) fades.set(next, { value: { from: 1, to: 0, durationMs: HERO_FADE_MS }, startedAt: now });
+    heroId = next;
+  }
+
+  function readFade(id: string, now: number): number {
+    const motion = fades.get(id);
+    if (!motion) return id === heroId ? 0 : 1;
+    const elapsed = now - motion.startedAt;
+    if (elapsed >= motion.value.durationMs) fades.delete(id);
+    return measureFade(motion.value, elapsed);
+  }
+
+  function readTilt(id: string, now: number): { x: number; z: number } {
+    const motion = wobbles.get(id);
+    if (!motion) return { x: 0, z: 0 };
+    const tilt = measureWobble(motion.value, now - motion.startedAt);
+    if (!tilt) wobbles.delete(id);
+    return tilt ?? { x: 0, z: 0 };
+  }
+
+  function setOpacity(piece: Piece, opacity: number) {
+    const isTransparent = opacity < 0.999;
+    for (const { material } of piece.materials) {
+      if (material.transparent !== isTransparent) {
+        material.transparent = isTransparent;
+        material.needsUpdate = true;
+      }
+      material.opacity = opacity;
+    }
+    for (const mesh of piece.meshes) mesh.castShadow = opacity > SHADOW_OPACITY;
+  }
+
   function draw(state: SceneState) {
     const isViewChanged = lastState?.layout.board !== state.layout.board;
     lastState = state;
@@ -216,17 +283,25 @@ export async function createTabletopScene(
       placeBoardCamera(camera, state.layout.board, viewport.height);
       fitShadow(state);
     }
+    if (state.heroId !== heroId) startHeroFades(state.heroId);
+    const now = performance.now();
     const scale = (state.layout.iconSize * SPAN_PER_ICON) / MODEL_FOOTPRINT;
     for (const piece of pieces) {
       const center = measureSlotCenter(piece.slot, state.frame, state.layout);
       const offset = state.offsets.get(piece.slot.id) ?? { x: 0, y: 0 };
       const point = toTablePoint({ x: center.x + offset.x, y: center.y + offset.y }, state.layout.board);
       const { visibility, focus } = measureEmphasis(piece.slot, state.frame);
-      piece.root.visible = visibility > 0 && piece.slot.id !== state.heroId;
+      const fade = readFade(piece.slot.id, now);
+      const opacity = visibility * fade;
+      piece.root.visible = opacity >= MIN_OPACITY;
       if (!piece.root.visible) continue;
+      setOpacity(piece, opacity);
+      const tilt = readTilt(piece.slot.id, now);
       piece.root.position.set(point.x, FOCUSED_LIFT * focus * scale, point.z);
-      piece.root.scale.setScalar(scale * (1 + FOCUSED_SCALE_GAIN * focus));
-      const strength = visibility * (DIMMED + (1 - DIMMED) * focus);
+      piece.root.rotation.set(tilt.x, 0, tilt.z);
+      // A fading hero piece shrinks a little as it gives way to its icon.
+      piece.root.scale.setScalar(scale * (1 + FOCUSED_SCALE_GAIN * focus) * (0.92 + 0.08 * fade));
+      const strength = DIMMED + (1 - DIMMED) * focus;
       for (const { material } of piece.materials) {
         const base = material.userData.base;
         if (base instanceof Color) material.color.copy(tableColor).lerp(base, strength);
@@ -236,6 +311,7 @@ export async function createTabletopScene(
       if (piece.lever) piece.lever.rotation.z = state.isSoundOn ? -LEVER_ANGLE : LEVER_ANGLE;
     }
     renderer.render(scene, camera);
+    keepAnimating();
   }
 
   return {
@@ -251,8 +327,12 @@ export async function createTabletopScene(
         if (!model) return [];
         const root = model.clone(true);
         const materials = collectMaterials(root);
+        const meshes: Mesh[] = [];
+        root.traverse((node) => {
+          if (node instanceof Mesh) meshes.push(node);
+        });
         scene.add(root);
-        return [{ slot, root, materials, lever: slot.modelUrl === SWITCH_MODEL ? (root.getObjectByName("lever") ?? null) : null }];
+        return [{ slot, root, materials, meshes, lever: slot.modelUrl === SWITCH_MODEL ? (root.getObjectByName("lever") ?? null) : null }];
       });
       applyColors();
     },
@@ -282,7 +362,12 @@ export async function createTabletopScene(
       qualityLevel = next;
       applyQuality();
     },
+    wobble(id, random) {
+      wobbles.set(id, { value: createWobble(random), startedAt: performance.now() });
+      if (lastState) draw(lastState);
+    },
     dispose() {
+      window.cancelAnimationFrame(animationId);
       for (const piece of pieces) for (const { material } of piece.materials) material.dispose();
       void renderer.dispose();
     },
