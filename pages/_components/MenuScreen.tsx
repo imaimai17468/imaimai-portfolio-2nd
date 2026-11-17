@@ -28,7 +28,10 @@ import {
   type MenuAxis,
 } from "./menu-motion";
 import { collectRowElements, paintRow } from "./menu-paint";
-import { createMenuScroller, type MenuScroller } from "./menu-scroller";
+import { createMenuScroller, type MenuFrame, type MenuScroller } from "./menu-scroller";
+import type { SceneState, TabletopScene } from "./scene/scene";
+import { listModelUrls, readSlotOrigins } from "./scene/slots";
+import { readTranslate } from "./scene/translate";
 import "./menu.css";
 
 type DetailSub = SubItem & { readonly action: Extract<SubItem["action"], { kind: "detail" }> };
@@ -41,6 +44,19 @@ const SELECTED_ICON_SCALE = 1.2;
 const HERO_RETURN_TRANSITION = "transform 550ms var(--ease-in-out) 150ms";
 const HERO_RETURN_MS = 700;
 const DETAIL_FADE_OUT_MS = 250;
+// Long enough for the farthest exit (150ms + 2 steps of 90ms + 520ms) and the
+// hero's way back (700ms) to finish before the 3D pieces stop following them.
+const EXIT_FOLLOW_MS = 1600;
+// Paints further apart than this are separate gestures, not one slow frame.
+const FRAME_GAP_MS = 100;
+
+function readExitOffset(stage: HTMLElement, id: string): { x: number; y: number } {
+  const [kind, row, sub] = id.split("-");
+  const rowElement = stage.querySelector<HTMLElement>(`[data-row="${row}"]`);
+  const item = kind === "main" ? rowElement?.querySelector(".menu-main-item") : rowElement?.querySelector(`[data-sub="${sub}"]`);
+  const parts = [rowElement, item].map((element) => (element ? readTranslate(getComputedStyle(element).translate) : { x: 0, y: 0 }));
+  return parts.reduce((sum, part) => ({ x: sum.x + part.x, y: sum.y + part.y }), { x: 0, y: 0 });
+}
 
 function countItems(axis: MenuAxis, mainIndex: number): number {
   return axis === "main" ? MENU.length : (MENU[mainIndex]?.subs.length ?? 0);
@@ -84,6 +100,10 @@ export default function MenuScreen() {
   const [detailSub, setDetailSub] = useState<DetailSub | null>(null);
   const [heroSubIndex, setHeroSubIndex] = useState(0);
   const [isHeroLanded, setIsHeroLanded] = useState(false);
+  const [isSceneReady, setIsSceneReady] = useState(false);
+  // The opened item whose 3D piece gives way to its 2D icon, from opening until
+  // the icon has flown back after closing.
+  const [sceneHeroId, setSceneHeroId] = useState<string | null>(null);
   const stageRef = useRef<HTMLElement>(null);
   const backButtonRef = useRef<HTMLButtonElement>(null);
   const detailRef = useRef<HTMLElement>(null);
@@ -91,6 +111,13 @@ export default function MenuScreen() {
   const closeTimers = useRef<number[]>([]);
   const scrollerRef = useRef<MenuScroller | null>(null);
   const tapCount = useRef(0);
+  const sceneRef = useRef<TabletopScene | null>(null);
+  const paintSceneRef = useRef<(frame?: MenuFrame) => void>(() => {});
+  const sceneInputRef = useRef<{ isSoundOn: boolean; heroId: string | null; offsets: ReadonlyMap<string, { x: number; y: number }> }>({
+    isSoundOn: false,
+    heroId: null,
+    offsets: new Map(),
+  });
 
   const subs = MENU[mainIndex]?.subs ?? [];
   const anchorSubIndex = isDetailOpen ? heroSubIndex : subIndex;
@@ -113,10 +140,36 @@ export default function MenuScreen() {
     const stage = stageRef.current;
     const rowsElement = stage?.querySelector<HTMLElement>(".menu-rows");
     if (!stage || !rowsElement) return;
+    const stageElement = stage;
     const readSize = (name: string) => Number.parseFloat(getComputedStyle(stage).getPropertyValue(name)) || 1;
-    let sizes = { row: readSize("--row"), sub: readSize("--sub-width") };
+    const bandElement = stage.querySelector<HTMLElement>(".menu-band");
+    const canvas = stage.querySelector<HTMLCanvasElement>(".menu-scene");
+    let sizes = { row: readSize("--row"), sub: readSize("--sub-width"), icon: readSize("--main-icon") };
+    let band = { top: bandElement?.offsetTop ?? 0, height: bandElement?.offsetHeight ?? 0 };
+    let lastPaintTime = 0;
+    let isDisposed = false;
+
+    function buildSceneState(frame: MenuFrame): SceneState {
+      const input = sceneInputRef.current;
+      return {
+        frame,
+        layout: { row: sizes.row, subWidth: sizes.sub, iconSize: sizes.icon },
+        band,
+        offsets: input.offsets,
+        heroId: input.heroId,
+        isSoundOn: input.isSoundOn,
+      };
+    }
+    function placeScene(scene: TabletopScene) {
+      const frame = scroller.readFrame();
+      scene.setSlots(readSlotOrigins(stageElement, frame, { row: sizes.row, subWidth: sizes.sub }));
+      scene.resize(window.innerWidth, window.innerHeight, window.devicePixelRatio);
+      scene.render(buildSceneState(frame));
+    }
     function handleResize() {
-      sizes = { row: readSize("--row"), sub: readSize("--sub-width") };
+      sizes = { row: readSize("--row"), sub: readSize("--sub-width"), icon: readSize("--main-icon") };
+      band = { top: bandElement?.offsetTop ?? 0, height: bandElement?.offsetHeight ?? 0 };
+      if (sceneRef.current) placeScene(sceneRef.current);
     }
     window.addEventListener("resize", handleResize);
     const rows = collectRowElements(stage);
@@ -127,15 +180,94 @@ export default function MenuScreen() {
       paint(frame) {
         rowsElement.style.transform = `translate3d(0, ${-frame.main * sizes.row}px, 0)`;
         for (const row of rows) paintRow(row, frame, sizes.sub);
+        const scene = sceneRef.current;
+        if (!scene) return;
+        const now = performance.now();
+        if (now - lastPaintTime < FRAME_GAP_MS) scene.recordFrameTime(now - lastPaintTime);
+        lastPaintTime = now;
+        scene.render(buildSceneState(frame));
       },
     });
     scrollerRef.current = scroller;
+    paintSceneRef.current = (frame) => sceneRef.current?.render(buildSceneState(frame ?? scroller.readFrame()));
+
+    // The 3D library loads only in the browser and only after the 2D menu is
+    // on screen; where it cannot start, the 2D menu simply stays.
+    if (canvas) {
+      void import("./scene/scene").then(async ({ createTabletopScene }) => {
+        const root = document.documentElement;
+        const scene = await createTabletopScene(canvas, (name) => getComputedStyle(root).getPropertyValue(name), listModelUrls());
+        if (!scene) return;
+        if (isDisposed) {
+          scene.dispose();
+          return;
+        }
+        sceneRef.current = scene;
+        placeScene(scene);
+        setIsSceneReady(true);
+      });
+    }
+
     return () => {
+      isDisposed = true;
       window.removeEventListener("resize", handleResize);
       scroller.destroy();
       scrollerRef.current = null;
+      sceneRef.current?.dispose();
+      sceneRef.current = null;
+      paintSceneRef.current = () => {};
     };
   }, []);
+
+  // Synchronise the 3D switch's lever with the sound setting.
+  useEffect(() => {
+    sceneInputRef.current.isSoundOn = isSoundOn;
+    paintSceneRef.current();
+  }, [isSoundOn]);
+
+  // Synchronise the hidden 3D piece with the item whose 2D icon is flying.
+  useEffect(() => {
+    sceneInputRef.current.heroId = sceneHeroId;
+    paintSceneRef.current();
+  }, [sceneHeroId]);
+
+  // Synchronise the scene's colours with the colour scheme.
+  useEffect(() => {
+    const query = window.matchMedia("(prefers-color-scheme: dark)");
+    function handleChange() {
+      sceneRef.current?.refreshColors();
+    }
+    query.addEventListener("change", handleChange);
+    return () => query.removeEventListener("change", handleChange);
+  }, []);
+
+  // While the DOM items leave or return, the pieces follow their translate.
+  function followExit(onDone?: () => void) {
+    const stage = stageRef.current;
+    if (!stage || !sceneRef.current) {
+      onDone?.();
+      return;
+    }
+    const startedAt = performance.now();
+    const ids = [...stage.querySelectorAll<HTMLElement>("[data-row]")].flatMap((rowElement) => {
+      const row = rowElement.dataset.row;
+      const subIds = [...rowElement.querySelectorAll<HTMLElement>("[data-sub]")].map((sub) => `sub-${row}-${sub.dataset.sub}`);
+      return [`main-${row}`, ...subIds];
+    });
+    function step(now: number) {
+      if (!stage) return;
+      sceneInputRef.current.offsets = new Map(ids.map((id) => [id, readExitOffset(stage, id)]));
+      paintSceneRef.current();
+      if (now - startedAt < EXIT_FOLLOW_MS) {
+        window.requestAnimationFrame(step);
+        return;
+      }
+      sceneInputRef.current.offsets = new Map();
+      onDone?.();
+      paintSceneRef.current();
+    }
+    window.requestAnimationFrame(step);
+  }
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -248,6 +380,8 @@ export default function MenuScreen() {
     });
     scrollerRef.current?.setInputEnabled(false);
     backButtonRef.current?.focus({ preventScroll: true });
+    setSceneHeroId(`sub-${mainIndex}-${index}`);
+    followExit();
     cue("transition_up");
   }
 
@@ -291,6 +425,7 @@ export default function MenuScreen() {
     stageRef.current?.querySelector<HTMLElement>(`[data-row="${mainIndex}"] [data-sub="${subIndex}"]`)?.focus({
       preventScroll: true,
     });
+    followExit(() => setSceneHeroId(null));
     cue("transition_down");
   }
 
@@ -426,7 +561,10 @@ export default function MenuScreen() {
       onTransitionEnd={handleTransitionEnd}
       data-detail={isDetailOpen ? "open" : undefined}
       data-hero-landed={isHeroLanded || undefined}
+      data-scene={isSceneReady ? "ready" : undefined}
+      data-scene-hero={sceneHeroId ? "" : undefined}
     >
+      <canvas className="menu-scene" aria-hidden="true" />
       <div className="menu-band" aria-hidden="true" />
 
       <nav className="menu-rows" aria-label="メインメニュー" inert={isDetailOpen}>

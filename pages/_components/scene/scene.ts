@@ -8,7 +8,7 @@ import {
   MeshBasicMaterial,
   MeshStandardMaterial,
   PerspectiveCamera,
-  PCFSoftShadowMap,
+  PCFShadowMap,
   PlaneGeometry,
   Scene,
   ShadowMaterial,
@@ -62,13 +62,15 @@ const FOCUSED_LIFT = 0.12;
 // A model's footprint is at most 0.7 units; on screen at the band it spans
 // this many times the 2D icon it replaces.
 const MODEL_FOOTPRINT = 0.7;
-const SCREEN_SPAN_PER_ICON = 1.3;
+const SCREEN_SPAN_PER_ICON = 0.95;
 const LEVER_ANGLE = (25 * Math.PI) / 180;
 const SWITCH_MODEL = "/models/sound--switch.glb";
 
 function placeCamera(camera: PerspectiveCamera): void {
-  // Above and to the front right of the table, looking down about 50 degrees.
-  camera.position.set(5, 16, 12);
+  // Above and slightly to the front right of the table, looking down about
+  // 50 degrees. A wider swing to the side, or a wider lens, tips the pieces at
+  // the screen's edges outward, so the lens is long and the camera far.
+  camera.position.set(3.3, 26.5, 21.5);
   camera.lookAt(0, 0, 0);
 }
 
@@ -100,7 +102,7 @@ export async function createTabletopScene(
     return null;
   }
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = PCFSoftShadowMap;
+  renderer.shadowMap.type = PCFShadowMap;
 
   const loader = new GLTFLoader();
   loader.setMeshoptDecoder(MeshoptDecoder);
@@ -116,7 +118,7 @@ export async function createTabletopScene(
   );
 
   const scene = new Scene();
-  const camera = new PerspectiveCamera(30, 1, 0.1, 200);
+  const camera = new PerspectiveCamera(18, 1, 0.1, 400);
   placeCamera(camera);
 
   const hemisphere = new HemisphereLight(0xffffff, 0xffffff, 1.6);
@@ -248,7 +250,9 @@ export async function createTabletopScene(
         const base = material.userData.base;
         if (base instanceof Color) material.color.copy(tableColor).lerp(base, strength);
       }
-      if (piece.lever) piece.lever.rotation.x = state.isSoundOn ? LEVER_ANGLE : -LEVER_ANGLE;
+      // Tipped right when on and left when off, across the camera's view, so
+      // both positions read at a glance.
+      if (piece.lever) piece.lever.rotation.z = state.isSoundOn ? -LEVER_ANGLE : LEVER_ANGLE;
     }
     renderer.render(scene, camera);
   }
