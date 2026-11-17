@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from "react";
 import { flushSync } from "react-dom";
+import { bgm } from "../../src/lib/bgm/player";
 import { piano } from "../../src/lib/piano/player";
 import type { PianoSound } from "../../src/lib/piano/sprite";
 import { EdgeBlur } from "./EdgeBlur";
@@ -76,7 +77,9 @@ function exitStyle(exit: Exit): CSSProperties {
 export default function MenuScreen() {
   const [mainIndex, setMainIndex] = useState(0);
   const [subIndex, setSubIndex] = useState(0);
-  const [isSoundOn, setIsSoundOn] = useState(true);
+  // Sound starts off, so the BGM begins from the tap that turns the switch on,
+  // which a browser always counts as a user gesture.
+  const [isSoundOn, setIsSoundOn] = useState(false);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [detailSub, setDetailSub] = useState<DetailSub | null>(null);
   const [heroSubIndex, setHeroSubIndex] = useState(0);
@@ -154,7 +157,9 @@ export default function MenuScreen() {
     window.addEventListener("pointerdown", unlockAudio);
     window.addEventListener("keydown", unlockAudio);
     window.addEventListener("touchend", unlockAudio);
+    window.addEventListener("click", unlockAudio);
     return () => {
+      window.removeEventListener("click", unlockAudio);
       window.removeEventListener("pointerdown", unlockAudio);
       window.removeEventListener("keydown", unlockAudio);
       window.removeEventListener("touchend", unlockAudio);
@@ -295,10 +300,12 @@ export default function MenuScreen() {
       case "soundSwitch":
         if (isSoundOn) {
           cue("toggle_off");
+          bgm.stop();
           setIsSoundOn(false);
         } else {
           setIsSoundOn(true);
           piano.play("toggle_on", SOUND_VOLUME);
+          bgm.start();
         }
         return;
       case "link":

@@ -30,6 +30,7 @@ export function createPianoPlayer(fetchAudio: FetchAudio): PianoPlayer {
     },
     play(sound, volume = 1) {
       const audioContext = getContext();
+      if (audioContext.state === "suspended") void audioContext.resume();
       decoded ??= fetchAudio(audioUrl)
         .then((response) => response.arrayBuffer())
         .then((data) => audioContext.decodeAudioData(data));
