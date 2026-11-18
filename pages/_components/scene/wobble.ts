@@ -13,9 +13,9 @@ export interface Wobble {
 // the piece settles, the rhythm of something set down on a table. A row of
 // equal hops reads as a shiver instead.
 export const HOPS: readonly { readonly ms: number; readonly height: number }[] = [
-  { ms: 150, height: 1 },
-  { ms: 85, height: 0.32 },
-  { ms: 50, height: 0.1 },
+  { ms: 110, height: 1 },
+  { ms: 65, height: 0.32 },
+  { ms: 40, height: 0.1 },
 ];
 export const WOBBLE_MS = HOPS.reduce((sum, hop) => sum + hop.ms, 0);
 const MIN_DEGREES = 8;

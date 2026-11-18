@@ -33,6 +33,14 @@ describe("detectArrival", () => {
     expect(detectArrival(armed(1.88), frame(1.9)).arrivedSub).toBe(2);
   });
 
+  test("the rattle starts while the row is still closing in, a quarter of an item away", () => {
+    expect(detectArrival(armed(1.66), frame(1.74)).arrivedSub).toBe(2);
+  });
+
+  test("moving away from an item is not an arrival, however slow", () => {
+    expect(detectArrival(armed(1.78), frame(1.76)).arrivedSub).toBeNull();
+  });
+
   test("an arrival counts once", () => {
     const first = detectArrival(armed(1.9995), frame(2.0004));
     expect(first.arrivedSub).toBe(2);

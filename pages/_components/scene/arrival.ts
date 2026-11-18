@@ -10,13 +10,14 @@ export interface ArrivalState {
   readonly previous: number;
 }
 
-// Further than SLIDING from an item, the row is sliding. Closer than LANDING
-// and moving less than SLOW per paint, it is settling onto the item, and the
-// rattle starts so it meets the landing rather than following the spring's
-// long tail. A row sweeping over an item on its way elsewhere moves faster.
-const SLIDING = 0.3;
-const LANDING = 0.12;
-const SLOW = 0.04;
+// Further than SLIDING from an item, the row is sliding. Within LANDING of an
+// item, closing in on it and moving less than SLOW per paint, it is settling
+// onto the item, and the rattle starts while the row is still a quarter of an
+// item away, so the knock lands with the row instead of after the spring's long
+// tail. A row sweeping over an item on its way elsewhere moves faster.
+const SLIDING = 0.35;
+const LANDING = 0.3;
+const SLOW = 0.1;
 
 export function detectArrival(state: ArrivalState, frame: MenuFrame): { state: ArrivalState; arrivedSub: number | null } {
   if (frame.subOwner !== state.owner) {
@@ -27,6 +28,7 @@ export function detectArrival(state: ArrivalState, frame: MenuFrame): { state: A
   const speed = Math.abs(frame.sub - state.previous);
   const next = { ...state, previous: frame.sub };
   if (distance > SLIDING) return { state: { ...next, isArmed: true }, arrivedSub: null };
-  if (state.isArmed && distance < LANDING && speed < SLOW) return { state: { ...next, isArmed: false }, arrivedSub: nearest };
+  const isClosing = distance < Math.abs(state.previous - nearest);
+  if (state.isArmed && isClosing && distance < LANDING && speed < SLOW) return { state: { ...next, isArmed: false }, arrivedSub: nearest };
   return { state: next, arrivedSub: null };
 }
