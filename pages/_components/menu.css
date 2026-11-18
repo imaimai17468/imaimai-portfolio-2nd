@@ -718,18 +718,10 @@ html:has(.menu) {
   transition: opacity 400ms var(--ease-in-out) var(--hero-grow-delay);
 }
 
-/* The board tilts into place first, then the pieces appear on it. */
+/* The board tilts into place first, then the scene sets the pieces down on
+   it one after another (intro.ts). */
 .menu[data-scene="ready"] .menu-scene {
   visibility: visible;
-  /* backwards only: a fill held after the end would pin the opacity, and the
-     fade on opening an item would jump to 0 instead of transitioning. */
-  animation: menu-scene-in 300ms var(--ease-out) 650ms backwards;
-}
-
-@keyframes menu-scene-in {
-  from {
-    opacity: 0;
-  }
 }
 
 /* The pieces leave with their items, and the scene fades only after the
@@ -815,9 +807,5 @@ html:has(.menu) {
 
   .menu-board {
     transition: none;
-  }
-
-  .menu[data-scene="ready"] .menu-scene {
-    animation: none;
   }
 }

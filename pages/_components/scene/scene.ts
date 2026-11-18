@@ -37,6 +37,7 @@ import {
 } from "./placement";
 import { createMotes, measureMote, type Mote } from "./dust";
 import { measureFade, type Fade } from "./fade";
+import { DROP_MS, INTRO_DELAY_MS, measureDrop, STAGGER_MS } from "./intro";
 import { chooseQualityLevel, QUALITY_LEVELS } from "./quality";
 import { readTokenColor } from "./tokens";
 import { createWobble, measureRimOffset, measureWobble, type Wobble } from "./wobble";
@@ -103,6 +104,10 @@ const HERO_FADE_MS = 250;
 const RIM_RADIUS = 0.28;
 const DUST_COUNT = 60;
 const AMBIENT_FRAME_MS = 32;
+// How far above the table, in icon sizes, a piece starts its fall on the first
+// showing, and how long the dust takes to come up after the pieces start.
+const DROP_HEIGHT = 0.9;
+const DUST_SHOW_MS = 800;
 const SWITCH_MODEL = "/models/sound--switch.glb";
 
 function collectMaterials(root: Object3D): Piece["materials"] {
@@ -222,6 +227,12 @@ export async function createTabletopScene(
   const fades = new Map<string, Motion<Fade>>();
   const wobbles = new Map<string, Motion<Wobble>>();
   let animationId = 0;
+  // The first showing: when it started, each piece's place in the sequence,
+  // the pieces that have landed, and when the last one lands.
+  let introStartedAt: number | null = null;
+  let introOrder = new Map<string, number>();
+  const landedIds = new Set<string>();
+  let introEndsAt = 0;
   // A deterministic source, so the dust lies the same way on every visit.
   let dustSeed = 0x2f6e2b1;
   function nextRandom(): number {
@@ -295,7 +306,7 @@ export async function createTabletopScene(
   // The dust alone keeps it drawing at about 30fps; reduced motion holds the
   // dust still and stops that loop.
   function keepAnimating() {
-    const isAmbientOnly = fades.size === 0 && wobbles.size === 0;
+    const isAmbientOnly = fades.size === 0 && wobbles.size === 0 && performance.now() >= introEndsAt;
     if (animationId || (isAmbientOnly && isMotionReduced)) return;
     animationId = window.requestAnimationFrame(function tick(now) {
       animationId = 0;
@@ -309,10 +320,12 @@ export async function createTabletopScene(
 
   function placeDust(now: number) {
     const elapsed = isMotionReduced ? 0 : now - startedAt;
+    const sinceIntro = now - (introStartedAt ?? now) - INTRO_DELAY_MS;
+    const shown = Math.min(Math.max(sinceIntro / DUST_SHOW_MS, 0), 1);
     motes.forEach((mote, index) => {
       const at = measureMote(mote, elapsed);
       dummy.position.set(at.x, at.y, at.z);
-      dummy.scale.setScalar(mote.size);
+      dummy.scale.setScalar(mote.size * shown);
       dummy.updateMatrix();
       dust.setMatrixAt(index, dummy.matrix);
     });
@@ -355,6 +368,28 @@ export async function createTabletopScene(
     for (const mesh of piece.meshes) mesh.castShadow = opacity > SHADOW_OPACITY;
   }
 
+  // The pieces on screen at the first showing fall in reading order: top to
+  // bottom, then left to right. The rest are hidden by the menu anyway.
+  function startIntro(state: SceneState, now: number) {
+    introStartedAt = now;
+    const shown = pieces
+      .filter((piece) => measureEmphasis(piece.slot, state.frame).visibility > 0)
+      .map((piece) => ({ id: piece.slot.id, center: measureSlotCenter(piece.slot, state.frame, state.layout) }))
+      .sort((a, b) => a.center.y - b.center.y || a.center.x - b.center.x);
+    introOrder = new Map(shown.map((entry, index) => [entry.id, index]));
+    introEndsAt = now + INTRO_DELAY_MS + Math.max(shown.length - 1, 0) * STAGGER_MS + DROP_MS;
+  }
+
+  function readDrop(id: string, now: number) {
+    const drop = measureDrop(introOrder.get(id) ?? 0, now - (introStartedAt ?? now), isMotionReduced);
+    if (drop.hasLanded && !landedIds.has(id)) {
+      landedIds.add(id);
+      const isIntroLanding = now < introEndsAt + DROP_MS;
+      if (isIntroLanding && !isMotionReduced) wobbles.set(id, { value: createWobble(Math.random), startedAt: now });
+    }
+    return drop;
+  }
+
   function draw(state: SceneState) {
     const isViewChanged = lastState?.layout.board !== state.layout.board;
     lastState = state;
@@ -364,6 +399,7 @@ export async function createTabletopScene(
     }
     if (state.heroId !== heroId) startHeroFades(state.heroId);
     const now = performance.now();
+    if (introStartedAt === null && pieces.length > 0) startIntro(state, now);
     const scale = (state.layout.iconSize * SPAN_PER_ICON) / MODEL_FOOTPRINT;
     for (const piece of pieces) {
       const center = measureSlotCenter(piece.slot, state.frame, state.layout);
@@ -371,7 +407,8 @@ export async function createTabletopScene(
       const point = toTablePoint({ x: center.x + offset.x, y: center.y + offset.y }, state.layout.board);
       const { visibility, focus } = measureEmphasis(piece.slot, state.frame);
       const fade = readFade(piece.slot.id, now);
-      const opacity = visibility * fade;
+      const drop = readDrop(piece.slot.id, now);
+      const opacity = visibility * fade * drop.opacity;
       piece.root.visible = opacity >= MIN_OPACITY;
       if (!piece.root.visible) continue;
       setOpacity(piece, opacity);
@@ -379,7 +416,8 @@ export async function createTabletopScene(
       const pieceScale = scale * (1 + FOCUSED_SCALE_GAIN * focus) * (0.92 + 0.08 * fade);
       const tip = readTip(piece.slot.id, now);
       const rim = measureRimOffset(tip.angle, tip.direction, RIM_RADIUS * pieceScale);
-      piece.root.position.set(point.x + rim.x, FOCUSED_LIFT * focus * scale + rim.y, point.z + rim.z);
+      const fall = drop.lift * DROP_HEIGHT * state.layout.iconSize;
+      piece.root.position.set(point.x + rim.x, FOCUSED_LIFT * focus * scale + rim.y + fall, point.z + rim.z);
       // Tipping toward +x turns about -z, toward +z about +x.
       piece.root.rotation.set(tip.angle * Math.sin(tip.direction), 0, -tip.angle * Math.cos(tip.direction));
       piece.root.scale.setScalar(pieceScale);
