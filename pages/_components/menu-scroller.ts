@@ -1,3 +1,4 @@
+import { measureCross, pickLead } from "./drag-lead";
 import {
   applyDetent,
   applyRubberBand,
@@ -75,7 +76,16 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
   let leftover: { owner: number; spring: SpringState } | null = null;
   let frame = 0;
   let lastFrameTime = 0;
-  let drag: (Gesture & { pointerId: number; lastX: number; lastY: number; isDragging: boolean }) | null = null;
+  let drag:
+    | (Gesture & {
+        pointerId: number;
+        lastX: number;
+        lastY: number;
+        isDragging: boolean;
+        lead: MenuAxis;
+        crossTravel: number;
+      })
+    | null = null;
   let wheel: Gesture | null = null;
   let wheelTimer = 0;
   let shouldSuppressClick = false;
@@ -220,6 +230,8 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
       lastX: event.clientX,
       lastY: event.clientY,
       isDragging: false,
+      lead: "sub",
+      crossTravel: 0,
     };
   }
 
@@ -230,12 +242,19 @@ export function createMenuScroller(stage: HTMLElement, options: MenuScrollerOpti
     if (!drag.isDragging) {
       if (Math.hypot(dx, dy) < DRAG_START_PX) return;
       drag.isDragging = true;
+      drag.lead = pickLead(dx, dy);
       stage.setPointerCapture(event.pointerId);
     }
     drag.lastX = event.clientX;
     drag.lastY = event.clientY;
-    drag.raw.main -= dy / options.sizeOf("main");
-    drag.raw.sub -= dx / options.sizeOf("sub");
+    const isSideways = drag.lead === "sub";
+    const along = isSideways ? dx : dy;
+    const across = isSideways ? dy : dx;
+    const crossBefore = measureCross(drag.crossTravel);
+    drag.crossTravel += across;
+    const crossMove = measureCross(drag.crossTravel) - crossBefore;
+    drag.raw.main -= (isSideways ? crossMove : along) / options.sizeOf("main");
+    drag.raw.sub -= (isSideways ? along : crossMove) / options.sizeOf("sub");
     follow(drag, event.timeStamp);
   }
 
