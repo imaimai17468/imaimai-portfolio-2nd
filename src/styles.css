@@ -23,6 +23,17 @@
   --piece-red: #eec3c1;
   --piece-green: #d7ecdc;
   --piece-wood: #f0e1d0;
+  /* The scene's light: a warm sky filling the shade, a low warm sun, the
+     shadows it casts, and the dust hanging in it. A strength scales the colour
+     before it is drawn. */
+  --scene-sky: #fffbf5;
+  --scene-ground: #f2e9dc;
+  --scene-sun: #ffe9cf;
+  --scene-shadow: #6b4d2e;
+  --scene-shadow-strength: 0.13;
+  --scene-dust: #fff6e5;
+  --scene-dust-strength: 4;
+  --scene-dust-size: 1;
 
   --font-sans: "LINE Seed JP", system-ui, sans-serif;
   --font-weight-body: 700;
@@ -63,16 +74,27 @@
     --foreground: var(--white);
     color-scheme: dark;
 
-    --table: #232323;
-    --table-band: #2f2f2f;
-    --piece-white: #d9d9d6;
-    --piece-grey: #8a8c93;
-    --piece-dark: #5a5c63;
-    --piece-blue: #86aed8;
-    --piece-gold: #d6b464;
-    --piece-red: #c25d57;
-    --piece-green: #87b993;
-    --piece-wood: #c29e76;
+    --table: #221f1c;
+    --table-band: #2d2925;
+    --piece-white: #e4e2dd;
+    --piece-grey: #bdbcbc;
+    --piece-dark: #a5a4a4;
+    --piece-blue: #bbcdde;
+    --piece-gold: #e3d0a4;
+    --piece-red: #d9a49e;
+    --piece-green: #bcd2bc;
+    --piece-wood: #d9c5ad;
+    /* A lamp in a dim room: pale pieces whose lit faces stand out against
+       the shade, darker shadows, and dust small and faint enough to sit in
+       the light instead of floating over the dark table. */
+    --scene-sky: #c2b8ac;
+    --scene-ground: #2a2622;
+    --scene-sun: #ffe4c4;
+    --scene-shadow: #000000;
+    --scene-shadow-strength: 0.4;
+    --scene-dust: #ffe2bd;
+    --scene-dust-strength: 0.6;
+    --scene-dust-size: 0.5;
   }
 }
 

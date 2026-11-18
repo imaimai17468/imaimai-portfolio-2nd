@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vite-plus/test";
 import { MENU } from "../menu-content";
-import { modelUrlOf, readTokenColor } from "./tokens";
+import { modelUrlOf, readTokenColor, readTokenNumber } from "./tokens";
 
 describe("readTokenColor", () => {
   test("reads a hex token with surrounding spaces", () => {
@@ -30,5 +30,16 @@ describe("modelUrlOf", () => {
     const files = new Set(Object.keys(import.meta.glob("/public/models/*.glb")).map((path) => path.replace(/^\/public/, "")));
     const missing = urls.filter((url) => !files.has(url));
     expect(missing).toEqual([]);
+  });
+});
+
+describe("readTokenNumber", () => {
+  test("reads a plain number the stylesheet declares", () => {
+    expect(readTokenNumber(() => " 0.45", "--scene-shadow-strength")).toBe(0.45);
+  });
+
+  test("gives null for a missing or non-numeric value, so the caller keeps its default", () => {
+    expect(readTokenNumber(() => "", "--scene-shadow-strength")).toBeNull();
+    expect(readTokenNumber(() => "12px", "--scene-shadow-strength")).toBeNull();
   });
 });

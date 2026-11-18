@@ -39,7 +39,7 @@ import { createMotes, measureMote, type Mote } from "./dust";
 import { measureFade, type Fade } from "./fade";
 import { DROP_MS, INTRO_DELAY_MS, measureDrop, STAGGER_MS } from "./intro";
 import { chooseQualityLevel, QUALITY_LEVELS } from "./quality";
-import { readTokenColor } from "./tokens";
+import { readTokenColor, readTokenNumber } from "./tokens";
 import { measureLever, type LeverSwing } from "./lever";
 import { createWobble, measureRimOffset, measureWobble, type Wobble } from "./wobble";
 
@@ -175,7 +175,9 @@ export async function createTabletopScene(
   const camera = new PerspectiveCamera(30, 1, 1, 20000);
 
   // Morning light: a low, warm sun from behind and to the left throws long
-  // soft shadows toward the viewer, and a warm sky fills the shade.
+  // soft shadows toward the viewer, and a warm sky fills the shade. Their
+  // colours and strengths come from the `--scene-*` tokens in applyColors,
+  // which turn the morning into a lamp-lit room in dark mode.
   const hemisphere = new HemisphereLight(0xfffbf5, 0xf2e9dc, 1.7);
   const sun = new DirectionalLight(0xffe9cf, 2.4);
   sun.castShadow = true;
@@ -186,7 +188,8 @@ export async function createTabletopScene(
   // The table is the DOM under the canvas; this plane only receives the
   // pieces' shadows, tinted warm rather than grey. It is measured in px, so it
   // reaches far past any screen.
-  const shadowCatcher = new Mesh(new PlaneGeometry(40000, 40000), new ShadowMaterial({ opacity: 0.13, color: 0x6b4d2e }));
+  const shadowMaterial = new ShadowMaterial({ opacity: 0.13, color: 0x6b4d2e });
+  const shadowCatcher = new Mesh(new PlaneGeometry(40000, 40000), shadowMaterial);
   shadowCatcher.rotation.x = -Math.PI / 2;
   shadowCatcher.position.y = 0;
   shadowCatcher.receiveShadow = true;
@@ -197,9 +200,10 @@ export async function createTabletopScene(
   scene.fog = fog;
 
   // Dust hanging in the light, bright enough for the bloom to catch.
+  const dustMaterial = new MeshBasicMaterial({ color: new Color(1, 0.92, 0.78).multiplyScalar(4), fog: false });
   const dust = new InstancedMesh(
     new SphereGeometry(1, 8, 6),
-    new MeshBasicMaterial({ color: new Color(1, 0.92, 0.78).multiplyScalar(4), fog: false }),
+    dustMaterial,
     DUST_COUNT,
   );
   dust.frustumCulled = false;
@@ -208,6 +212,7 @@ export async function createTabletopScene(
   let motes: Mote[] = [];
   const startedAt = performance.now();
   let lastAmbientDraw = 0;
+  let dustSize = 1;
 
   // Highlights glow softly past their edges. The glow adds to the colour but
   // keeps the scene's alpha: the canvas is premultiplied, so glow over an empty
@@ -252,6 +257,13 @@ export async function createTabletopScene(
   function applyColors() {
     tableColor.setHex(readColor("--table", 0xeeeeec));
     fog.color.copy(tableColor);
+    hemisphere.color.setHex(readColor("--scene-sky", 0xfffbf5));
+    hemisphere.groundColor.setHex(readColor("--scene-ground", 0xf2e9dc));
+    sun.color.setHex(readColor("--scene-sun", 0xffe9cf));
+    shadowMaterial.color.setHex(readColor("--scene-shadow", 0x6b4d2e));
+    dustSize = readTokenNumber(readToken, "--scene-dust-size") ?? 1;
+    shadowMaterial.opacity = readTokenNumber(readToken, "--scene-shadow-strength") ?? 0.13;
+    dustMaterial.color.setHex(readColor("--scene-dust", 0xfff6e5)).multiplyScalar(readTokenNumber(readToken, "--scene-dust-strength") ?? 4);
     for (const piece of pieces) {
       for (const { material, token } of piece.materials) {
         material.userData.base = new Color(readColor(token, 0xffffff));
@@ -329,7 +341,7 @@ export async function createTabletopScene(
     motes.forEach((mote, index) => {
       const at = measureMote(mote, elapsed);
       dummy.position.set(at.x, at.y, at.z);
-      dummy.scale.setScalar(mote.size * shown);
+      dummy.scale.setScalar(mote.size * dustSize * shown);
       dummy.updateMatrix();
       dust.setMatrixAt(index, dummy.matrix);
     });

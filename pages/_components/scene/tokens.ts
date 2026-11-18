@@ -20,6 +20,14 @@ export function readTokenColor(read: (name: string) => string, token: string): n
   return match?.[1] ? Number.parseInt(match[1], 16) : null;
 }
 
+const PLAIN_NUMBER = /^-?\d+(\.\d+)?$/;
+
+// For the scene's unitless settings, such as how dark a shadow falls.
+export function readTokenNumber(read: (name: string) => string, token: string): number | null {
+  const value = read(token).trim();
+  return PLAIN_NUMBER.test(value) ? Number(value) : null;
+}
+
 export function modelUrlOf(mainId: string, subId: string | null): string {
   return subId === null ? `/models/${mainId}.glb` : `/models/${mainId}--${subId}.glb`;
 }
