@@ -15,14 +15,14 @@
      a custom property's computed value is its declared text. */
   --table: #f1ece4;
   --table-band: #e4ddd2;
-  --piece-white: #f2f2f0;
-  --piece-grey: #9a9ca3;
-  --piece-dark: #3a3b40;
-  --piece-blue: #9cc3ec;
-  --piece-gold: #edc977;
-  --piece-red: #d46a64;
-  --piece-green: #9ccfa8;
-  --piece-wood: #d9b48a;
+  --piece-white: #fafaf9;
+  --piece-grey: #d7d7da;
+  --piece-dark: #b0b0b3;
+  --piece-blue: #d7e7f7;
+  --piece-gold: #f8e9c8;
+  --piece-red: #eec3c1;
+  --piece-green: #d7ecdc;
+  --piece-wood: #f0e1d0;
 
   --font-sans: "LINE Seed JP", system-ui, sans-serif;
   --font-weight-body: 700;
