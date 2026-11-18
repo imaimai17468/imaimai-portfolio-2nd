@@ -13,8 +13,8 @@
 
   /* The 3D menu reads these with getComputedStyle, so they stay hex literals:
      a custom property's computed value is its declared text. */
-  --table: #eeeeec;
-  --table-band: #dcdcda;
+  --table: #f1ece4;
+  --table-band: #e4ddd2;
   --piece-white: #f2f2f0;
   --piece-grey: #9a9ca3;
   --piece-dark: #3a3b40;

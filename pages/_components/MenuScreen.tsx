@@ -278,7 +278,7 @@ export default function MenuScreen() {
           sceneRef.current?.dispose();
           sceneRef.current = null;
           setIsSceneReady(false);
-        });
+        }, window.matchMedia("(prefers-reduced-motion: reduce)").matches);
         if (!scene) {
           setIsSceneLoading(false);
           return;

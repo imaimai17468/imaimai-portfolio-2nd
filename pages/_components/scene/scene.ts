@@ -1,9 +1,15 @@
 import {
   Color,
   DirectionalLight,
+  Fog,
   HemisphereLight,
+  InstancedMesh,
   Mesh,
+  MeshBasicMaterial,
   MeshStandardMaterial,
+  NeutralToneMapping,
+  Object3D as Dummy,
+  SphereGeometry,
   PerspectiveCamera,
   PCFShadowMap,
   PlaneGeometry,
@@ -14,7 +20,9 @@ import {
 } from "three";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { WebGPURenderer } from "three/webgpu";
+import { bloom } from "three/addons/tsl/display/BloomNode.js";
+import { pass, vec4 } from "three/tsl";
+import { RenderPipeline, WebGPURenderer } from "three/webgpu";
 import type { MenuFrame } from "../menu-scroller";
 import {
   measureEmphasis,
@@ -27,6 +35,7 @@ import {
   type ScreenPoint,
   type SlotOrigin,
 } from "./placement";
+import { createMotes, measureMote, type Mote } from "./dust";
 import { measureFade, type Fade } from "./fade";
 import { chooseQualityLevel, QUALITY_LEVELS } from "./quality";
 import { readTokenColor } from "./tokens";
@@ -92,6 +101,8 @@ const HERO_FADE_MS = 250;
 // How far from the base centre a rattling piece pivots, in model units: a
 // little inside the 0.7 footprint, since most bases are narrower than it.
 const RIM_RADIUS = 0.28;
+const DUST_COUNT = 60;
+const AMBIENT_FRAME_MS = 32;
 const SWITCH_MODEL = "/models/sound--switch.glb";
 
 function collectMaterials(root: Object3D): Piece["materials"] {
@@ -115,6 +126,7 @@ export async function createTabletopScene(
   readToken: (name: string) => string,
   modelUrls: readonly string[],
   onLost: () => void,
+  isMotionReduced: boolean,
 ): Promise<TabletopScene | null> {
   // Transparent: the table and the printed labels are the DOM under the canvas,
   // so a piece in front hides the print behind it.
@@ -127,6 +139,9 @@ export async function createTabletopScene(
   renderer.setClearColor(0x000000, 0);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = PCFShadowMap;
+  // A soft curve, so the warm highlights roll off instead of clipping.
+  renderer.toneMapping = NeutralToneMapping;
+  renderer.toneMappingExposure = 1.05;
 
   const loader = new GLTFLoader();
   loader.setMeshoptDecoder(MeshoptDecoder);
@@ -153,20 +168,49 @@ export async function createTabletopScene(
   const scene = new Scene();
   const camera = new PerspectiveCamera(30, 1, 1, 20000);
 
-  const hemisphere = new HemisphereLight(0xffffff, 0xffffff, 1.6);
-  const sun = new DirectionalLight(0xffffff, 2.2);
+  // Morning light: a low, warm sun from behind and to the left throws long
+  // soft shadows toward the viewer, and a warm sky fills the shade.
+  const hemisphere = new HemisphereLight(0xfffbf5, 0xf2e9dc, 1.7);
+  const sun = new DirectionalLight(0xffe9cf, 2.4);
   sun.castShadow = true;
-  sun.shadow.radius = 6;
+  sun.shadow.radius = 8;
   sun.shadow.bias = -0.0005;
   scene.add(hemisphere, sun, sun.target);
 
   // The table is the DOM under the canvas; this plane only receives the
-  // pieces' shadows.
-  const shadowCatcher = new Mesh(new PlaneGeometry(400, 400), new ShadowMaterial({ opacity: 0.16 }));
+  // pieces' shadows, tinted warm rather than grey. It is measured in px, so it
+  // reaches far past any screen.
+  const shadowCatcher = new Mesh(new PlaneGeometry(40000, 40000), new ShadowMaterial({ opacity: 0.13, color: 0x6b4d2e }));
   shadowCatcher.rotation.x = -Math.PI / 2;
   shadowCatcher.position.y = 0;
   shadowCatcher.receiveShadow = true;
   scene.add(shadowCatcher);
+
+  // Haze: pieces further back melt into the table's warm colour.
+  const fog = new Fog(0xffffff, 1, 2);
+  scene.fog = fog;
+
+  // Dust hanging in the light, bright enough for the bloom to catch.
+  const dust = new InstancedMesh(
+    new SphereGeometry(1, 8, 6),
+    new MeshBasicMaterial({ color: new Color(1, 0.92, 0.78).multiplyScalar(4), fog: false }),
+    DUST_COUNT,
+  );
+  dust.frustumCulled = false;
+  scene.add(dust);
+  const dummy = new Dummy();
+  let motes: Mote[] = [];
+  const startedAt = performance.now();
+  let lastAmbientDraw = 0;
+
+  // Highlights glow softly past their edges. The glow adds to the colour but
+  // keeps the scene's alpha: the canvas is premultiplied, so glow over an empty
+  // pixel adds light to the DOM table under it instead of painting it black.
+  const pipeline = new RenderPipeline(renderer);
+  const scenePass = pass(scene, camera);
+  const sceneColor = scenePass.getTextureNode("output");
+  const glow = bloom(sceneColor, 0.5, 0.65, 0.78);
+  pipeline.outputNode = vec4(sceneColor.rgb.add(glow.rgb), sceneColor.a);
 
   let pieces: Piece[] = [];
   let viewport = { width: 1, height: 1 };
@@ -178,6 +222,12 @@ export async function createTabletopScene(
   const fades = new Map<string, Motion<Fade>>();
   const wobbles = new Map<string, Motion<Wobble>>();
   let animationId = 0;
+  // A deterministic source, so the dust lies the same way on every visit.
+  let dustSeed = 0x2f6e2b1;
+  function nextRandom(): number {
+    dustSeed = (dustSeed * 1664525 + 1013904223) >>> 0;
+    return dustSeed / 0x100000000;
+  }
   const tableColor = new Color();
 
   function readColor(token: string, fallback: number): number {
@@ -186,6 +236,7 @@ export async function createTabletopScene(
 
   function applyColors() {
     tableColor.setHex(readColor("--table", 0xeeeeec));
+    fog.color.copy(tableColor);
     for (const piece of pieces) {
       for (const { material, token } of piece.materials) {
         material.userData.base = new Color(readColor(token, 0xffffff));
@@ -223,7 +274,7 @@ export async function createTabletopScene(
     const radius = Math.max(...corners.map((point) => point.distanceTo(center))) + state.layout.iconSize * 2;
     const distance = state.layout.board.perspective * 2;
     sun.target.position.copy(center);
-    sun.position.copy(center).add(new Vector3(-0.35, 0.85, 0.4).normalize().multiplyScalar(distance));
+    sun.position.copy(center).add(new Vector3(-0.62, 0.42, -0.66).normalize().multiplyScalar(distance));
     const shadowCamera = sun.shadow.camera;
     shadowCamera.left = -radius;
     shadowCamera.right = radius;
@@ -232,16 +283,41 @@ export async function createTabletopScene(
     shadowCamera.near = distance * 0.2;
     shadowCamera.far = distance * 2;
     shadowCamera.updateProjectionMatrix();
+    const perspective = state.layout.board.perspective;
+    fog.near = perspective * 0.95;
+    fog.far = perspective * 2.8;
+    dustSeed = 0x2f6e2b1;
+    motes = createMotes(nextRandom, DUST_COUNT, { centerX: center.x, centerZ: center.z, radius: radius * 0.8, height: state.layout.iconSize * 4 });
   }
 
   // Fades and wobbles play on time rather than on the scroll, so while one
   // runs the scene redraws every frame from the last state.
+  // The dust alone keeps it drawing at about 30fps; reduced motion holds the
+  // dust still and stops that loop.
   function keepAnimating() {
-    if (animationId || (fades.size === 0 && wobbles.size === 0)) return;
-    animationId = window.requestAnimationFrame(() => {
+    const isAmbientOnly = fades.size === 0 && wobbles.size === 0;
+    if (animationId || (isAmbientOnly && isMotionReduced)) return;
+    animationId = window.requestAnimationFrame(function tick(now) {
       animationId = 0;
+      if (isAmbientOnly && now - lastAmbientDraw < AMBIENT_FRAME_MS) {
+        animationId = window.requestAnimationFrame(tick);
+        return;
+      }
       if (lastState) draw(lastState);
     });
+  }
+
+  function placeDust(now: number) {
+    const elapsed = isMotionReduced ? 0 : now - startedAt;
+    motes.forEach((mote, index) => {
+      const at = measureMote(mote, elapsed);
+      dummy.position.set(at.x, at.y, at.z);
+      dummy.scale.setScalar(mote.size);
+      dummy.updateMatrix();
+      dust.setMatrixAt(index, dummy.matrix);
+    });
+    dust.count = motes.length;
+    dust.instanceMatrix.needsUpdate = true;
   }
 
   function startHeroFades(next: string | null) {
@@ -316,7 +392,10 @@ export async function createTabletopScene(
       // both positions read at a glance.
       if (piece.lever) piece.lever.rotation.z = state.isSoundOn ? -LEVER_ANGLE : LEVER_ANGLE;
     }
-    renderer.render(scene, camera);
+    placeDust(now);
+    lastAmbientDraw = now;
+    if (qualityLevel >= QUALITY_LEVELS.length - 1) renderer.render(scene, camera);
+    else pipeline.render();
     keepAnimating();
   }
 
