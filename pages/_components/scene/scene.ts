@@ -40,6 +40,7 @@ import { measureFade, type Fade } from "./fade";
 import { DROP_MS, INTRO_DELAY_MS, measureDrop, STAGGER_MS } from "./intro";
 import { chooseQualityLevel, QUALITY_LEVELS } from "./quality";
 import { readTokenColor } from "./tokens";
+import { measureLever, type LeverSwing } from "./lever";
 import { createWobble, measureRimOffset, measureWobble, type Wobble } from "./wobble";
 
 export interface SceneLayout {
@@ -233,6 +234,9 @@ export async function createTabletopScene(
   let introOrder = new Map<string, number>();
   const landedIds = new Set<string>();
   let introEndsAt = 0;
+  // The lever's resting side, and its swing while the sound is switched.
+  let leverTarget: number | null = null;
+  let leverSwing: Motion<LeverSwing> | null = null;
   // A deterministic source, so the dust lies the same way on every visit.
   let dustSeed = 0x2f6e2b1;
   function nextRandom(): number {
@@ -306,7 +310,7 @@ export async function createTabletopScene(
   // The dust alone keeps it drawing at about 30fps; reduced motion holds the
   // dust still and stops that loop.
   function keepAnimating() {
-    const isAmbientOnly = fades.size === 0 && wobbles.size === 0 && performance.now() >= introEndsAt;
+    const isAmbientOnly = fades.size === 0 && wobbles.size === 0 && leverSwing === null && performance.now() >= introEndsAt;
     if (animationId || (isAmbientOnly && isMotionReduced)) return;
     animationId = window.requestAnimationFrame(function tick(now) {
       animationId = 0;
@@ -390,6 +394,24 @@ export async function createTabletopScene(
     return drop;
   }
 
+  // The first draw puts the lever where it rests; a later switch swings it
+  // from wherever it is, so a quick second tap turns it back mid-swing.
+  function readLever(target: number, now: number): number {
+    if (leverTarget === null || isMotionReduced) {
+      leverTarget = target;
+      return target;
+    }
+    if (target !== leverTarget) {
+      const from = leverSwing ? (measureLever(leverSwing.value, now - leverSwing.startedAt) ?? leverTarget) : leverTarget;
+      leverSwing = { value: { from, to: target }, startedAt: now };
+      leverTarget = target;
+    }
+    if (!leverSwing) return target;
+    const angle = measureLever(leverSwing.value, now - leverSwing.startedAt);
+    if (angle === null) leverSwing = null;
+    return angle ?? target;
+  }
+
   function draw(state: SceneState) {
     const isViewChanged = lastState?.layout.board !== state.layout.board;
     lastState = state;
@@ -428,7 +450,7 @@ export async function createTabletopScene(
       }
       // Tipped right when on and left when off, across the camera's view, so
       // both positions read at a glance.
-      if (piece.lever) piece.lever.rotation.z = state.isSoundOn ? -LEVER_ANGLE : LEVER_ANGLE;
+      if (piece.lever) piece.lever.rotation.z = readLever(state.isSoundOn ? -LEVER_ANGLE : LEVER_ANGLE, now);
     }
     placeDust(now);
     lastAmbientDraw = now;
